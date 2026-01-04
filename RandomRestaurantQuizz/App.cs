@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Models;
 
 namespace RandomRestaurantQuizz;
 
@@ -17,31 +18,35 @@ public sealed class App : IDisposable
         _cts = new CancellationTokenSource();
     }
 
+    private async Task<IReadOnlyList<PlaceResult>> GetRestaurants(GeoLoc center)
+    {
+        // Get all possible restaurants
+        var restaurants = (await _placesClient.GetRestaurantsInCity(center, 1000, _cts.Token)).Where(r => r.Photos?.Count > 0).ToList();
+
+        // Enrich with photos TODO fetch all photos
+        var restaurantsWithFirstPhoto = await _photoManager.GetFirstImages(restaurants, _cts.Token);
+
+        // Filter only those with at least one photo and more than 1 user rating
+        var selectedRestaurants = restaurantsWithFirstPhoto.Where(r => r.FirstImage is not null && r.UserRatingCount > 0).ToList().AsReadOnly();
+        _logger.LogInformation("Selected {SelectedRestaurantCount} out of {RestaurantCount}", selectedRestaurants.Count, restaurants.Count);
+
+        return selectedRestaurants;
+    }
+
     public async Task RunAsync()
     {
-        var restaurants = (await _placesClient.GetRestaurantsInDijonAsync()).ToList();
-        if (restaurants.Count == 0)
-        {
-            _logger.LogWarning("No restaurants found in Dijon.");
-            return;
-        }
+        Cities.Data.TryGetValue("Dijon", out var city);
 
-        var restaurantsWithFirstPhoto = await _photoManager.GetAllImages(restaurants, _cts.Token);
-        var without = restaurantsWithFirstPhoto.Count(r => r.FirstImage == null || r.FirstImage.Length == 0);
-        _logger.LogInformation("{WithCount} with photos, {WithoutCount} without", restaurants.Count - without, without);
-
-        foreach (var restaurant in restaurantsWithFirstPhoto)
+        foreach (var restaurant in await GetRestaurants(city))
         {
             _logger.LogInformation("====================================");
-            _logger.LogInformation("Name: {Name}", restaurant.DisplayName?.Text ?? "N/A");
-            _logger.LogInformation("Rating: {Rating} ⭐", restaurant.Rating?.ToString("0.0") ?? "N/A");
-            _logger.LogInformation("Reviews: {Reviews}", restaurant.UserRatingCount?.ToString() ?? "N/A");
-            _logger.LogInformation("Address: {Address}", restaurant.FormattedAddress ?? "N/A");
+            _logger.LogInformation("Name: {Name}", restaurant.DisplayName?.Text);
+            _logger.LogInformation("Rating: {Rating}⭐ ({UserRatingCount})", restaurant.Rating?.ToString("0.0"), restaurant.UserRatingCount);
+            _logger.LogInformation("Address: {Address}", restaurant.FormattedAddress);
             _logger.LogInformation("PhotoCount: {PhotoCount}", restaurant.Photos?.Count ?? 0);
-            await _photoManager.DisplayFirstImage(restaurant);
-            Console.ReadLine();
+            await _photoManager.OpenFirstImage(restaurant);
+            //Console.ReadLine();
         }
-
     }
 
     public void Dispose()

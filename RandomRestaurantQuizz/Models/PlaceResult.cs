@@ -1,5 +1,5 @@
-﻿
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+
 namespace RandomRestaurantQuizz.Models;
 
 public sealed class PlaceResult

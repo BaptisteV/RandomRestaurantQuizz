@@ -16,7 +16,6 @@ await Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((context, services) =>
     {
-        // Register HttpClient
         services.AddHttpClient();
 
         var apiKey = Environment.GetEnvironmentVariable("GOOGLE_PLACES_API_KEY");
@@ -25,21 +24,18 @@ await Host.CreateDefaultBuilder(args)
             throw new InvalidOperationException("GOOGLE_PLACES_API_KEY environment variable is not set.");
         }
 
-        // Register GooglePlacesClient as singleton
-        services.AddSingleton<GooglePlacesClient>(provider =>
+        services.AddSingleton(provider =>
         {
             var httpClient = provider.GetRequiredService<HttpClient>();
             return new GooglePlacesClient(httpClient, apiKey, provider.GetRequiredService<ILogger<GooglePlacesClient>>());
         });
 
-        // Register GooglePlacesClient as singleton
-        services.AddSingleton<PhotoManager>(provider =>
+        services.AddSingleton(provider =>
         {
             var httpClient = provider.GetRequiredService<HttpClient>();
             return new PhotoManager(httpClient, apiKey, provider.GetRequiredService<ILogger<PhotoManager>>());
         });
 
-        // Register your application runner
         services.AddTransient<App>();
     })
     .Build()

@@ -21,8 +21,7 @@ public sealed class GooglePlacesClient
         _logger = logger;
     }
 
-    public async Task<IList<PlaceResult>> GetRestaurantsInDijonAsync(
-    CancellationToken cancellationToken = default)
+    public async Task<IList<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize = 1000, CancellationToken cancellationToken = default)
     {
         var request = new
         {
@@ -32,37 +31,30 @@ public sealed class GooglePlacesClient
                 {
                     center = new
                     {
-                        latitude = 47.3220,
-                        longitude = 5.0415
+                        latitude = center.Latitude,
+                        longitude = center.Longitude,
                     },
-                    radius = 100
-                }
+                    // Max 50000
+                    radius = radiusSize,
+                },
             },
-            includedTypes = new[] { "restaurant" }
+            includedTypes = new[] { "restaurant" },
         };
 
-        using var httpRequest = new HttpRequestMessage(
-            HttpMethod.Post,
-            BaseUrl)
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, BaseUrl)
         {
-            Content = JsonContent.Create(request)
+            Content = JsonContent.Create(request),
         };
 
         httpRequest.Headers.Add("X-Goog-Api-Key", _apiKey);
-        httpRequest.Headers.Add(
-            "X-Goog-FieldMask",
-            "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress");
+        httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress");
 
-        //var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
-        //response.EnsureSuccessStatusCode();
-        //var jsonToSave = await response.Content.ReadAsStringAsync(cancellationToken);
-        //var json = await response.Content.ReadFromJsonAsync<PlacesApiResponse>(TestData.JsonDij,
-        //    cancellationToken: cancellationToken);
+        // var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+        // response.EnsureSuccessStatusCode();
+        // var json = await response.Content.ReadFromJsonAsync<PlacesApiResponse>(cancellationToken: cancellationToken);
 
         var json = JsonSerializer.Deserialize<PlacesApiResponse>(TestData.JsonDij, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
         return json?.Places ?? [];
     }
-
-
 }
