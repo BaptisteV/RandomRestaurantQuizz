@@ -18,9 +18,6 @@ public sealed class PlaceResult
 
     [JsonPropertyName("photos")]
     public List<Photo>? Photos { get; set; }
-
-    // New property to store the downloaded image bytes
-    public byte[]? FirstImage { get; set; }
 }
 
 public sealed class DisplayName
@@ -43,6 +40,8 @@ public sealed class Photo
     /// </summary>
     [JsonPropertyName("photoMetadata")]
     public PhotoMetadata? PhotoMetadata { get; set; }
+
+    public byte[]? DownloadedImage { get; set; }
 }
 
 public sealed class PhotoMetadata

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz;
+using RandomRestaurantQuizz.Places;
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
@@ -36,10 +37,10 @@ await Host.CreateDefaultBuilder(args)
             return new PhotoManager(httpClient, apiKey, provider.GetRequiredService<ILogger<PhotoManager>>());
         });
 
-        services.AddTransient<App>();
+        services.AddTransient<PlaceFinder>();
     })
     .Build()
     .Services
-    .GetRequiredService<App>()
+    .GetRequiredService<PlaceFinder>()
     .RunAsync();
 

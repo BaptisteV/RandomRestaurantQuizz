@@ -1,11 +1,12 @@
 ﻿
 
 using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Data;
 using RandomRestaurantQuizz.Models;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace RandomRestaurantQuizz;
+namespace RandomRestaurantQuizz.Places;
 
 public sealed class GooglePlacesClient
 {

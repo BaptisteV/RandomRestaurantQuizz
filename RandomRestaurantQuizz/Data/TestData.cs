@@ -1,4 +1,4 @@
-﻿namespace RandomRestaurantQuizz;
+﻿namespace RandomRestaurantQuizz.Data;
 
 public static class TestData
 {

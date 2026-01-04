@@ -1,16 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Data;
 using RandomRestaurantQuizz.Models;
+using RandomRestaurantQuizz.Places;
 
 namespace RandomRestaurantQuizz;
 
-public sealed class App : IDisposable
+public sealed class PlaceFinder : IDisposable
 {
     private readonly GooglePlacesClient _placesClient;
-    private readonly ILogger<App> _logger;
+    private readonly ILogger<PlaceFinder> _logger;
     private readonly PhotoManager _photoManager;
     private readonly CancellationTokenSource _cts;
 
-    public App(GooglePlacesClient placesClient, PhotoManager photoManager, ILogger<App> logger)
+    public PlaceFinder(GooglePlacesClient placesClient, PhotoManager photoManager, ILogger<PlaceFinder> logger)
     {
         _placesClient = placesClient;
         _logger = logger;
@@ -23,11 +25,11 @@ public sealed class App : IDisposable
         // Get all possible restaurants
         var restaurants = (await _placesClient.GetRestaurantsInCity(center, 1000, _cts.Token)).Where(r => r.Photos?.Count > 0).ToList();
 
-        // Enrich with photos TODO fetch all photos
-        var restaurantsWithFirstPhoto = await _photoManager.GetFirstImages(restaurants, _cts.Token);
+        // Enrich with photos
+        var restaurantsWithFirstPhoto = await _photoManager.GetPhotos(restaurants, _cts.Token);
 
         // Filter only those with at least one photo and more than 1 user rating
-        var selectedRestaurants = restaurantsWithFirstPhoto.Where(r => r.FirstImage is not null && r.UserRatingCount > 0).ToList().AsReadOnly();
+        var selectedRestaurants = restaurantsWithFirstPhoto.Where(r => r.UserRatingCount > 0).ToList().AsReadOnly();
         _logger.LogInformation("Selected {SelectedRestaurantCount} out of {RestaurantCount}", selectedRestaurants.Count, restaurants.Count);
 
         return selectedRestaurants;
@@ -44,9 +46,9 @@ public sealed class App : IDisposable
             _logger.LogInformation("Rating: {Rating}⭐ ({UserRatingCount})", restaurant.Rating?.ToString("0.0"), restaurant.UserRatingCount);
             _logger.LogInformation("Address: {Address}", restaurant.FormattedAddress);
             _logger.LogInformation("PhotoCount: {PhotoCount}", restaurant.Photos?.Count ?? 0);
-            await _photoManager.OpenFirstImage(restaurant);
-            //Console.ReadLine();
+            await _photoManager.SaveTempJpgs(restaurant);
         }
+        _photoManager.OpenTempFolder();
     }
 
     public void Dispose()

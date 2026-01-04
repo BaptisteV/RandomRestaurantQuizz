@@ -1,13 +1,8 @@
-﻿using System.Collections.Immutable;
+﻿using RandomRestaurantQuizz.Models;
+using System.Collections.Immutable;
 
-namespace RandomRestaurantQuizz;
+namespace RandomRestaurantQuizz.Data;
 
-public readonly struct GeoLoc
-{
-    public double Latitude { get; init; }
-    public double Longitude { get; init; }
-
-}
 public static class Cities
 {
     private static readonly ImmutableDictionary<string, GeoLoc> Dict = new Dictionary<string, GeoLoc>()
