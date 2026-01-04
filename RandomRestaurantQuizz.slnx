@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="RandomRestaurantQuizz.App/RandomRestaurantQuizz.App.csproj" Id="3b158963-bd22-4121-9de6-dd1bd0f5e2d5" />
+  <Project Path="RandomRestaurantQuizz.Core/RandomRestaurantQuizz.Core.csproj" Id="0e066a34-d728-459e-9c20-d8e829a3c180" />
   <Project Path="RandomRestaurantQuizz/RandomRestaurantQuizz.csproj" />
 </Solution>

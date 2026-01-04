@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz;
-using RandomRestaurantQuizz.Photos;
-using RandomRestaurantQuizz.Places;
-using RandomRestaurantQuizz.Quizzz;
+using RandomRestaurantQuizz.Core;
+using RandomRestaurantQuizz.Core.Photos;
+using RandomRestaurantQuizz.Core.Places;
+using RandomRestaurantQuizz.Core.Quizzz;
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
