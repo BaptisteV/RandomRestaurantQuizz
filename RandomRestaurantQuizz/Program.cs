@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz;
 using RandomRestaurantQuizz.Photos;
 using RandomRestaurantQuizz.Places;
+using RandomRestaurantQuizz.Quizzz;
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
@@ -41,7 +42,8 @@ await Host.CreateDefaultBuilder(args)
         });
 
         services.AddTransient<IPlaceFinder, PlaceFinder>();
-        services.AddTransient<IRunner, TestSearchAndPhotosRunner>();
+        services.AddTransient<IRunner, QuizzConsoleRunner>();
+        services.AddTransient<IQuizz, Quizz>();
     })
     .Build()
     .Services
