@@ -41,7 +41,7 @@ await Host.CreateDefaultBuilder(args)
         });
 
         services.AddTransient<IPlaceFinder, PlaceFinder>();
-        services.AddTransient<IRunner, Runner>();
+        services.AddTransient<IRunner, TestSearchAndPhotosRunner>();
     })
     .Build()
     .Services

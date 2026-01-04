@@ -4,13 +4,13 @@ using RandomRestaurantQuizz.Photos;
 
 namespace RandomRestaurantQuizz.Places;
 
-public class Runner : IRunner
+public class TestSearchAndPhotosRunner : IRunner
 {
     private readonly IPlaceFinder _placeFinder;
     private readonly PhotoFileManager _photoManager;
-    private readonly ILogger<Runner> _logger;
+    private readonly ILogger<TestSearchAndPhotosRunner> _logger;
 
-    public Runner(IPlaceFinder placeFinder, PhotoFileManager photoManager, ILogger<Runner> logger)
+    public TestSearchAndPhotosRunner(IPlaceFinder placeFinder, PhotoFileManager photoManager, ILogger<TestSearchAndPhotosRunner> logger)
     {
         _placeFinder = placeFinder;
         _photoManager = photoManager;
