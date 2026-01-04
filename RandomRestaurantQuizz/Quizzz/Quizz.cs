@@ -40,6 +40,7 @@ public class Quizz : IQuizz
 
         _logger.LogInformation("Answered     {Guess} for {PlaceName}", guess.GuessedScore, answered.DisplayName?.Text);
         _logger.LogInformation("Real ranking {RealRank}", answered.Rating);
+        _logger.LogInformation("Score: {Score}", _player.Score());
 
         _model.GuessInput = guessedValue;
         _model.ActivePlaceIndex += 1;
