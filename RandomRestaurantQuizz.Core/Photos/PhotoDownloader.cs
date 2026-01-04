@@ -29,6 +29,7 @@ public class PhotoDownloader
     public async Task<byte[]> GetImage(Photo photo, CancellationToken cancellationToken)
     {
         var url = GetPhotoUrl(photo.Name!);
+        _logger.LogInformation("Downloading: {DownloadUrl}", url);
         using var response = await _httpClient.GetAsync(url, cancellationToken);
         response.EnsureSuccessStatusCode();
 

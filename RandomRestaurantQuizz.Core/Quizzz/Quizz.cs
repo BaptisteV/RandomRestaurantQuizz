@@ -10,6 +10,7 @@ public class Quizz : IQuizz
     private readonly IPlaceFinder _placeFinder;
     private readonly Player _player = new();
     private readonly Queue<PlaceResult> _places = [];
+    private readonly QuizzModel _model = new();
     private readonly ILogger<Quizz> _logger;
 
     public Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger)
@@ -26,10 +27,17 @@ public class Quizz : IQuizz
         {
             _places.Enqueue(restaurant);
         }
+        _model.CurrentPlace = _places.Dequeue();
     }
 
     public void Answer(double guessedValue)
     {
+        if (_places.Count == 0)
+        {
+            _logger.LogError("No place to answer");
+            return;
+        }
+
         var answered = _places.Dequeue();
         var guess = new Guess()
         {
@@ -42,12 +50,9 @@ public class Quizz : IQuizz
         _logger.LogInformation("Real ranking {RealRank}", answered.Rating);
         _logger.LogInformation("Score: {Score}", _player.Score());
 
-        _model.GuessInput = guessedValue;
-        _model.ActivePlaceIndex += 1;
-        _model.PlacesToBeAnswered = [.. _places];
+        _model.CurrentPlace = answered;
     }
 
-    private readonly QuizzModel _model = new();
     public QuizzModel CurrentState()
     {
         return _model;

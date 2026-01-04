@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /RandomRestaurantQuizz/Properties/launchSettings.json
+/RandomRestaurantQuizz.App/Properties/launchSettings.json
