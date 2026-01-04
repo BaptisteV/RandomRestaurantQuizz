@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz;
+using RandomRestaurantQuizz.Photos;
 using RandomRestaurantQuizz.Places;
 
 await Host.CreateDefaultBuilder(args)
@@ -31,16 +32,19 @@ await Host.CreateDefaultBuilder(args)
             return new GooglePlacesClient(httpClient, apiKey, provider.GetRequiredService<ILogger<GooglePlacesClient>>());
         });
 
-        services.AddSingleton(provider =>
+        services.AddTransient<IFileNamer, FileNamer>();
+        services.AddTransient<PhotoFileManager>();
+        services.AddTransient(provider =>
         {
             var httpClient = provider.GetRequiredService<HttpClient>();
-            return new PhotoManager(httpClient, apiKey, provider.GetRequiredService<ILogger<PhotoManager>>());
+            return new PhotoDownloader(httpClient, apiKey, provider.GetRequiredService<IFileNamer>(), provider.GetRequiredService<ILogger<PhotoDownloader>>());
         });
 
-        services.AddTransient<PlaceFinder>();
+        services.AddTransient<IPlaceFinder, PlaceFinder>();
+        services.AddTransient<IRunner, Runner>();
     })
     .Build()
     .Services
-    .GetRequiredService<PlaceFinder>()
+    .GetRequiredService<IRunner>()
     .RunAsync();
 
