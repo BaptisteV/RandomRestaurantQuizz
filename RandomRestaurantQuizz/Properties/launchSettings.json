@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RandomRestaurantQuizz": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "GOOGLE_PLACES_API_KEY": "AIzaSyBujm_BrN3VEi8k4vfUoX3-vcwfZ37R2K0"
+      }
+    }
+  }
+}
