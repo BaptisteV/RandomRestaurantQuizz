@@ -2,16 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RandomRestaurantQuizz.App.MainPage"
+             xmlns:controls="clr-namespace:RandomRestaurantQuizz.App;assembly=RandomRestaurantQuizz.App"
              Loaded="ContentPage_Loaded">
 
     <ScrollView>
         <VerticalStackLayout Padding="30,0"
                              Spacing="25">
-
-            <Label Text="Restaurant star quizz"
-                   Style="{StaticResource SubHeadline}"
-                   SemanticProperties.HeadingLevel="Level2"
-                   SemanticProperties.Description="Restaurant star quizz" />
 
             <FlexLayout x:Name="PhotoContainer"
                         JustifyContent="Center">
@@ -20,7 +16,7 @@
                 </FlexLayout.GestureRecognizers>
 
                 <Image x:Name="RestaurantPhotoImage"
-                       HeightRequest="600"
+                       HeightRequest="400"
                        Aspect="AspectFit"
                        SemanticProperties.Description="Restaurant photo">
                 </Image>
@@ -30,7 +26,12 @@
                    Text="2.5"
                    FontSize="Large"
                    HorizontalOptions="Center" />
-            
+
+            <controls:StarRating x:Name="Stars"
+                                 StarSize="40"
+                                 HorizontalOptions="Center"
+                                 Rating="2.5" />
+
             <Slider x:Name="RatingSlider"
                     HeightRequest="40"
                     Minimum="0"
@@ -44,6 +45,11 @@
                     SemanticProperties.Hint="Counts the number of times you click"
                     Clicked="OnCounterClicked"
                     HorizontalOptions="Fill" />
+
+            <Label x:Name="ScoreLabel"
+                   Text="0.00"
+                   FontSize="Large"
+                   HorizontalOptions="Center" />
         </VerticalStackLayout>
     </ScrollView>
 

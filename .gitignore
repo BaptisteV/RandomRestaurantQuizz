@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /RandomRestaurantQuizz/Properties/launchSettings.json
 /RandomRestaurantQuizz.App/Properties/launchSettings.json
+/RandomRestaurantQuizz.App/secrets.json

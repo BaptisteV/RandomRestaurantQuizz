@@ -12,5 +12,8 @@ public interface IQuizz
 
     void Answer(double guessedValue);
 
+    void NextPhoto();
+    void PreviousPhoto();
+
     public QuizzModel CurrentState();
 }

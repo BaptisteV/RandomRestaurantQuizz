@@ -29,7 +29,7 @@ public class PhotoDownloader
     public async Task<byte[]> GetImage(Photo photo, CancellationToken cancellationToken)
     {
         var url = GetPhotoUrl(photo.Name!);
-        _logger.LogInformation("Downloading: {DownloadUrl}", url);
+        _logger.LogDebug("Downloading: {DownloadUrl}", url);
         using var response = await _httpClient.GetAsync(url, cancellationToken);
         response.EnsureSuccessStatusCode();
 
@@ -45,7 +45,7 @@ public class PhotoDownloader
         if (new FileInfo(filename).Length == 0)
             return true;
 
-        _logger.LogInformation("Photo {PhotoIndex} already exists for {PlaceName}, skipping download.", photoIndex, place.DisplayName?.Text);
+        _logger.LogDebug("Photo {PhotoIndex} already exists for {PlaceName}, skipping download.", photoIndex, place.DisplayName?.Text);
         return false;
     }
 
@@ -84,5 +84,4 @@ public class PhotoDownloader
 
         return placeResults;
     }
-
 }

@@ -1,9 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Core;
 using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace RandomRestaurantQuizz.App;
+
+public class SecretsJson
+{
+    [JsonPropertyName("GOOGLE_PLACES_API_KEY")]
+    public string GooglePlacesApiKey { get; set; } = "";
+}
 
 public static class MauiProgram
 {
@@ -23,11 +33,21 @@ public static class MauiProgram
 #endif
         var services = builder.Services;
         services.AddHttpClient();
+        // Load embedded JSON config
+        using var stream = Assembly
+            .GetExecutingAssembly()
+            .GetManifestResourceStream("RandomRestaurantQuizz.App.secrets.json")
+                ?? throw new InvalidOperationException("Failed to load embedded configuration file.");
 
-        var apiKey = Environment.GetEnvironmentVariable("GOOGLE_PLACES_API_KEY") ?? "AIzaSyBujm_BrN3VEi8k4vfUoX3-vcwfZ37R2K0";
+        var secrets = new ConfigurationBuilder()
+            .AddJsonStream(stream)
+            .Build();
+
+        var apiKey = secrets.GetRequiredSection("GOOGLE_PLACES_API_KEY").Value;
+
         if (string.IsNullOrWhiteSpace(apiKey))
         {
-            throw new InvalidOperationException("GOOGLE_PLACES_API_KEY environment variable is not set.");
+            throw new InvalidOperationException("GOOGLE_PLACES_API_KEY not found");
         }
 
         services.AddSingleton(provider =>
@@ -45,7 +65,10 @@ public static class MauiProgram
         });
 
         services.AddTransient<IPlaceFinder, PlaceFinder>();
-        services.AddTransient<IQuizz, Quizz>();
+        services.AddSingleton<IQuizz, Quizz>();
+        services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
+        services.AddTransient<SoundEffects>();
+
         return builder.Build();
     }
 }
