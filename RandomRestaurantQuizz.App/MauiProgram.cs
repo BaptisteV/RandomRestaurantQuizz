@@ -36,7 +36,7 @@ public static class MauiProgram
         // Load embedded JSON config
         using var stream = Assembly
             .GetExecutingAssembly()
-            .GetManifestResourceStream("RandomRestaurantQuizz.App.secrets.json")
+            .GetManifestResourceStream($"{typeof(MauiProgram).Namespace}.secrets.json")
                 ?? throw new InvalidOperationException("Failed to load embedded configuration file.");
 
         var secrets = new ConfigurationBuilder()
@@ -67,7 +67,7 @@ public static class MauiProgram
         services.AddTransient<IPlaceFinder, PlaceFinder>();
         services.AddSingleton<IQuizz, Quizz>();
         services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-        services.AddTransient<SoundEffects>();
+        services.AddTransient<RessourSoundEffect>();
 
         return builder.Build();
     }

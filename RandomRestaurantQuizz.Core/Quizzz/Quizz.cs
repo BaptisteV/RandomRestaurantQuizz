@@ -2,6 +2,7 @@
 using RandomRestaurantQuizz.Core.Data;
 using RandomRestaurantQuizz.Core.Models;
 using RandomRestaurantQuizz.Core.Places;
+using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
@@ -13,8 +14,8 @@ public class Quizz : IQuizz
     private readonly QuizzModel _model = new();
     private readonly ILogger<Quizz> _logger;
 
-    private readonly SoundEffects _soundEffects;
-    public Quizz(IPlaceFinder placeFinder, SoundEffects soundEffects, ILogger<Quizz> logger)
+    private readonly ResourceSoundEffects _soundEffects;
+    public Quizz(IPlaceFinder placeFinder, ResourceSoundEffects soundEffects, ILogger<Quizz> logger)
     {
         _placeFinder = placeFinder;
         _soundEffects = soundEffects;
