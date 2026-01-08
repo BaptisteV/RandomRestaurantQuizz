@@ -14,8 +14,8 @@ public class Quizz : IQuizz
     private readonly QuizzModel _model = new();
     private readonly ILogger<Quizz> _logger;
 
-    private readonly ResourceSoundEffects _soundEffects;
-    public Quizz(IPlaceFinder placeFinder, ResourceSoundEffects soundEffects, ILogger<Quizz> logger)
+    private readonly ISoundEffect _soundEffects;
+    public Quizz(IPlaceFinder placeFinder, ISoundEffect soundEffects, ILogger<Quizz> logger)
     {
         _placeFinder = placeFinder;
         _soundEffects = soundEffects;
@@ -51,14 +51,9 @@ public class Quizz : IQuizz
 
         var scoreDifference = Math.Abs(guess.GuessedScore - answered.Rating ?? 0.0);
         _player.Guesses.Add(guess);
-        if (scoreDifference < 0.5)
-        {
-            _soundEffects.PlayWin();
-        }
-        else
-        {
-            _soundEffects.PlayLoose();
-        }
+
+        _ = Task.Run(async () => await _soundEffects.OnAnswer(correctnessPercentage: scoreDifference * 100.0, CancellationToken.None));
+
         _logger.LogInformation("Answered     {Guess} for {PlaceName}", guess.GuessedScore, answered.DisplayName?.Text);
         _logger.LogInformation("Real ranking {RealRank}", answered.Rating);
         _logger.LogInformation("Score: {Score}", _player.Score());
