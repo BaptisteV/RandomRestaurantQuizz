@@ -1,13 +1,21 @@
-﻿namespace RandomRestaurantQuizz.Core.Quizzz;
+﻿using System.Collections.ObjectModel;
+
+namespace RandomRestaurantQuizz.Core.Quizzz;
 
 public class Player
 {
-    public List<Guess> Guesses { get; set; } = [];
+    public ObservableCollection<Guess> Guesss { get; set; } = [];
+    //private List<Guess> Guesses { get; set; } = [];
+
+    public void NewGuess(Guess guess)
+    {
+        Guesss.Add(guess);
+    }
 
     public double Score()
     {
         var score = 0.0;
-        foreach (var guess in Guesses)
+        foreach (var guess in Guesss)
         {
             var dist = Math.Abs(guess.GuessedScore - (guess.Place.Rating ?? 0));
 

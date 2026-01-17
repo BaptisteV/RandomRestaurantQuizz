@@ -1,15 +1,19 @@
-﻿using RandomRestaurantQuizz.Core.Quizzz;
+﻿using RandomRestaurantQuizz.Core;
+using RandomRestaurantQuizz.Core.Quizzz;
 
 namespace RandomRestaurantQuizz.App;
 
 public partial class MainPage : ContentPage
 {
     private readonly IQuizz _quizz;
+    private readonly IQuizzUIHandler _uiHandler;
 
-    public MainPage(IQuizz quizz)
+    public MainPage(IQuizz quizz, IQuizzUIHandler uIHandler)
     {
         _quizz = quizz;
+        _uiHandler = uIHandler;
         InitializeComponent();
+        _uiHandler.Init(ScoreLabel);
     }
 
     private void OnCounterClicked(object? sender, EventArgs e)
@@ -39,7 +43,6 @@ public partial class MainPage : ContentPage
             var ms = new MemoryStream(photo.DownloadedImage!);
             RestaurantPhotoImage.Source = ImageSource.FromStream(() => ms);
         }
-        ScoreLabel.Text = $"Score: {model.Player.Score():F2}";
     }
 
     private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)

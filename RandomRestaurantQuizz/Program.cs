@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Console;
 using RandomRestaurantQuizz.Core;
 using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz;
+using RandomRestaurantQuizz.Core.SoundEffects;
 
+Console.WriteLine("Starting...");
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
     {
@@ -43,7 +45,16 @@ await Host.CreateDefaultBuilder(args)
 
         services.AddTransient<IPlaceFinder, PlaceFinder>();
         services.AddTransient<IRunner, QuizzConsoleRunner>();
+        //services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
+        //services.AddTransient<IPitchShifter, PitchShifter>();
+        services.AddTransient<ISoundEffect, NoSoundEffect>();
+        services.AddSingleton<IQuizzUIHandler, ConsoleUIHandler>();
         services.AddTransient<IQuizz, Quizz>();
+    })
+    .UseDefaultServiceProvider(o =>
+    {
+        o.ValidateScopes = true;
+        o.ValidateOnBuild = true;
     })
     .Build()
     .Services

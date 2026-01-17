@@ -1,8 +1,7 @@
-﻿namespace RandomRestaurantQuizz.Core.SoundEffects
+﻿namespace RandomRestaurantQuizz.Core.SoundEffects;
+
+public interface ISoundEffect
 {
-    public interface ISoundEffect
-    {
-        Task Init();
-        Task OnAnswer(double correctnessPercentage, CancellationToken cancellationToken);
-    }
+    Task Init();
+    Task PlayAnswer(double correctnessPercentage, CancellationToken cancellationToken);
 }

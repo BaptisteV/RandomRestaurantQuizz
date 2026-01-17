@@ -14,9 +14,9 @@ public class DynamicSoundEffect(IAudioManager audioManager, IPitchShifter pitchS
         _baseSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("base.wav"));
     }
 
-    public Task OnAnswer(double correctnessPercentage, CancellationToken cancellationToken)
+    public async Task PlayAnswer(double correctnessPercentage, CancellationToken cancellationToken)
     {
         var shiftedSound = pitchShifter.ShiftBy(_baseSound, correctnessPercentage);
-        return shiftedSound.PlayAsync(cancellationToken);
+        await shiftedSound.PlayAsync(cancellationToken);
     }
 }

@@ -16,7 +16,7 @@ public class ResourceSoundEffect(IAudioManager audioManager) : ISoundEffect
         _looseSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("loose.wav"));
     }
 
-    public async Task OnAnswer(double correctnessPercentage, CancellationToken cancellationToken)
+    public async Task PlayAnswer(double correctnessPercentage, CancellationToken cancellationToken)
     {
         if (correctnessPercentage > 50.0)
         {

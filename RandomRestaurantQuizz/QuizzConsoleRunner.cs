@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Core;
+using RandomRestaurantQuizz.Core.Quizzz;
 using System.Globalization;
 
-namespace RandomRestaurantQuizz.Core.Quizzz;
+namespace RandomRestaurantQuizz.Console;
 
 public class QuizzConsoleRunner : IRunner
 {
@@ -32,8 +34,8 @@ public static class DoubleReader
     {
         while (true)
         {
-            Console.Write(prompt);
-            string? input = Console.ReadLine();
+            System.Console.Write(prompt);
+            string? input = System.Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
                 continue;
@@ -50,7 +52,7 @@ public static class DoubleReader
                 return result;
             }
 
-            Console.WriteLine("Invalid number. Please try again.");
+            System.Console.WriteLine("Invalid number. Please try again.");
         }
     }
 }
