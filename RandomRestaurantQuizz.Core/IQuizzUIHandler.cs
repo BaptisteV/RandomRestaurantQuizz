@@ -2,6 +2,6 @@
 
 public interface IQuizzUIHandler
 {
-    void Init(Label scoreLabel);
+    Task Init(Label scoreLabel);
     void OnUpdateScore(double newScore, double scoreDiff);
 }

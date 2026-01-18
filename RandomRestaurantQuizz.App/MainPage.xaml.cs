@@ -13,7 +13,6 @@ public partial class MainPage : ContentPage
         _quizz = quizz;
         _uiHandler = uIHandler;
         InitializeComponent();
-        _uiHandler.Init(ScoreLabel);
     }
 
     private void OnCounterClicked(object? sender, EventArgs e)
@@ -22,9 +21,10 @@ public partial class MainPage : ContentPage
         ApplyState();
     }
 
-    private void ContentPage_Loaded(object sender, EventArgs e)
+    private async void ContentPage_Loaded(object sender, EventArgs e)
     {
-        _quizz.Init().ContinueWith(async (_) =>
+        await _uiHandler.Init(ScoreLabel);
+        await _quizz.Init().ContinueWith(async (_) =>
         {
             await MainThread.InvokeOnMainThreadAsync(() =>
             {

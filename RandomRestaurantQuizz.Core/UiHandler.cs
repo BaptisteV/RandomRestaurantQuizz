@@ -6,14 +6,15 @@ public class UiHandler(ISoundEffect soundEffects) : IQuizzUIHandler
 {
     private Label _scoreLabel;
 
-    public void Init(Label scoreLabel)
+    public async Task Init(Label scoreLabel)
     {
         _scoreLabel = scoreLabel;
+        await soundEffects.Init();
     }
 
     public void OnUpdateScore(double newScore, double scoreDiff)
     {
         _scoreLabel.Text = $"Score: {newScore:F2}";
-        _ = Task.Run(async () => await soundEffects.PlayAnswer(correctnessPercentage: scoreDiff * 100.0, CancellationToken.None));
+        soundEffects.PlayAnswer(correctnessPercentage: scoreDiff * 100.0, CancellationToken.None);
     }
 }

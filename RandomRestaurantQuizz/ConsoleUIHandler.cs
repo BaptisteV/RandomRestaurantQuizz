@@ -4,8 +4,9 @@ namespace RandomRestaurantQuizz.Console;
 
 internal class ConsoleUIHandler : IQuizzUIHandler
 {
-    public void Init(Label scoreLabel)
+    public Task Init(Label scoreLabel)
     {
+        return Task.CompletedTask;
     }
 
     public void OnUpdateScore(double newScore, double scoreDiff)

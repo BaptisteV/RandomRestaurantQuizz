@@ -67,12 +67,11 @@ public static class MauiProgram
         });
 
         services.AddTransient<IPlaceFinder, PlaceFinder>();
-        //IRunner ?
-        //services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-        //services.AddTransient<IPitchShifter, PitchShifter>();
-        services.AddTransient<ISoundEffect, NoSoundEffect>();
+        services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
+        services.AddSingleton<IPitchShifter, PitchShifter>();
+        services.AddSingleton<ISoundEffect, DynamicSoundEffect>();
         services.AddSingleton<IQuizzUIHandler, UiHandler>();
-        services.AddTransient<IQuizz, Quizz>();
+        services.AddSingleton<IQuizz, Quizz>();
 
         return builder.Build();
     }
