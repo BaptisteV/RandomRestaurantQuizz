@@ -11,6 +11,7 @@
             
             <Label x:Name="RestaurantNameLabel"
                    Text=""
+                   HorizontalOptions="Center"
                    FontSize="Medium" />
             
             <FlexLayout x:Name="PhotoContainer"

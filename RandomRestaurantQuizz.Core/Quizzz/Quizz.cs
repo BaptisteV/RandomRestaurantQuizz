@@ -12,6 +12,7 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
 
     private readonly Player _player = new();
     private readonly Queue<PlaceResult> _places = [];
+    private PlaceResult _currentPlace;
     private readonly QuizzModel _model = new();
 
     public Func<QuizzModel, Task> ScoreChanged { get; set; } = (_) => Task.CompletedTask;
@@ -25,7 +26,11 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
         {
             _places.Enqueue(restaurant);
         }
-        _model.CurrentPlace = _places.Dequeue();
+        _currentPlace = _places.Dequeue();
+
+        _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
+        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage!;
+
         await ScoreChanged(_model);
         await PhotoChanged(_model);
     }
@@ -38,38 +43,47 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
             return;
         }
 
-        var answered = _places.Dequeue();
+        _currentPlace = _places.Dequeue();
         var guess = new Guess()
         {
             GuessedScore = guessedValue,
-            Place = answered
+            Place = _currentPlace
         };
 
         _player.NewGuess(guess);
 
-        _logger.LogInformation("Answered {Guess} for {PlaceName}", guess.GuessedScore, answered.DisplayName?.Text);
-        _logger.LogInformation("Real ranking {RealRank}", answered.Rating);
+        _logger.LogInformation("Answered {Guess} for {PlaceName}", guess.GuessedScore, _currentPlace.DisplayName?.Text);
+        _logger.LogInformation("Real ranking {RealRank}", _currentPlace.Rating);
         _logger.LogInformation("Score: {Score}, Total: {TotalScore}", guess.Score(), _player.Score());
 
-        _model.LastGuess = guess;
-        _model.CurrentPlace = answered;
-        _model.CurrentPhotoIndex = 0;
-        _model.Player = _player;
+        _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
+        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage!;
+        _model.TotalScore = (int)_player.Score();
+        _model.LastScoreUpdate = (int)guess.Score();
+        _model.LastRating = guess.Place.Rating ?? 0.0;
 
         await ScoreChanged(_model);
         await PhotoChanged(_model);
     }
 
+    private int _currentPhotoIndex = 0;
+
     public async Task NextPhoto()
     {
-        var maxIndex = _model.CurrentPlace!.Photos!.Count - 1;
-        _model.CurrentPhotoIndex = Math.Min(_model.CurrentPhotoIndex + 1, maxIndex);
+        var maxIndex = _currentPlace!.Photos!.Count - 1;
+        var nextIndex = Math.Min(_currentPhotoIndex + 1, maxIndex);
+        _currentPhotoIndex = nextIndex;
+        _model.Image = _currentPlace!.Photos?[nextIndex].DownloadedImage!;
+
         await PhotoChanged(_model);
     }
 
     public async Task PreviousPhoto()
     {
-        _model.CurrentPhotoIndex = Math.Max(0, _model.CurrentPhotoIndex - 1);
+        var prevIndex = Math.Max(0, _currentPhotoIndex - 1);
+        _currentPhotoIndex = prevIndex;
+        _model.Image = _currentPlace!.Photos?[prevIndex].DownloadedImage!;
+
         await PhotoChanged(_model);
     }
 }

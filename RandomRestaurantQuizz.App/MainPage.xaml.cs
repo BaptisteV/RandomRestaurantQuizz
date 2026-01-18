@@ -20,45 +20,29 @@ public partial class MainPage : ContentPage
 
         _quizz.ScoreChanged = async (model) =>
         {
-            // Update score
-            _logger.LogDebug("Score changed");
-            var newScore = model.Player.Score();
-            ScoreLabel.Text = $"Score: {newScore:n0}";
+            ScoreLabel.Text = $"Score: {model.TotalScore}";
+            RestaurantNameLabel.Text = model.RestaurantName;
 
-            // Update score diff
-            if (model.LastGuess is not null)
+            if (model.LastScoreUpdate < 0)
+                return;
+            ScoreDiffLabel.Opacity = 0.0;
+            ScoreDiffLabel.Text = $"+{model.LastScoreUpdate} ({model.LastRating:n1})";
+            _ = Task.Run(async () =>
             {
-                var scoreDiff = model.LastGuess.Score();
-                ScoreDiffLabel.Opacity = 0.0;
-                ScoreDiffLabel.Text = $"+{scoreDiff:n0} ({model.LastGuess.Place.Rating:n1})";
-                _ = Task.Run(async () =>
-                {
-                    await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
-                    await Task.Delay(500);
-                    await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
-                });
+                await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
+                await Task.Delay(500);
+                await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
+            });
 
-                await _soundEffects.PlayAnswer(correctnessPercentage: scoreDiff, CancellationToken.None);
-            }
-            else
-            {
-                _logger.LogWarning("No last guess");
-            }
+            await _soundEffects.PlayAnswer(correctnessPercentage: model.LastScoreUpdate, CancellationToken.None);
 
-            // Update restaurant name
-            RestaurantNameLabel.Text = model.CurrentPlace?.DisplayName?.Text;
         };
 
         _quizz.PhotoChanged = async (model) =>
         {
             _logger.LogDebug("Photo changed");
-            var photos = model.CurrentPlace?.Photos;
-            var photo = photos?.ElementAtOrDefault(model.CurrentPhotoIndex);
-            if (photo is not null)
-            {
-                var ms = new MemoryStream(photo.DownloadedImage!);
-                RestaurantPhotoImage.Source = ImageSource.FromStream(() => ms);
-            }
+            var ms = new MemoryStream(model.Image);
+            RestaurantPhotoImage.Source = ImageSource.FromStream(() => ms);
         };
     }
 

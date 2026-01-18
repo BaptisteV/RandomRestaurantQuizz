@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!--<TargetFrameworks>
+    <TargetFrameworks>
       net10.0-android36.0;
       net10.0-windows10.0.19041.0
-    </TargetFrameworks> -->
-     <TargetFrameworks>
-      net10.0-windows10.0.19041.0
     </TargetFrameworks>
+     <!--<TargetFrameworks>
+      net10.0-windows10.0.19041.0
+    </TargetFrameworks> -->
 
     <OutputType>Exe</OutputType>
     <RootNamespace>RandomRestaurantQuizz.App</RootNamespace>
@@ -52,7 +52,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FmodAudio" Version="2.2.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />

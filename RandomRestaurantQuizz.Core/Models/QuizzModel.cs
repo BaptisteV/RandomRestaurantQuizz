@@ -1,19 +1,19 @@
-﻿using RandomRestaurantQuizz.Core.Quizzz;
-
-namespace RandomRestaurantQuizz.Core.Models;
+﻿namespace RandomRestaurantQuizz.Core.Models;
 
 public class QuizzModel
 {
-    public PlaceResult? CurrentPlace { get; set; }
+    public byte[] Image { get; set; } = [];
 
-    public int CurrentPhotoIndex { get; set; } = 0;
+    public int TotalScore { get; set; } = 0;
 
-    public Player Player { get; set; } = new Player();
+    public int LastScoreUpdate { get; set; } = -1;
 
-    public Guess? LastGuess { get; internal set; }
+    public double LastRating { get; set; } = 0;
+
+    public string RestaurantName { get; set; } = "";
 
     public override string ToString()
     {
-        return $"CurrentPlace={CurrentPlace?.DisplayName?.Text}, Score {Player.Score()}";
+        return $"CurrentPlace={RestaurantName}, TotalScore {TotalScore}";
     }
 }
