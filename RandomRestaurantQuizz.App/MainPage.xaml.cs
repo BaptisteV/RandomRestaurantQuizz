@@ -20,22 +20,38 @@ public partial class MainPage : ContentPage
 
         _quizz.ScoreChanged = async (model) =>
         {
+            // Update score
+            _logger.LogDebug("Score changed");
             var newScore = model.Player.Score();
-            ScoreLabel.Text = $"Score: {newScore:F2}";
+            ScoreLabel.Text = $"Score: {newScore:n0}";
 
+            // Update score diff
             if (model.LastGuess is not null)
             {
-                var scoreDiff = model.LastGuess.ScoreDiffPercentage();
+                var scoreDiff = model.LastGuess.Score();
+                ScoreDiffLabel.Opacity = 0.0;
+                ScoreDiffLabel.Text = $"+{scoreDiff:n0} ({model.LastGuess.Place.Rating:n1})";
+                _ = Task.Run(async () =>
+                {
+                    await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
+                    await Task.Delay(500);
+                    await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
+                });
+
                 await _soundEffects.PlayAnswer(correctnessPercentage: scoreDiff, CancellationToken.None);
             }
             else
             {
                 _logger.LogWarning("No last guess");
             }
+
+            // Update restaurant name
+            RestaurantNameLabel.Text = model.CurrentPlace?.DisplayName?.Text;
         };
 
         _quizz.PhotoChanged = async (model) =>
         {
+            _logger.LogDebug("Photo changed");
             var photos = model.CurrentPlace?.Photos;
             var photo = photos?.ElementAtOrDefault(model.CurrentPhotoIndex);
             if (photo is not null)

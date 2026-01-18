@@ -26,6 +26,7 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
             _places.Enqueue(restaurant);
         }
         _model.CurrentPlace = _places.Dequeue();
+        await ScoreChanged(_model);
         await PhotoChanged(_model);
     }
 
@@ -52,6 +53,7 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
 
         _model.LastGuess = guess;
         _model.CurrentPlace = answered;
+        _model.CurrentPhotoIndex = 0;
         _model.Player = _player;
 
         await ScoreChanged(_model);

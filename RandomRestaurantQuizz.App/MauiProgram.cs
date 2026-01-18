@@ -30,7 +30,7 @@ public static class MauiProgram
 
 #if DEBUG
         builder.Logging.AddDebug();
-
+        builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
         var services = builder.Services;
         services.AddHttpClient();
@@ -67,7 +67,8 @@ public static class MauiProgram
 
         services.AddTransient<IPlaceFinder, PlaceFinder>();
         services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-        services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
+        // services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
+        services.AddSingleton<ISoundEffect, SoundEffectGenerator>();
         services.AddSingleton<IQuizz, Quizz>();
 
         return builder.Build();
