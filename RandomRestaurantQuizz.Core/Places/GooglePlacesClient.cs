@@ -22,7 +22,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         _apiKey = sec.GooglePlacesApiKey;
     }
 
-    public async Task<List<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize = 1000, CancellationToken cancellationToken = default)
+    private async Task<List<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize = 1000, CancellationToken cancellationToken = default)
     {
         var request = new
         {

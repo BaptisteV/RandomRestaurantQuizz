@@ -17,4 +17,5 @@ public interface IQuizz
 
     Func<QuizzModel, Task> ScoreChanged { get; set; }
     Func<QuizzModel, Task> PhotoChanged { get; set; }
+    Func<QuizzModel, Task> RoundFinished { get; set; }
 }

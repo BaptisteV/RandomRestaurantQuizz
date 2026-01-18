@@ -16,6 +16,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
 
     public Func<QuizzModel, Task> ScoreChanged { get; set; } = (_) => Task.CompletedTask;
     public Func<QuizzModel, Task> PhotoChanged { get; set; } = (_) => Task.CompletedTask;
+    public Func<QuizzModel, Task> RoundFinished { get; set; } = (_) => Task.CompletedTask;
 
     public async Task DownloadRestaurants()
     {
@@ -29,7 +30,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
 
         _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
         _model.RatingCount = _currentPlace.UserRatingCount ?? 0;
-        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage!;
+        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage ?? [];
 
         await ScoreChanged(_model);
         await PhotoChanged(_model);
@@ -39,7 +40,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
     {
         if (_places.Count == 0)
         {
-            _logger.LogError("No place to answer");
+            await RoundFinished(_model);
             return;
         }
 
@@ -58,7 +59,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
 
         _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
         _model.RatingCount = _currentPlace.UserRatingCount ?? 0;
-        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage!;
+        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage ?? [];
         _model.TotalScore = (int)_player.TotalScore();
         _model.LastScoreUpdate = (int)guess.GuessScore();
         _model.LastRating = guess.Place.Rating ?? 0.0;
@@ -74,7 +75,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
         var maxIndex = _currentPlace!.Photos!.Count - 1;
         var nextIndex = Math.Min(_currentPhotoIndex + 1, maxIndex);
         _currentPhotoIndex = nextIndex;
-        _model.Image = _currentPlace!.Photos?[nextIndex].DownloadedImage!;
+        _model.Image = _currentPlace!.Photos?[nextIndex].DownloadedImage ?? [];
 
         await PhotoChanged(_model);
     }
@@ -83,7 +84,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
     {
         var prevIndex = Math.Max(0, _currentPhotoIndex - 1);
         _currentPhotoIndex = prevIndex;
-        _model.Image = _currentPlace!.Photos?[prevIndex].DownloadedImage!;
+        _model.Image = _currentPlace!.Photos?[prevIndex].DownloadedImage ?? [];
 
         await PhotoChanged(_model);
     }

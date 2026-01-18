@@ -56,7 +56,8 @@ public sealed class PhotoMetadata
     [JsonPropertyName("attributions")]
     public List<string>? Attributions { get; set; }
 }
+
 public sealed class PlacesApiResponse
 {
-    public List<PlaceResult> Places { get; set; } = [];
+    public List<PlaceResult>? Places { get; set; }
 }

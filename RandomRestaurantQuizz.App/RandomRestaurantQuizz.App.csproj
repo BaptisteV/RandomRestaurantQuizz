@@ -92,4 +92,10 @@
       <EmbeddedResource Include="secrets.json" />
     </ItemGroup>
 
+    <ItemGroup>
+      <MauiXaml Update="RecapModal.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+    </ItemGroup>
+
 </Project>

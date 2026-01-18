@@ -45,6 +45,12 @@ public partial class MainPage : ContentPage
             var ms = new MemoryStream(model.Image);
             RestaurantPhotoImage.Source = ImageSource.FromStream(() => ms);
         };
+
+        _quizz.RoundFinished = async (model) =>
+        {
+            _logger.LogDebug("Round finished");
+            await Navigation.PushModalAsync(new RecapModal());
+        };
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)

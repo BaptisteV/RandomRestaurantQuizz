@@ -60,7 +60,14 @@ public class PhotoDownloader : IPhotoDownloader
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    for (var p = 0; p < place.Photos!.Count; p++)
+                    var p = 0;
+                    if (place.Photos is null)
+                    {
+                        _logger.LogWarning("No photo for {PlaceName}", place.DisplayName?.Text);
+                        return;
+                    }
+
+                    foreach (var photo in place.Photos)
                     {
                         if (ShouldDownload(place, p))
                         {
@@ -72,12 +79,13 @@ public class PhotoDownloader : IPhotoDownloader
                             var image = await File.ReadAllBytesAsync(_fileNamer.GetFilename(place, p), cancellationToken);
                             place.Photos[p].DownloadedImage = image;
                         }
+                        p++;
                     }
-
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to get image for place: {PlaceName}", place.DisplayName?.Text);
+                    throw;
                 }
             })
             .ToList();

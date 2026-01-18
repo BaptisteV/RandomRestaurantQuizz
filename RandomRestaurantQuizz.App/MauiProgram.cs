@@ -44,7 +44,7 @@ public static class MauiProgram
             throw new InvalidOperationException("GOOGLE_PLACES_API_KEY not found");
         }
 
-        services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
+        services.AddHttpClient<IGooglePlacesClient, GooglePlacesStaticClient>(a =>
         {
             a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
         });
