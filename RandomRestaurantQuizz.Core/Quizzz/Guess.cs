@@ -7,7 +7,7 @@ public class Guess
     public required PlaceResult Place { get; set; }
     public required double GuessedScore { get; set; }
 
-    public double Score()
+    public double GuessScore()
     {
         var score = 0.0;
         var dist = Math.Abs(GuessedScore - (Place.Rating ?? 0));
@@ -17,10 +17,5 @@ public class Guess
             score = Math.Round(100 * (1 - dist / 1.5));
         }
         return score;
-    }
-
-    public double ScoreDiffPercentage()
-    {
-        return Math.Abs(GuessedScore - Place.Rating ?? 0.0) * 100.0;
     }
 }

@@ -21,11 +21,13 @@ public partial class MainPage : ContentPage
         _quizz.ScoreChanged = async (model) =>
         {
             ScoreLabel.Text = $"Score: {model.TotalScore}";
-            RestaurantNameLabel.Text = model.RestaurantName;
+            RestaurantNameLabel.Text = $"{model.RestaurantName} ({model.RatingCount})";
 
+            ScoreDiffLabel.Opacity = 0.0;
             if (model.LastScoreUpdate < 0)
                 return;
-            ScoreDiffLabel.Opacity = 0.0;
+
+            ScoreDiffLabel.TextColor = model.LastScoreUpdate >= 50.0 ? Colors.Green : Colors.Red;
             ScoreDiffLabel.Text = $"+{model.LastScoreUpdate} ({model.LastRating:n1})";
             _ = Task.Run(async () =>
             {
@@ -35,7 +37,6 @@ public partial class MainPage : ContentPage
             });
 
             await _soundEffects.PlayAnswer(correctnessPercentage: model.LastScoreUpdate, CancellationToken.None);
-
         };
 
         _quizz.PhotoChanged = async (model) =>

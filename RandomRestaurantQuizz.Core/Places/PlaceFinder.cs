@@ -6,12 +6,12 @@ namespace RandomRestaurantQuizz.Core.Places;
 
 public sealed class PlaceFinder : IPlaceFinder, IDisposable
 {
-    private readonly GooglePlacesClient _placesClient;
+    private readonly IGooglePlacesClient _placesClient;
     private readonly ILogger<PlaceFinder> _logger;
     private readonly PhotoDownloader _photoDownloader;
     private readonly CancellationTokenSource _cts;
 
-    public PlaceFinder(GooglePlacesClient placesClient, PhotoDownloader photoDownloader, ILogger<PlaceFinder> logger)
+    public PlaceFinder(IGooglePlacesClient placesClient, PhotoDownloader photoDownloader, ILogger<PlaceFinder> logger)
     {
         _placesClient = placesClient;
         _photoDownloader = photoDownloader;

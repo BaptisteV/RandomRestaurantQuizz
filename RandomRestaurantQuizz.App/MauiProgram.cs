@@ -5,15 +5,8 @@ using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz;
 using RandomRestaurantQuizz.Core.SoundEffects;
 using System.Reflection;
-using System.Text.Json.Serialization;
 
 namespace RandomRestaurantQuizz.App;
-
-public class SecretsJson
-{
-    [JsonPropertyName("GOOGLE_PLACES_API_KEY")]
-    public string GooglePlacesApiKey { get; set; } = "";
-}
 
 public static class MauiProgram
 {
@@ -33,7 +26,7 @@ public static class MauiProgram
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
         var services = builder.Services;
-        services.AddHttpClient();
+        services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>();
         // Load embedded JSON config
         using var stream = Assembly
             .GetExecutingAssembly()
@@ -51,10 +44,14 @@ public static class MauiProgram
             throw new InvalidOperationException("GOOGLE_PLACES_API_KEY not found");
         }
 
-        services.AddSingleton(provider =>
+        services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
         {
-            var httpClient = provider.GetRequiredService<HttpClient>();
-            return new GooglePlacesClient(httpClient, apiKey, provider.GetRequiredService<ILogger<GooglePlacesClient>>());
+            a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
+        });
+
+        services.Configure<SecretsJson>(c =>
+        {
+            c.GooglePlacesApiKey = apiKey;
         });
 
         services.AddTransient<IFileNamer, FileNamer>();

@@ -4,15 +4,12 @@ using NAudio.Wave.SampleProviders;
 namespace RandomRestaurantQuizz.Core.SoundEffects;
 
 
-public class SoundEffectGenerator : ISoundEffect
+public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
 {
-    private IWavePlayer waveOut;
-
-    public SoundEffectGenerator()
+    private readonly IWavePlayer waveOut = new WaveOutEvent
     {
-        // Initialize the wave player
-        waveOut = new WaveOutEvent();
-    }
+        Volume = 0.25f,
+    };
 
     public void PlayVictorySound()
     {

@@ -12,6 +12,8 @@ public class QuizzModel
 
     public string RestaurantName { get; set; } = "";
 
+    public int RatingCount { get; set; } = 0;
+
     public override string ToString()
     {
         return $"CurrentPlace={RestaurantName}, TotalScore {TotalScore}";

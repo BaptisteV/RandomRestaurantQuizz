@@ -9,12 +9,12 @@ public class Player
         _guesses.Add(guess);
     }
 
-    public double Score()
+    public double TotalScore()
     {
         var score = 0.0;
         foreach (var guess in _guesses)
         {
-            score += guess.Score();
+            score += guess.GuessScore();
         }
         return score;
     }

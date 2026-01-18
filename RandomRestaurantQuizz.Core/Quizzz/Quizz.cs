@@ -12,7 +12,7 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
 
     private readonly Player _player = new();
     private readonly Queue<PlaceResult> _places = [];
-    private PlaceResult _currentPlace;
+    private PlaceResult _currentPlace = new();
     private readonly QuizzModel _model = new();
 
     public Func<QuizzModel, Task> ScoreChanged { get; set; } = (_) => Task.CompletedTask;
@@ -29,6 +29,7 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
         _currentPlace = _places.Dequeue();
 
         _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
+        _model.RatingCount = _currentPlace.UserRatingCount ?? 0;
         _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage!;
 
         await ScoreChanged(_model);
@@ -54,12 +55,13 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
 
         _logger.LogInformation("Answered {Guess} for {PlaceName}", guess.GuessedScore, _currentPlace.DisplayName?.Text);
         _logger.LogInformation("Real ranking {RealRank}", _currentPlace.Rating);
-        _logger.LogInformation("Score: {Score}, Total: {TotalScore}", guess.Score(), _player.Score());
+        _logger.LogInformation("Score: {Score}, Total: {TotalScore}", guess.GuessScore(), _player.TotalScore());
 
         _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
+        _model.RatingCount = _currentPlace.UserRatingCount ?? 0;
         _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage!;
-        _model.TotalScore = (int)_player.Score();
-        _model.LastScoreUpdate = (int)guess.Score();
+        _model.TotalScore = (int)_player.TotalScore();
+        _model.LastScoreUpdate = (int)guess.GuessScore();
         _model.LastRating = guess.Place.Rating ?? 0.0;
 
         await ScoreChanged(_model);

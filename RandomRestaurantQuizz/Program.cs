@@ -21,7 +21,10 @@ await Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((context, services) =>
     {
-        services.AddHttpClient();
+        services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
+        {
+            a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
+        });
 
         var apiKey = Environment.GetEnvironmentVariable("GOOGLE_PLACES_API_KEY");
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -29,10 +32,9 @@ await Host.CreateDefaultBuilder(args)
             throw new InvalidOperationException("GOOGLE_PLACES_API_KEY environment variable is not set.");
         }
 
-        services.AddSingleton(provider =>
+        services.Configure<SecretsJson>(c =>
         {
-            var httpClient = provider.GetRequiredService<HttpClient>();
-            return new GooglePlacesClient(httpClient, apiKey, provider.GetRequiredService<ILogger<GooglePlacesClient>>());
+            c.GooglePlacesApiKey = apiKey;
         });
 
         services.AddTransient<IFileNamer, FileNamer>();
