@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.Core;
 using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz;
@@ -68,9 +67,7 @@ public static class MauiProgram
 
         services.AddTransient<IPlaceFinder, PlaceFinder>();
         services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-        services.AddSingleton<IPitchShifter, PitchShifter>();
-        services.AddSingleton<ISoundEffect, DynamicSoundEffect>();
-        services.AddSingleton<IQuizzUIHandler, UiHandler>();
+        services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
         services.AddSingleton<IQuizz, Quizz>();
 
         return builder.Build();

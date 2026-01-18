@@ -1,17 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.Core.Quizzz;
-
-namespace RandomRestaurantQuizz.App
+﻿namespace RandomRestaurantQuizz.App
 {
     public partial class App : Application
     {
-        protected readonly IQuizz _quizz;
-        protected readonly ILoggerFactory _logger;
-        public App(IQuizz quizz, ILoggerFactory logger)
+        public App()
         {
             InitializeComponent();
-            _quizz = quizz;
-            _logger = logger;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

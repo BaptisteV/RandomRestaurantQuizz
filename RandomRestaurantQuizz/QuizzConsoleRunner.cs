@@ -14,16 +14,19 @@ public class QuizzConsoleRunner : IRunner
     {
         _quizz = quizz;
         _logger = logger;
+        _quizz.ScoreChanged = async (model) =>
+        {
+            _logger.LogInformation("{CurrentState}", model);
+        };
     }
 
     public async Task RunAsync()
     {
-        await _quizz.Init();
+        await _quizz.DownloadRestaurants();
         while (true)
         {
-            _logger.LogInformation("{CurrentState}", _quizz.CurrentState());
             var answerValue = DoubleReader.ReadDouble("Guessed rating ? : ");
-            _quizz.Answer(answerValue);
+            await _quizz.Answer(answerValue);
         }
     }
 }

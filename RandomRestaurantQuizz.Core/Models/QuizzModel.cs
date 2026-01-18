@@ -10,6 +10,8 @@ public class QuizzModel
 
     public Player Player { get; set; } = new Player();
 
+    public Guess? LastGuess { get; internal set; }
+
     public override string ToString()
     {
         return $"CurrentPlace={CurrentPlace?.DisplayName?.Text}, Score {Player.Score()}";

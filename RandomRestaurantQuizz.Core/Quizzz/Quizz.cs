@@ -2,47 +2,23 @@
 using RandomRestaurantQuizz.Core.Data;
 using RandomRestaurantQuizz.Core.Models;
 using RandomRestaurantQuizz.Core.Places;
-using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public class Quizz : IQuizz
+public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
 {
-    private readonly IPlaceFinder _placeFinder;
+    private readonly IPlaceFinder _placeFinder = placeFinder;
+    private readonly ILogger<Quizz> _logger = logger;
+
     private readonly Player _player = new();
     private readonly Queue<PlaceResult> _places = [];
     private readonly QuizzModel _model = new();
-    private readonly ILogger<Quizz> _logger;
 
-    private readonly ISoundEffect _soundEffects;
-    private readonly IQuizzUIHandler _uiHandler;
+    public Func<QuizzModel, Task> ScoreChanged { get; set; } = (_) => Task.CompletedTask;
+    public Func<QuizzModel, Task> PhotoChanged { get; set; } = (_) => Task.CompletedTask;
 
-    public Quizz(IPlaceFinder placeFinder, ISoundEffect soundEffects, ILogger<Quizz> logger, IQuizzUIHandler uiHandler)
+    public async Task DownloadRestaurants()
     {
-        _placeFinder = placeFinder;
-        _soundEffects = soundEffects;
-        _logger = logger;
-        _uiHandler = uiHandler;
-        _player.Guesss.CollectionChanged += (o, e) =>
-        {
-            if (e.NewItems?.Count == 0)
-            {
-                _logger.LogWarning("Guesses change ignored");
-                return;
-            }
-
-            if (e.NewItems?.Count != 1)
-                throw new InvalidOperationException("Expected only one change at a time");
-
-            var newScore = _player.Score();
-            var addedGuess = (Guess)e.NewItems[0]!;
-            _uiHandler.OnUpdateScore(newScore, addedGuess.ScoreDiffPercentage());
-        };
-    }
-
-    public async Task Init()
-    {
-        await _soundEffects.Init();
         Cities.Data.TryGetValue("Dijon", out var city);
         var restaurants = await _placeFinder.GetRestaurants(city);
         foreach (var restaurant in restaurants)
@@ -50,9 +26,10 @@ public class Quizz : IQuizz
             _places.Enqueue(restaurant);
         }
         _model.CurrentPlace = _places.Dequeue();
+        await PhotoChanged(_model);
     }
 
-    public void Answer(double guessedValue)
+    public async Task Answer(double guessedValue)
     {
         if (_places.Count == 0)
         {
@@ -67,31 +44,30 @@ public class Quizz : IQuizz
             Place = answered
         };
 
-        var scoreDifference = Math.Abs(guess.GuessedScore - answered.Rating ?? 0.0);
         _player.NewGuess(guess);
 
-        _logger.LogInformation("Answered     {Guess} for {PlaceName}", guess.GuessedScore, answered.DisplayName?.Text);
+        _logger.LogInformation("Answered {Guess} for {PlaceName}", guess.GuessedScore, answered.DisplayName?.Text);
         _logger.LogInformation("Real ranking {RealRank}", answered.Rating);
-        _logger.LogInformation("Score: {Score}", _player.Score());
+        _logger.LogInformation("Score: {Score}, Total: {TotalScore}", guess.Score(), _player.Score());
 
+        _model.LastGuess = guess;
         _model.CurrentPlace = answered;
         _model.Player = _player;
 
+        await ScoreChanged(_model);
+        await PhotoChanged(_model);
     }
 
-    public QuizzModel CurrentState()
-    {
-        return _model;
-    }
-
-    public void NextPhoto()
+    public async Task NextPhoto()
     {
         var maxIndex = _model.CurrentPlace!.Photos!.Count - 1;
         _model.CurrentPhotoIndex = Math.Min(_model.CurrentPhotoIndex + 1, maxIndex);
+        await PhotoChanged(_model);
     }
 
-    public void PreviousPhoto()
+    public async Task PreviousPhoto()
     {
         _model.CurrentPhotoIndex = Math.Max(0, _model.CurrentPhotoIndex - 1);
+        await PhotoChanged(_model);
     }
 }

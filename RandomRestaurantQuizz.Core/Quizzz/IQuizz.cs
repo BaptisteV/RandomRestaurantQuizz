@@ -8,12 +8,13 @@ public interface IQuizz
     /// Fetch data and prepare the quizz
     /// </summary>
     /// <returns></returns>
-    Task Init();
+    Task DownloadRestaurants();
 
-    void Answer(double guessedValue);
+    Task Answer(double guessedValue);
 
-    void NextPhoto();
-    void PreviousPhoto();
+    Task NextPhoto();
+    Task PreviousPhoto();
 
-    public QuizzModel CurrentState();
+    Func<QuizzModel, Task> ScoreChanged { get; set; }
+    Func<QuizzModel, Task> PhotoChanged { get; set; }
 }

@@ -48,7 +48,6 @@ await Host.CreateDefaultBuilder(args)
         //services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
         //services.AddTransient<IPitchShifter, PitchShifter>();
         services.AddTransient<ISoundEffect, NoSoundEffect>();
-        services.AddSingleton<IQuizzUIHandler, ConsoleUIHandler>();
         services.AddTransient<IQuizz, Quizz>();
     })
     .UseDefaultServiceProvider(o =>

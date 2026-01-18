@@ -12,8 +12,8 @@ public class ResourceSoundEffect(IAudioManager audioManager) : ISoundEffect
 
     public async Task Init()
     {
-        _winSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("win.wav"));
-        _looseSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("loose.wav"));
+        _winSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("win2.wav"));
+        _looseSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("loose2.wav"));
     }
 
     public async Task PlayAnswer(double correctnessPercentage, CancellationToken cancellationToken)

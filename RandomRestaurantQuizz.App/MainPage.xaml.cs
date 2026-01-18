@@ -1,51 +1,58 @@
-﻿using RandomRestaurantQuizz.Core;
+﻿using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz.Core.Quizzz;
+using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
 
 public partial class MainPage : ContentPage
 {
+    private readonly ILogger<MainPage> _logger;
+    private readonly ISoundEffect _soundEffects;
     private readonly IQuizz _quizz;
-    private readonly IQuizzUIHandler _uiHandler;
 
-    public MainPage(IQuizz quizz, IQuizzUIHandler uIHandler)
+    public MainPage(IQuizz quizz, ILogger<MainPage> logger, ISoundEffect soundEffects)
     {
         _quizz = quizz;
-        _uiHandler = uIHandler;
-        InitializeComponent();
-    }
 
-    private void OnCounterClicked(object? sender, EventArgs e)
-    {
-        _quizz.Answer(RatingSlider.Value);
-        ApplyState();
+        _logger = logger;
+        _soundEffects = soundEffects;
+        InitializeComponent();
+
+        _quizz.ScoreChanged = async (model) =>
+        {
+            var newScore = model.Player.Score();
+            ScoreLabel.Text = $"Score: {newScore:F2}";
+
+            if (model.LastGuess is not null)
+            {
+                var scoreDiff = model.LastGuess.ScoreDiffPercentage();
+                await _soundEffects.PlayAnswer(correctnessPercentage: scoreDiff, CancellationToken.None);
+            }
+            else
+            {
+                _logger.LogWarning("No last guess");
+            }
+        };
+
+        _quizz.PhotoChanged = async (model) =>
+        {
+            var photos = model.CurrentPlace?.Photos;
+            var photo = photos?.ElementAtOrDefault(model.CurrentPhotoIndex);
+            if (photo is not null)
+            {
+                var ms = new MemoryStream(photo.DownloadedImage!);
+                RestaurantPhotoImage.Source = ImageSource.FromStream(() => ms);
+            }
+        };
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
-        await _uiHandler.Init(ScoreLabel);
-        await _quizz.Init().ContinueWith(async (_) =>
-        {
-            await MainThread.InvokeOnMainThreadAsync(() =>
-            {
-                ApplyState();
-            });
-        });
+        await _soundEffects.Init();
+        await _quizz.DownloadRestaurants();
     }
 
-    private void ApplyState()
-    {
-        var model = _quizz.CurrentState();
-        var photos = model.CurrentPlace?.Photos;
-        var photo = photos?.ElementAtOrDefault(model.CurrentPhotoIndex);
-        if (photo is not null)
-        {
-            var ms = new MemoryStream(photo.DownloadedImage!);
-            RestaurantPhotoImage.Source = ImageSource.FromStream(() => ms);
-        }
-    }
-
-    private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
+    private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
     {
         var x = e.GetPosition(PhotoContainer)!.Value.X;
         var width = PhotoContainer.Width;
@@ -54,13 +61,11 @@ public partial class MainPage : ContentPage
         // Tap sides to change photo
         if (xPercent <= 25)
         {
-            _quizz.PreviousPhoto();
-            ApplyState();
+            await _quizz.PreviousPhoto();
         }
         else if (xPercent >= 75)
         {
-            _quizz.NextPhoto();
-            ApplyState();
+            await _quizz.NextPhoto();
         }
     }
 
@@ -68,5 +73,10 @@ public partial class MainPage : ContentPage
     {
         RatingLabel.Text = $"{e.NewValue:F1}";
         Stars.Rating = e.NewValue;
+    }
+
+    private void AnswerBtn_Clicked(object sender, EventArgs e)
+    {
+        _quizz.Answer(RatingSlider.Value);
     }
 }
