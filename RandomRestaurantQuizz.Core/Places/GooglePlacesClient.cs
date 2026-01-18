@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RandomRestaurantQuizz.Core.Models;
+using RandomRestaurantQuizz.Core.Photos;
 using System.Net.Http.Json;
 
 namespace RandomRestaurantQuizz.Core.Places;
@@ -8,10 +10,14 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
+    private readonly IPhotoDownloader _photoDownloader;
+    private readonly ILogger<GooglePlacesClient> _logger;
 
-    public GooglePlacesClient(HttpClient httpClient, IOptionsMonitor<SecretsJson> config)
+    public GooglePlacesClient(HttpClient httpClient, IOptionsMonitor<SecretsJson> config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
     {
         _httpClient = httpClient;
+        _photoDownloader = photoDownloader;
+        _logger = logger;
         var sec = config.CurrentValue;
         _apiKey = sec.GooglePlacesApiKey;
     }
@@ -49,5 +55,20 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         var json = await response.Content.ReadFromJsonAsync<PlacesApiResponse>(cancellationToken: cancellationToken);
 
         return json?.Places ?? [];
+    }
+
+    public async Task<List<PlaceResult>> GetRestaurants(GeoLoc center, CancellationToken cancellationToken = default)
+    {
+        // Get all possible restaurants
+        var restaurants = (await GetRestaurantsInCity(center, 1000, cancellationToken)).Where(r => r.Photos?.Count > 0).ToList();
+
+        // Enrich with photos
+        var restaurantsWithFirstPhoto = await _photoDownloader.GetPhotos(restaurants, cancellationToken);
+
+        // Filter only those with at least one photo and more than 1 user rating
+        var selectedRestaurants = restaurantsWithFirstPhoto.Where(r => r.UserRatingCount > 0).ToList();
+        _logger.LogInformation("Selected {SelectedRestaurantCount} out of {RestaurantCount}", selectedRestaurants.Count, restaurants.Count);
+
+        return selectedRestaurants;
     }
 }

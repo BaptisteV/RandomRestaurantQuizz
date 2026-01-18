@@ -1,9 +1,9 @@
 ﻿using RandomRestaurantQuizz.Core.Models;
 
-namespace RandomRestaurantQuizz.Core.Places
+namespace RandomRestaurantQuizz.Core.Places;
+
+public interface IGooglePlacesClient
 {
-    public interface IGooglePlacesClient
-    {
-        Task<List<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize = 1000, CancellationToken cancellationToken = default);
-    }
+    Task<List<PlaceResult>> GetRestaurants(GeoLoc center, CancellationToken cancellationToken = default);
+    //Task<List<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize = 1000, CancellationToken cancellationToken = default);
 }

@@ -48,6 +48,7 @@ public static class MauiProgram
         {
             a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
         });
+        services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
 
         services.Configure<SecretsJson>(c =>
         {
@@ -56,13 +57,7 @@ public static class MauiProgram
 
         services.AddTransient<IFileNamer, FileNamer>();
         services.AddTransient<PhotoFileManager>();
-        services.AddTransient(provider =>
-        {
-            var httpClient = provider.GetRequiredService<HttpClient>();
-            return new PhotoDownloader(httpClient, apiKey, provider.GetRequiredService<IFileNamer>(), provider.GetRequiredService<ILogger<PhotoDownloader>>());
-        });
 
-        services.AddTransient<IPlaceFinder, PlaceFinder>();
         services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
         // services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
         services.AddSingleton<ISoundEffect, SoundEffectGenerator>();

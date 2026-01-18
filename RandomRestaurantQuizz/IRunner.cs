@@ -1,4 +1,4 @@
-﻿namespace RandomRestaurantQuizz.Core;
+﻿namespace RandomRestaurantQuizz.Console;
 
 public interface IRunner
 {

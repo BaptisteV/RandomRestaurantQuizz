@@ -5,9 +5,8 @@ using RandomRestaurantQuizz.Core.Places;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
+public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQuizz
 {
-    private readonly IPlaceFinder _placeFinder = placeFinder;
     private readonly ILogger<Quizz> _logger = logger;
 
     private readonly Player _player = new();
@@ -21,7 +20,7 @@ public class Quizz(IPlaceFinder placeFinder, ILogger<Quizz> logger) : IQuizz
     public async Task DownloadRestaurants()
     {
         Cities.Data.TryGetValue("Dijon", out var city);
-        var restaurants = await _placeFinder.GetRestaurants(city);
+        var restaurants = await restauClient.GetRestaurants(city);
         foreach (var restaurant in restaurants)
         {
             _places.Enqueue(restaurant);

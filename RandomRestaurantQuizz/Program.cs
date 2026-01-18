@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz.Console;
-using RandomRestaurantQuizz.Core;
 using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz;
@@ -21,16 +20,18 @@ await Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((context, services) =>
     {
-        services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
-        {
-            a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
-        });
-
         var apiKey = Environment.GetEnvironmentVariable("GOOGLE_PLACES_API_KEY");
         if (string.IsNullOrWhiteSpace(apiKey))
         {
             throw new InvalidOperationException("GOOGLE_PLACES_API_KEY environment variable is not set.");
         }
+
+        services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
+        {
+            a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
+        });
+
+        services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
 
         services.Configure<SecretsJson>(c =>
         {
@@ -39,17 +40,9 @@ await Host.CreateDefaultBuilder(args)
 
         services.AddTransient<IFileNamer, FileNamer>();
         services.AddTransient<PhotoFileManager>();
-        services.AddTransient(provider =>
-        {
-            var httpClient = provider.GetRequiredService<HttpClient>();
-            return new PhotoDownloader(httpClient, apiKey, provider.GetRequiredService<IFileNamer>(), provider.GetRequiredService<ILogger<PhotoDownloader>>());
-        });
-
-        services.AddTransient<IPlaceFinder, PlaceFinder>();
         services.AddTransient<IRunner, QuizzConsoleRunner>();
-        //services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-        //services.AddTransient<IPitchShifter, PitchShifter>();
-        services.AddTransient<ISoundEffect, NoSoundEffect>();
+        services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
+        services.AddSingleton<ISoundEffect, SoundEffectGenerator>();
         services.AddTransient<IQuizz, Quizz>();
     })
     .UseDefaultServiceProvider(o =>

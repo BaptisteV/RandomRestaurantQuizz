@@ -1,18 +1,20 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RandomRestaurantQuizz.Core.Models;
+using RandomRestaurantQuizz.Core.Places;
 
 namespace RandomRestaurantQuizz.Core.Photos;
 
-public class PhotoDownloader
+public class PhotoDownloader : IPhotoDownloader
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
     private readonly IFileNamer _fileNamer;
     private readonly ILogger<PhotoDownloader> _logger;
-    public PhotoDownloader(HttpClient httpClient, string apiKey, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
+    public PhotoDownloader(HttpClient httpClient, IOptionsMonitor<SecretsJson> config, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
     {
         _httpClient = httpClient;
-        _apiKey = apiKey;
+        _apiKey = config.CurrentValue.GooglePlacesApiKey;
         _logger = logger;
         _fileNamer = fileNamer;
     }
@@ -26,7 +28,7 @@ public class PhotoDownloader
         return url;
     }
 
-    public async Task<byte[]> GetImage(Photo photo, CancellationToken cancellationToken)
+    private async Task<byte[]> GetImage(Photo photo, CancellationToken cancellationToken)
     {
         var url = GetPhotoUrl(photo.Name!);
         _logger.LogDebug("Downloading: {DownloadUrl}", url);
@@ -49,7 +51,7 @@ public class PhotoDownloader
         return false;
     }
 
-    public async Task<IList<PlaceResult>> GetPhotos(List<PlaceResult> placeResults, CancellationToken cancellationToken)
+    public async Task<List<PlaceResult>> GetPhotos(List<PlaceResult> placeResults, CancellationToken cancellationToken)
     {
         var downloadTasks = placeResults
             .Select(async (place, i) =>
