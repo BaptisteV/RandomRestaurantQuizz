@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using RandomRestaurantQuizz.Core.Models;
 using RandomRestaurantQuizz.Core.Places;
+using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Core.Photos;
 
@@ -53,6 +54,7 @@ public class PhotoDownloader : IPhotoDownloader
 
     public async Task<List<PlaceResult>> GetPhotos(List<PlaceResult> placeResults, CancellationToken cancellationToken)
     {
+        var sw = Stopwatch.StartNew();
         var downloadTasks = placeResults
             .Select(async (place, i) =>
             {
@@ -60,14 +62,13 @@ public class PhotoDownloader : IPhotoDownloader
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var p = 0;
                     if (place.Photos is null)
                     {
                         _logger.LogWarning("No photo for {PlaceName}", place.DisplayName?.Text);
                         return;
                     }
 
-                    foreach (var photo in place.Photos)
+                    for (var p = 0; p < place.Photos.Count; p++)
                     {
                         if (ShouldDownload(place, p))
                         {
@@ -79,7 +80,6 @@ public class PhotoDownloader : IPhotoDownloader
                             var image = await File.ReadAllBytesAsync(_fileNamer.GetFilename(place, p), cancellationToken);
                             place.Photos[p].DownloadedImage = image;
                         }
-                        p++;
                     }
                 }
                 catch (Exception ex)
@@ -91,6 +91,9 @@ public class PhotoDownloader : IPhotoDownloader
             .ToList();
 
         await Task.WhenAll(downloadTasks);
+
+        var elapsed = sw.Elapsed;
+        _logger.LogInformation("Downloaded all photos in {DlElapsed}", elapsed);
 
         return placeResults;
     }
