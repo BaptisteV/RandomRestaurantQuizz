@@ -21,43 +21,6 @@ public static class MauiProgram
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
         builder.Services.AddCoreServices();
-        //services.AddHttpClient<IGooglePlacesClient, GooglePlacesStaticClient>();
-        //// Load embedded JSON config
-        //using var stream = Assembly
-        //    .GetExecutingAssembly()
-        //    .GetManifestResourceStream($"{typeof(MauiProgram).Namespace}.secrets.json")
-        //        ?? throw new InvalidOperationException("Failed to load embedded configuration file.");
-        //
-        //var secrets = new ConfigurationBuilder()
-        //    .AddJsonStream(stream)
-        //    .Build();
-        //
-        //var apiKey = secrets.GetRequiredSection("GOOGLE_PLACES_API_KEY").Value;
-        //
-        //if (string.IsNullOrWhiteSpace(apiKey))
-        //{
-        //    throw new InvalidOperationException("GOOGLE_PLACES_API_KEY not found");
-        //}
-        //
-        //services.AddHttpClient<IGooglePlacesClient, GooglePlacesStaticClient>(a =>
-        //{
-        //    a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
-        //});
-        //services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
-        //
-        //services.Configure<SecretsJson>(c =>
-        //{
-        //    c.GooglePlacesApiKey = apiKey;
-        //});
-        //
-        //services.AddTransient<IFileNamer, FileNamer>();
-        //services.AddTransient<PhotoFileManager>();
-        //
-        //services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-        //// services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
-        //services.AddSingleton<ISoundEffect, SoundEffectGenerator>();
-        //services.AddSingleton<IQuizz, Quizz>();
-        //
         return builder.Build();
     }
 }

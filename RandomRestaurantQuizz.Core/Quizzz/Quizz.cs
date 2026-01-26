@@ -5,7 +5,7 @@ using RandomRestaurantQuizz.Core.Places;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQuizz
+public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger, IScoreSaver scoreSaver) : IQuizz
 {
     private readonly ILogger<Quizz> _logger = logger;
 
@@ -13,6 +13,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
     private readonly Queue<PlaceResult> _places = [];
     private PlaceResult _currentPlace = new();
     private readonly QuizzModel _model = new();
+    private readonly IScoreSaver _scoreSaver = scoreSaver;
 
     public Func<QuizzModel, Task> ScoreChanged { get; set; } = (_) => Task.CompletedTask;
     public Func<QuizzModel, Task> PhotoChanged { get; set; } = (_) => Task.CompletedTask;
@@ -40,6 +41,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
     {
         if (_places.Count == 0)
         {
+            _model.PersonalBests = await _scoreSaver.ReadScores();
             await RoundFinished(_model);
             return;
         }

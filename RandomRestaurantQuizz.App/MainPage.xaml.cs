@@ -8,14 +8,16 @@ public partial class MainPage : ContentPage
 {
     private readonly ILogger<MainPage> _logger;
     private readonly ISoundEffect _soundEffects;
+    private readonly IScoreSaver _scoreSaver;
     private readonly IQuizz _quizz;
 
-    public MainPage(IQuizz quizz, ILogger<MainPage> logger, ISoundEffect soundEffects)
+    public MainPage(IQuizz quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, IScoreSaver scoreSaver)
     {
         _quizz = quizz;
-
         _logger = logger;
         _soundEffects = soundEffects;
+        _scoreSaver = scoreSaver;
+
         InitializeComponent();
 
         _quizz.ScoreChanged = async (model) =>
@@ -48,7 +50,8 @@ public partial class MainPage : ContentPage
         _quizz.RoundFinished = async model =>
         {
             _logger.LogDebug("Round finished");
-            await Navigation.PushModalAsync(new RecapModal());
+            await _scoreSaver.SaveScore(model.TotalScore);
+            await Navigation.PushModalAsync(new RecapModal(model));
         };
     }
 

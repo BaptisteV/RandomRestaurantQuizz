@@ -1,4 +1,6 @@
-﻿namespace RandomRestaurantQuizz.Core.Models;
+﻿using RandomRestaurantQuizz.Core.Quizzz;
+
+namespace RandomRestaurantQuizz.Core.Models;
 
 public class QuizzModel
 {
@@ -13,6 +15,8 @@ public class QuizzModel
     public string RestaurantName { get; set; } = "";
 
     public int RatingCount { get; set; } = 0;
+
+    public List<Score> PersonalBests { get; set; } = [];
 
     public override string ToString()
     {

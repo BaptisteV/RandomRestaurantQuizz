@@ -4,14 +4,8 @@ namespace RandomRestaurantQuizz.Core.Quizzz;
 
 public interface IQuizz
 {
-    /// <summary>
-    /// Fetch data and prepare the quizz
-    /// </summary>
-    /// <returns></returns>
     Task DownloadRestaurants(CancellationToken cancellationToken);
-
     Task Answer(double guessedValue);
-
     Task NextPhoto();
     Task PreviousPhoto();
 
