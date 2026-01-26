@@ -12,6 +12,7 @@ public class PhotoDownloader : IPhotoDownloader
     private readonly string _apiKey;
     private readonly IFileNamer _fileNamer;
     private readonly ILogger<PhotoDownloader> _logger;
+
     public PhotoDownloader(HttpClient httpClient, IOptionsMonitor<SecretsJson> config, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
     {
         _httpClient = httpClient;
@@ -29,6 +30,14 @@ public class PhotoDownloader : IPhotoDownloader
         return url;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="photo"></param>
+    /// <param name="cancellationToken"></param>
+    /// <exception cref="HttpRequestException">Failed to fetch</exception>
+    /// <exception cref="OperationCanceledException">Download cancelled</exception>
+    /// <returns></returns>
     private async Task<byte[]> GetImage(Photo photo, CancellationToken cancellationToken)
     {
         var url = GetPhotoUrl(photo.Name!);
@@ -55,40 +64,7 @@ public class PhotoDownloader : IPhotoDownloader
     public async Task<List<PlaceResult>> GetPhotos(List<PlaceResult> placeResults, CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
-        var downloadTasks = placeResults
-            .Select(async (place, i) =>
-            {
-                try
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    if (place.Photos is null)
-                    {
-                        _logger.LogWarning("No photo for {PlaceName}", place.DisplayName?.Text);
-                        return;
-                    }
-
-                    for (var p = 0; p < place.Photos.Count; p++)
-                    {
-                        if (ShouldDownload(place, p))
-                        {
-                            var image = await GetImage(place.Photos[p], cancellationToken);
-                            place.Photos[p].DownloadedImage = image;
-                        }
-                        else
-                        {
-                            var image = await File.ReadAllBytesAsync(_fileNamer.GetFilename(place, p), cancellationToken);
-                            place.Photos[p].DownloadedImage = image;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to get image for place: {PlaceName}", place.DisplayName?.Text);
-                    throw;
-                }
-            })
-            .ToList();
+        var downloadTasks = placeResults.Select((place, i) => DownloadRestaurantPhotosTask(place, cancellationToken));
 
         await Task.WhenAll(downloadTasks);
 
@@ -96,5 +72,45 @@ public class PhotoDownloader : IPhotoDownloader
         _logger.LogInformation("Downloaded all photos in {DlElapsed}", elapsed);
 
         return placeResults;
+    }
+
+    private async Task<bool> DownloadRestaurantPhotosTask(PlaceResult place, CancellationToken cancellationToken)
+    {
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (place.Photos.Count == 0)
+            {
+                _logger.LogWarning("No photo for {PlaceName}", place.DisplayName?.Text);
+                return false;
+            }
+
+            for (var p = 0; p < place.Photos.Count; p++)
+            {
+                if (ShouldDownload(place, p))
+                {
+                    var image = await GetImage(place.Photos[p], cancellationToken);
+                    place.Photos[p].DownloadedImage = image;
+                }
+                else
+                {
+                    var image = await File.ReadAllBytesAsync(_fileNamer.GetFilename(place, p), cancellationToken);
+                    place.Photos[p].DownloadedImage = image;
+                }
+            }
+        }
+        catch (HttpRequestException reqException)
+        {
+            _logger.LogError(reqException, "Failed to get image for place: {PlaceName}", place.DisplayName?.Text);
+            throw;
+        }
+        catch (OperationCanceledException cancelledException)
+        {
+            _logger.LogError(cancelledException, "Getting image canceled for: {PlaceName}", place.DisplayName?.Text);
+            throw;
+        }
+
+        return true;
     }
 }

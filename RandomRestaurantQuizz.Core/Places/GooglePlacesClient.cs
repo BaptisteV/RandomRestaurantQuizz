@@ -18,29 +18,28 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         _httpClient = httpClient;
         _photoDownloader = photoDownloader;
         _logger = logger;
-        var sec = config.CurrentValue;
-        _apiKey = sec.GooglePlacesApiKey;
+        _apiKey = config.CurrentValue.GooglePlacesApiKey;
     }
 
-    private async Task<List<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize = 1000, CancellationToken cancellationToken = default)
+    private static NearbySearchRequest CreateRequest(GeoLoc center, int radiusSize)
     {
-        var request = new
+        return new NearbySearchRequest
         {
-            locationRestriction = new
+            LocationRestriction = new LocationRestriction
             {
-                circle = new
+                Circle = new Circle
                 {
-                    center = new
-                    {
-                        latitude = center.Latitude,
-                        longitude = center.Longitude,
-                    },
-                    // Max 50000
-                    radius = radiusSize,
-                },
+                    Center = center,
+                    Radius = radiusSize,
+                }
             },
-            includedTypes = new[] { "restaurant" },
+            IncludedTypes = ["restaurant"]
         };
+    }
+
+    private async Task<List<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize, CancellationToken cancellationToken)
+    {
+        var request = CreateRequest(center, radiusSize);
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
         {
@@ -57,18 +56,23 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         return json?.Places ?? [];
     }
 
-    public async Task<List<PlaceResult>> GetRestaurants(GeoLoc center, CancellationToken cancellationToken = default)
+    public async Task<List<PlaceResult>> GetRestaurants(GeoLoc center, int radiusSize, CancellationToken cancellationToken)
     {
         // Get all possible restaurants
-        var restaurants = (await GetRestaurantsInCity(center, 1000, cancellationToken)).Where(r => r.Photos?.Count > 0).ToList();
+        var restaurantsInCity = (await GetRestaurantsInCity(center, radiusSize, cancellationToken)).ToList();
+
+        // Remove restaurants with no photo to download or no rating
+        var restaurants = restaurantsInCity.WithRatingAndPhotos();
+
+        var filteredCount = restaurantsInCity.Count - restaurants.Count;
+        if (filteredCount > 0)
+        {
+            _logger.LogInformation("Deleted {NoRatingCount} restaurants as they don't have a single user rating or no photo", filteredCount);
+        }
+        _logger.LogInformation("Downloading all photos for {RestauCount} restaurants", restaurants.Count);
+
 
         // Enrich with photos
-        var restaurantsWithFirstPhoto = await _photoDownloader.GetPhotos(restaurants, cancellationToken);
-
-        // Filter only those with at least one photo and more than 1 user rating
-        var selectedRestaurants = restaurantsWithFirstPhoto.Where(r => r.UserRatingCount > 0).ToList();
-        _logger.LogInformation("Selected {SelectedRestaurantCount} out of {RestaurantCount}", selectedRestaurants.Count, restaurants.Count);
-
-        return selectedRestaurants;
+        return await _photoDownloader.GetPhotos(restaurants, cancellationToken);
     }
 }

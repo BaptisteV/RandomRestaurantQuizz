@@ -364,3 +364,5 @@ FodyWeavers.xsd
 /RandomRestaurantQuizz/Properties/launchSettings.json
 /RandomRestaurantQuizz.App/Properties/launchSettings.json
 /RandomRestaurantQuizz.App/secrets.json
+/RandomRestaurantQuizz/secrets.json
+/RandomRestaurantQuizz.Core/secrets.json

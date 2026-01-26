@@ -2,7 +2,7 @@
 
 public static class TestData
 {
-    public const string JsonDij =
+    public static string JsonDij { get; } =
 """
 {
   "places": [

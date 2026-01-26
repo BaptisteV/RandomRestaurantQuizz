@@ -39,14 +39,13 @@ public partial class MainPage : ContentPage
             await _soundEffects.PlayAnswer(correctnessPercentage: model.LastScoreUpdate, CancellationToken.None);
         };
 
-        _quizz.PhotoChanged = async (model) =>
+        _quizz.PhotoChanged = async model =>
         {
             _logger.LogDebug("Photo changed");
-            var ms = new MemoryStream(model.Image);
-            RestaurantPhotoImage.Source = ImageSource.FromStream(() => ms);
+            RestaurantPhotoImage.Source = ImageSource.FromStream(() => new MemoryStream(model.Image));
         };
 
-        _quizz.RoundFinished = async (model) =>
+        _quizz.RoundFinished = async model =>
         {
             _logger.LogDebug("Round finished");
             await Navigation.PushModalAsync(new RecapModal());
@@ -56,7 +55,7 @@ public partial class MainPage : ContentPage
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _soundEffects.Init();
-        await _quizz.DownloadRestaurants();
+        await _quizz.DownloadRestaurants(CancellationToken.None);
     }
 
     private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
@@ -76,10 +75,10 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void RatingSlider_ValueChanged(object sender, ValueChangedEventArgs e)
+    private void RatingSlider_ValueChanged(object sender, ValueChangedEventArgs slideEvent)
     {
-        RatingLabel.Text = $"{e.NewValue:F1}";
-        Stars.Rating = e.NewValue;
+        RatingLabel.Text = $"{slideEvent.NewValue:F1}";
+        Stars.Rating = slideEvent.NewValue;
     }
 
     private void AnswerBtn_Clicked(object sender, EventArgs e)

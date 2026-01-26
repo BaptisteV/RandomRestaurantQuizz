@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.Core;
 using RandomRestaurantQuizz.Core.Quizzz;
 using System.Globalization;
 
@@ -14,21 +13,24 @@ public class QuizzConsoleRunner : IRunner
     {
         _quizz = quizz;
         _logger = logger;
-        _quizz.ScoreChanged = async (model) =>
+        _quizz.ScoreChanged = (model) =>
         {
             _logger.LogInformation("{CurrentState}", model);
+            return Task.CompletedTask;
         };
     }
 
-    public async Task RunAsync()
+#pragma warning disable S2190 // Add a way to break out this method's recursion
+    public async Task RunAsync(CancellationToken cancellationToken)
     {
-        await _quizz.DownloadRestaurants();
+        await _quizz.DownloadRestaurants(cancellationToken);
         while (true)
         {
             var answerValue = DoubleReader.ReadDouble("Guessed rating ? : ");
             await _quizz.Answer(answerValue);
         }
     }
+#pragma warning restore S2190 // Add a way to break out this method's recursion
 }
 
 public static class DoubleReader

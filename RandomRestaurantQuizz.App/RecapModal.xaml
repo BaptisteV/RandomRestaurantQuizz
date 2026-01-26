@@ -2,14 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RandomRestaurantQuizz.App.RecapModal"
-             Title="RecapModal">
+             Title="RecapModal"
+             BackgroundColor="Transparent">
     <VerticalStackLayout Padding="20"
                          Spacing="15">
         <Label Text="Score"
                FontSize="Medium"
                HorizontalOptions="Center" />
 
-        <Button Text="Close"
-                Clicked="OnCloseClicked" />
+        <Button x:Name="CloseBtn"
+                Text="Close"
+                Clicked="CloseBtn_Clicked" />
     </VerticalStackLayout>
 </ContentPage>

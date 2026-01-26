@@ -18,10 +18,10 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
     public Func<QuizzModel, Task> PhotoChanged { get; set; } = (_) => Task.CompletedTask;
     public Func<QuizzModel, Task> RoundFinished { get; set; } = (_) => Task.CompletedTask;
 
-    public async Task DownloadRestaurants()
+    public async Task DownloadRestaurants(CancellationToken cancellationToken)
     {
         Cities.Data.TryGetValue("Dijon", out var city);
-        var restaurants = await restauClient.GetRestaurants(city);
+        var restaurants = await restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken);
         foreach (var restaurant in restaurants)
         {
             _places.Enqueue(restaurant);
@@ -53,8 +53,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger) : IQ
 
         _player.NewGuess(guess);
 
-        _logger.LogInformation("Answered {Guess} for {PlaceName}", guess.GuessedScore, _currentPlace.DisplayName?.Text);
-        _logger.LogInformation("Real ranking {RealRank}", _currentPlace.Rating);
+        _logger.LogInformation("Answered {Guess} for {PlaceName}\tReal ranking {RealRank}", guess.GuessedScore, _currentPlace.DisplayName?.Text, _currentPlace.Rating);
         _logger.LogInformation("Score: {Score}, Total: {TotalScore}", guess.GuessScore(), _player.TotalScore());
 
         _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";

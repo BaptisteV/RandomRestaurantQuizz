@@ -5,32 +5,32 @@ using RandomRestaurantQuizz.Core.Places;
 
 namespace RandomRestaurantQuizz.Console;
 
-public class TestSearchAndPhotosRunner : IRunner
+public partial class TestSearchAndPhotosRunner(IGooglePlacesClient restauClient, PhotoFileManager photoManager, ILogger<TestSearchAndPhotosRunner> logger) : IRunner
 {
-    private readonly IGooglePlacesClient _restauClient;
-    private readonly PhotoFileManager _photoManager;
-    private readonly ILogger<TestSearchAndPhotosRunner> _logger;
+    private readonly IGooglePlacesClient _restauClient = restauClient;
+    private readonly PhotoFileManager _photoManager = photoManager;
+    private readonly ILogger<TestSearchAndPhotosRunner> _logger = logger;
 
-    public TestSearchAndPhotosRunner(IGooglePlacesClient restauClient, PhotoFileManager photoManager, ILogger<TestSearchAndPhotosRunner> logger)
-    {
-        _restauClient = restauClient;
-        _photoManager = photoManager;
-        _logger = logger;
-    }
-
-    public async Task RunAsync()
+    public async Task RunAsync(CancellationToken cancellationToken)
     {
         Cities.Data.TryGetValue("Dijon", out var city);
 
-        foreach (var restaurant in await _restauClient.GetRestaurants(city))
+        foreach (var restaurant in await _restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken))
         {
-            _logger.LogInformation("====================================");
-            _logger.LogInformation("Name: {Name}", restaurant.DisplayName?.Text);
-            _logger.LogInformation("Rating: {Rating}⭐ ({UserRatingCount})", restaurant.Rating?.ToString("0.0"), restaurant.UserRatingCount);
-            _logger.LogInformation("Address: {Address}", restaurant.FormattedAddress);
-            _logger.LogInformation("PhotoCount: {PhotoCount}", restaurant.Photos?.Count ?? 0);
+            LogRestaurant(restaurant.DisplayName?.Text, restaurant.Rating, restaurant.UserRatingCount ?? 0, restaurant.FormattedAddress, restaurant.Photos.Count);
             await _photoManager.SaveTempJpgs(restaurant);
         }
+
         _photoManager.OpenTempFolder();
     }
+
+
+    [LoggerMessage(Level = LogLevel.Information, Message =
+        $$"""
+        Name: {Name}
+        Rating: {Rating}:0.0⭐ ({UserRatingCount})
+        Address: {Address}
+        PhotoCount: {PhotoCount}
+        """)]
+    private partial void LogRestaurant(string? name, double? rating, int? userRatingCount, string? address, int? photoCount);
 }

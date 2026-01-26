@@ -5,6 +5,15 @@ namespace RandomRestaurantQuizz.Core.Data;
 
 public static class Cities
 {
+    public static int DefaultRadius
+    {
+        get; set
+        {
+            if (value < 50_000)
+                throw new ArgumentOutOfRangeException(nameof(DefaultRadius));
+        }
+    } = 1000;
+
     private static readonly ImmutableDictionary<string, GeoLoc> Dict = new Dictionary<string, GeoLoc>()
     {
         { "Dijon", new GeoLoc { Latitude = 47.3220, Longitude = 5.0415 }},

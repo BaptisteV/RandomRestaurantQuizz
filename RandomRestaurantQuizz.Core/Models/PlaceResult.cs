@@ -17,7 +17,17 @@ public sealed class PlaceResult
     public string? FormattedAddress { get; set; }
 
     [JsonPropertyName("photos")]
-    public List<Photo>? Photos { get; set; }
+    public List<Photo> Photos { get; set; } = [];
+}
+
+public static class PlaceResultsExtensions
+{
+    public static List<PlaceResult> WithRatingAndPhotos(this IEnumerable<PlaceResult> source)
+    {
+        return [.. source.Where(r =>
+            r.UserRatingCount > 0 &&
+            r.Photos.Any(p => !string.IsNullOrWhiteSpace(p.Name)))];
+    }
 }
 
 public sealed class DisplayName
@@ -59,5 +69,5 @@ public sealed class PhotoMetadata
 
 public sealed class PlacesApiResponse
 {
-    public List<PlaceResult>? Places { get; set; }
+    public List<PlaceResult> Places { get; set; } = [];
 }

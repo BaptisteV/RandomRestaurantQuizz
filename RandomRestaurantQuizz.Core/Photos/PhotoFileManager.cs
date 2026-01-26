@@ -28,7 +28,7 @@ public class PhotoFileManager
             Directory.CreateDirectory(Path.GetDirectoryName(root)!);
         }
 
-        var writes = place.Photos!
+        var writes = place.Photos
             .Select(async (ph, i) =>
             {
                 try
