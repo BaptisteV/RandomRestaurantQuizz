@@ -41,7 +41,7 @@ public class PhotoFileManager
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to save image for place: {PlaceName}", place.DisplayName?.Text);
+                    _logger.LogError(ex, "Failed to save image for place: {PlaceName}", place.DisplayName.Text);
                 }
             })
             .ToList();

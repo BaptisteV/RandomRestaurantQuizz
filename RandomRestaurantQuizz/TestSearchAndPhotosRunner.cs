@@ -17,7 +17,7 @@ public partial class TestSearchAndPhotosRunner(IGooglePlacesClient restauClient,
 
         foreach (var restaurant in await _restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken))
         {
-            LogRestaurant(restaurant.DisplayName?.Text, restaurant.Rating, restaurant.UserRatingCount ?? 0, restaurant.FormattedAddress, restaurant.Photos.Count);
+            LogRestaurant(restaurant.DisplayName.Text, restaurant.Rating, restaurant.UserRatingCount ?? 0, restaurant.FormattedAddress, restaurant.Photos.Count);
             await _photoManager.SaveTempJpgs(restaurant);
         }
 

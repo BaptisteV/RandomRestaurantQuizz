@@ -57,7 +57,7 @@ public class PhotoDownloader : IPhotoDownloader
         if (new FileInfo(filename).Length == 0)
             return true;
 
-        _logger.LogDebug("Photo {PhotoIndex} already exists for {PlaceName}, skipping download.", photoIndex, place.DisplayName?.Text);
+        _logger.LogDebug("Photo {PhotoIndex} already exists for {PlaceName}, skipping download.", photoIndex, place.DisplayName.Text);
         return false;
     }
 
@@ -82,7 +82,7 @@ public class PhotoDownloader : IPhotoDownloader
 
             if (place.Photos.Count == 0)
             {
-                _logger.LogWarning("No photo for {PlaceName}", place.DisplayName?.Text);
+                _logger.LogWarning("No photo for {PlaceName}", place.DisplayName.Text);
                 return false;
             }
 
@@ -102,12 +102,12 @@ public class PhotoDownloader : IPhotoDownloader
         }
         catch (HttpRequestException reqException)
         {
-            _logger.LogError(reqException, "Failed to get image for place: {PlaceName}", place.DisplayName?.Text);
+            _logger.LogError(reqException, "Failed to get image for place: {PlaceName}", place.DisplayName.Text);
             throw;
         }
         catch (OperationCanceledException cancelledException)
         {
-            _logger.LogError(cancelledException, "Getting image canceled for: {PlaceName}", place.DisplayName?.Text);
+            _logger.LogError(cancelledException, "Getting image canceled for: {PlaceName}", place.DisplayName.Text);
             throw;
         }
 

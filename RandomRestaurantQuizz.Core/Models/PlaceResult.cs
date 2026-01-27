@@ -5,7 +5,7 @@ namespace RandomRestaurantQuizz.Core.Models;
 public sealed class PlaceResult
 {
     [JsonPropertyName("displayName")]
-    public DisplayName? DisplayName { get; set; }
+    public DisplayName DisplayName { get; set; } = new();
 
     [JsonPropertyName("rating")]
     public double? Rating { get; set; }
@@ -22,18 +22,21 @@ public sealed class PlaceResult
 
 public static class PlaceResultsExtensions
 {
-    public static List<PlaceResult> WithRatingAndPhotos(this IEnumerable<PlaceResult> source)
+    extension(IEnumerable<PlaceResult> source)
     {
-        return [.. source.Where(r =>
+        public List<PlaceResult> WithRatingAndPhotos()
+        {
+            return [..source.Where(r =>
             r.UserRatingCount > 0 &&
             r.Photos.Any(p => !string.IsNullOrWhiteSpace(p.Name)))];
+        }
     }
 }
 
 public sealed class DisplayName
 {
     [JsonPropertyName("text")]
-    public string? Text { get; set; }
+    public string Text { get; set; } = "";
 }
 
 public sealed class Photo

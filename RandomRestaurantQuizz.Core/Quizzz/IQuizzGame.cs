@@ -3,7 +3,7 @@
 public interface IQuizzGame
 {
     Task InitRound(CancellationToken cancellationToken);
-    Task Answer(double guessedValue);
+    Task Answer(double guessedRating);
     Task NextPhoto();
     Task PreviousPhoto();
 

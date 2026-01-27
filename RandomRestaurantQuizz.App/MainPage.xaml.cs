@@ -18,52 +18,51 @@ public partial class MainPage : ContentPage
 
         InitializeComponent();
 
-        _quizzGame.ScoreChanged = async (model) =>
-        {
-            UpdateLabels(model);
-
-            ScoreDiffLabel.Opacity = 0.0;
-            if (model.LastGuess is null)
-                return;
-
-            var lastScoreUpdate = model.LastGuess.GuessScore();
-
-            ScoreDiffLabel.TextColor = lastScoreUpdate >= 50.0 ? Colors.Green : Colors.Red;
-            ScoreDiffLabel.Text = $"+{lastScoreUpdate} ({lastScoreUpdate:n1})";
-            _ = Task.Run(async () =>
-            {
-                await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
-                await Task.Delay(500);
-                await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
-            });
-
-            await _soundEffects.PlayAnswer(correctnessPercentage: lastScoreUpdate, CancellationToken.None);
-        };
-
-        _quizzGame.PhotoChanged = async model =>
-        {
-            UpdatePhoto(model);
-        };
-
-        _quizzGame.RoundFinished = async model =>
-        {
-            _logger.LogDebug("Round finished");
-            await Navigation.PushModalAsync(new RecapModal(model));
-
-            await _quizzGame.InitRound(CancellationToken.None);
-        };
+        _quizzGame.ScoreChanged = OnScoreChanged;
+        _quizzGame.PhotoChanged = OnPhotoChanged;
+        _quizzGame.RoundFinished = OnRoundFinished;
     }
 
-    private void UpdateLabels(QuizzModel model)
+    private async Task OnScoreChanged(QuizzModel model)
     {
         ScoreLabel.Text = $"Score: {model.Player.TotalScore()}";
-        RestaurantNameLabel.Text = $"{model.CurrentPlace.DisplayName?.Text} ({model.CurrentPlace.UserRatingCount})";
+        RestaurantNameLabel.Text = $"{model.CurrentPlace.DisplayName.Text} ({model.CurrentPlace.UserRatingCount})";
+
+        ScoreDiffLabel.Opacity = 0.0;
+        if (model.LastGuess is null)
+            return;
+
+        var roundScore = model.LastGuess.RoundScore();
+
+        AnimateScoreDiff(roundScore);
+
+        await _soundEffects.PlayAnswer(correctnessPercentage: roundScore, CancellationToken.None);
     }
 
-    private void UpdatePhoto(QuizzModel model)
+    private Task OnPhotoChanged(QuizzModel model)
     {
         _logger.LogDebug("Photo changed");
         RestaurantPhotoImage.Source = ImageSource.FromStream(() => new MemoryStream(model.Image));
+        return Task.CompletedTask;
+    }
+
+    private async Task OnRoundFinished(QuizzModel model)
+    {
+        _logger.LogDebug("Round finished");
+        await Navigation.PushModalAsync(new RecapModal(model));
+        await _quizzGame.InitRound(CancellationToken.None);
+    }
+
+    private void AnimateScoreDiff(double roundScore)
+    {
+        ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
+        ScoreDiffLabel.Text = $"+{roundScore} ({roundScore:n1})";
+        _ = Task.Run(async () =>
+        {
+            await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
+            await Task.Delay(500);
+            await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
+        });
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)

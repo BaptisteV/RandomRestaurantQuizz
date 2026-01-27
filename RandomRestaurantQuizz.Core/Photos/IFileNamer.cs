@@ -39,7 +39,7 @@ public class FileNamer : IFileNamer
     public string GetFilename(PlaceResult place, int index)
     {
         var root = Path.Combine(Path.GetTempPath(), FOLDER);
-        var file = SanitizeFileName($"{place.DisplayName?.Text}-{index.ToString().PadLeft(2, '0')}.jpg");
+        var file = SanitizeFileName($"{place.DisplayName.Text}-{index.ToString().PadLeft(2, '0')}.jpg");
         return Path.Combine(root, file);
     }
 }

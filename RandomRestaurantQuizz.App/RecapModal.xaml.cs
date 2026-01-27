@@ -4,6 +4,8 @@ namespace RandomRestaurantQuizz.App;
 
 public partial class RecapModal : ContentPage
 {
+    private const int MaxScoreCount = 10;
+
     public RecapModal(QuizzModel quizzModel)
     {
         InitializeComponent();
@@ -14,9 +16,9 @@ public partial class RecapModal : ContentPage
     {
         ScoreLabel.Text = $"Score: {quizzModel.Player.TotalScore()}";
 
-        var orderedScores = quizzModel.PersonalBests
-            .OrderByDescending(s => s.Value)
-            .ThenByDescending(s => s.Timestamp)
+        var orderedScores = quizzModel
+            .SortBest()
+            .Take(MaxScoreCount)
             .ToList();
 
         PbGrid.BatchBegin();

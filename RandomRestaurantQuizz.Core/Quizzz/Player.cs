@@ -4,7 +4,7 @@ public class Player
 {
     private readonly List<Guess> _guesses = [];
 
-    public void NewGuess(Guess guess)
+    public void AddGuess(Guess guess)
     {
         _guesses.Add(guess);
     }
@@ -14,7 +14,7 @@ public class Player
         var score = 0.0;
         foreach (var guess in _guesses)
         {
-            score += guess.GuessScore();
+            score += guess.RoundScore();
         }
         return (int)Math.Round(score);
     }

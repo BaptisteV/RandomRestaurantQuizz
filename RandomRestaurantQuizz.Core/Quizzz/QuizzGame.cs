@@ -2,6 +2,7 @@
 using RandomRestaurantQuizz.Core.Data;
 using RandomRestaurantQuizz.Core.Models;
 using RandomRestaurantQuizz.Core.Places;
+using RandomRestaurantQuizz.Core.Quizzz.Scores;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
@@ -19,6 +20,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
     public async Task InitRound(CancellationToken cancellationToken)
     {
+        await _scoreSaver.Init();
         Cities.Data.TryGetValue("Dijon", out var city);
 
         var restaurants = await restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken);
@@ -30,34 +32,35 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         }
         var currentPlace = _places.Dequeue();
 
-        _model = _model.NextRestaurant(currentPlace, _model.Player, null);
+        _model = _model.NextRestaurant(currentPlace, null);
 
         await ScoreChanged(_model);
         await PhotoChanged(_model);
     }
 
-    public async Task Answer(double guessedValue)
+    public async Task Answer(double guessedRating)
     {
         if (_places.Count == 0)
         {
+            await _scoreSaver.SaveScore(new Score { Value = _model.Player.TotalScore(), Timestamp = DateTime.Now });
             _model.PersonalBests = await _scoreSaver.ReadScores();
-            await _scoreSaver.SaveScore(_model.Player.TotalScore());
             await RoundFinished(_model);
             return;
         }
+
         var currentPlace = _places.Dequeue();
 
         var guess = new Guess()
         {
-            GuessedScore = guessedValue,
+            GuessedRating = guessedRating,
             Place = currentPlace,
         };
 
-        _model.Player.NewGuess(guess);
-        _model = _model.NextRestaurant(currentPlace, _model.Player, guess);
+        _model.Player.AddGuess(guess);
+        _model = _model.NextRestaurant(currentPlace, guess);
 
-        _logger.LogInformation("Answered {Guess} for {PlaceName}\tReal ranking {RealRank}", guess.GuessedScore, _model.CurrentPlace.DisplayName?.Text, _model.CurrentPlace.Rating);
-        _logger.LogInformation("Score: {Score}, Total: {TotalScore}", guess.GuessScore(), _model.Player.TotalScore());
+        _logger.LogInformation("Answered {Guess} for {PlaceName}\tReal ranking {RealRank}", guess.GuessedRating, _model.CurrentPlace.DisplayName.Text, _model.CurrentPlace.Rating);
+        _logger.LogInformation("Round score: {RoundScore}, Total: {TotalScore}", guess.RoundScore(), _model.Player.TotalScore());
 
         await ScoreChanged(_model);
         await PhotoChanged(_model);

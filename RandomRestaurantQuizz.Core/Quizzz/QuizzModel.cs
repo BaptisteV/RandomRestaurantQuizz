@@ -1,4 +1,5 @@
 ﻿using RandomRestaurantQuizz.Core.Models;
+using RandomRestaurantQuizz.Core.Quizzz.Scores;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
@@ -14,11 +15,11 @@ public class QuizzModel
 
     public List<Score> PersonalBests { get; set; } = [];
 
-    public QuizzModel NextRestaurant(PlaceResult newRestaurant, Player player, Guess? lastGuess)
+    public QuizzModel NextRestaurant(PlaceResult newRestaurant, Guess? lastGuess)
     {
         CurrentPlace = newRestaurant;
-        Player = player;
         LastGuess = lastGuess;
+        _currentPhotoIndex = 0;
         return this;
     }
 
@@ -43,6 +44,19 @@ public class QuizzModel
 
     public override string ToString()
     {
-        return $"CurrentPlace={CurrentPlace.DisplayName?.Text}, TotalScore {Player.TotalScore()}";
+        return $"CurrentPlace={CurrentPlace.DisplayName.Text}, TotalScore {Player.TotalScore()}";
+    }
+}
+
+public static class QuizzModelExtensions
+{
+    extension(QuizzModel model)
+    {
+        public IEnumerable<Score> SortBest()
+        {
+            return model.PersonalBests
+                .OrderByDescending(s => s.Value)
+                .ThenByDescending(s => s.Timestamp);
+        }
     }
 }

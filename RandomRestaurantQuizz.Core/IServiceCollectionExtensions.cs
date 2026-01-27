@@ -2,6 +2,7 @@
 using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz;
+using RandomRestaurantQuizz.Core.Quizzz.Scores;
 using RandomRestaurantQuizz.Core.SoundEffects;
 using System.Reflection;
 
@@ -25,7 +26,7 @@ public static class IServiceCollectionExtensions
 
             services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
             services.AddSingleton<ISoundEffect, SoundEffectGenerator>();
-            services.AddSingleton<IScoreSaver, TempScoreSaver>();
+            services.AddSingleton<IScoreSaver, SqlLiteScoreSaver>();
             services.AddSingleton<IQuizzGame, QuizzGame>();
 
             services.AddSecretsFromRessources();
