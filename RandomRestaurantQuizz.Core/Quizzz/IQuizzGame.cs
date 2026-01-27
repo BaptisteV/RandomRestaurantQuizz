@@ -1,8 +1,6 @@
-﻿using RandomRestaurantQuizz.Core.Models;
+﻿namespace RandomRestaurantQuizz.Core.Quizzz;
 
-namespace RandomRestaurantQuizz.Core.Quizzz;
-
-public interface IQuizz
+public interface IQuizzGame
 {
     Task InitRound(CancellationToken cancellationToken);
     Task Answer(double guessedValue);

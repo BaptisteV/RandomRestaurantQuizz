@@ -8,28 +8,28 @@ public partial class MainPage : ContentPage
 {
     private readonly ILogger<MainPage> _logger;
     private readonly ISoundEffect _soundEffects;
-    private readonly IScoreSaver _scoreSaver;
-    private readonly IQuizz _quizz;
+    private readonly IQuizzGame _quizzGame;
 
-    public MainPage(IQuizz quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, IScoreSaver scoreSaver)
+    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects)
     {
-        _quizz = quizz;
+        _quizzGame = quizz;
         _logger = logger;
         _soundEffects = soundEffects;
-        _scoreSaver = scoreSaver;
 
         InitializeComponent();
 
-        _quizz.ScoreChanged = async (model) =>
+        _quizzGame.ScoreChanged = async (model) =>
         {
             UpdateLabels(model);
 
             ScoreDiffLabel.Opacity = 0.0;
-            if (model.LastScoreUpdate < 0)
+            if (model.LastGuess is null)
                 return;
 
-            ScoreDiffLabel.TextColor = model.LastScoreUpdate >= 50.0 ? Colors.Green : Colors.Red;
-            ScoreDiffLabel.Text = $"+{model.LastScoreUpdate} ({model.LastRating:n1})";
+            var lastScoreUpdate = model.LastGuess.GuessScore();
+
+            ScoreDiffLabel.TextColor = lastScoreUpdate >= 50.0 ? Colors.Green : Colors.Red;
+            ScoreDiffLabel.Text = $"+{lastScoreUpdate} ({lastScoreUpdate:n1})";
             _ = Task.Run(async () =>
             {
                 await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
@@ -37,31 +37,30 @@ public partial class MainPage : ContentPage
                 await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
             });
 
-            await _soundEffects.PlayAnswer(correctnessPercentage: model.LastScoreUpdate, CancellationToken.None);
+            await _soundEffects.PlayAnswer(correctnessPercentage: lastScoreUpdate, CancellationToken.None);
         };
 
-        _quizz.PhotoChanged = async model =>
+        _quizzGame.PhotoChanged = async model =>
         {
             UpdatePhoto(model);
         };
 
-        _quizz.RoundFinished = async model =>
+        _quizzGame.RoundFinished = async model =>
         {
             _logger.LogDebug("Round finished");
-            await _scoreSaver.SaveScore(model.TotalScore);
             await Navigation.PushModalAsync(new RecapModal(model));
 
-            await _quizz.InitRound(CancellationToken.None);
+            await _quizzGame.InitRound(CancellationToken.None);
         };
     }
 
-    private void UpdateLabels(Core.Models.QuizzModel model)
+    private void UpdateLabels(QuizzModel model)
     {
-        ScoreLabel.Text = $"Score: {model.TotalScore}";
-        RestaurantNameLabel.Text = $"{model.RestaurantName} ({model.RatingCount})";
+        ScoreLabel.Text = $"Score: {model.Player.TotalScore()}";
+        RestaurantNameLabel.Text = $"{model.CurrentPlace.DisplayName?.Text} ({model.CurrentPlace.UserRatingCount})";
     }
 
-    private void UpdatePhoto(Core.Models.QuizzModel model)
+    private void UpdatePhoto(QuizzModel model)
     {
         _logger.LogDebug("Photo changed");
         RestaurantPhotoImage.Source = ImageSource.FromStream(() => new MemoryStream(model.Image));
@@ -70,7 +69,7 @@ public partial class MainPage : ContentPage
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _soundEffects.Init();
-        await _quizz.InitRound(CancellationToken.None);
+        await _quizzGame.InitRound(CancellationToken.None);
         AnswerBtn.IsEnabled = true;
     }
 
@@ -83,11 +82,11 @@ public partial class MainPage : ContentPage
         // Tap sides to change photo
         if (xPercent <= 25)
         {
-            await _quizz.PreviousPhoto();
+            await _quizzGame.PreviousPhoto();
         }
         else if (xPercent >= 75)
         {
-            await _quizz.NextPhoto();
+            await _quizzGame.NextPhoto();
         }
     }
 
@@ -99,6 +98,6 @@ public partial class MainPage : ContentPage
 
     private void AnswerBtn_Clicked(object sender, EventArgs e)
     {
-        _quizz.Answer(RatingSlider.Value);
+        _quizzGame.Answer(RatingSlider.Value);
     }
 }

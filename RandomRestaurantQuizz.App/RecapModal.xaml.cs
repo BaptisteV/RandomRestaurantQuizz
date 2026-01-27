@@ -1,4 +1,4 @@
-using RandomRestaurantQuizz.Core.Models;
+using RandomRestaurantQuizz.Core.Quizzz;
 
 namespace RandomRestaurantQuizz.App;
 
@@ -7,17 +7,19 @@ public partial class RecapModal : ContentPage
     public RecapModal(QuizzModel quizzModel)
     {
         InitializeComponent();
-        RefreshUI(quizzModel);
+        InitUI(quizzModel);
     }
 
-    private void RefreshUI(QuizzModel quizzModel)
+    private void InitUI(QuizzModel quizzModel)
     {
-        ScoreLabel.Text = $"Score: {quizzModel.TotalScore}";
+        ScoreLabel.Text = $"Score: {quizzModel.Player.TotalScore()}";
 
         var orderedScores = quizzModel.PersonalBests
             .OrderByDescending(s => s.Value)
             .ThenByDescending(s => s.Timestamp)
             .ToList();
+
+        PbGrid.BatchBegin();
         for (var row = 0; row < orderedScores.Count; row++)
         {
             var pb = orderedScores[row];
@@ -37,6 +39,7 @@ public partial class RecapModal : ContentPage
             PbGrid.Add(lblTime, 0, row);
             PbGrid.Add(lblScore, 1, row);
         }
+        PbGrid.BatchCommit();
     }
 
     private async void CloseBtn_Clicked(object sender, EventArgs e)

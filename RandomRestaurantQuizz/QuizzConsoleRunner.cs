@@ -6,14 +6,14 @@ namespace RandomRestaurantQuizz.Console;
 
 public class QuizzConsoleRunner : IRunner
 {
-    private readonly IQuizz _quizz;
+    private readonly IQuizzGame _quizzGame;
     private readonly ILogger<QuizzConsoleRunner> _logger;
 
-    public QuizzConsoleRunner(IQuizz quizz, ILogger<QuizzConsoleRunner> logger)
+    public QuizzConsoleRunner(IQuizzGame quizz, ILogger<QuizzConsoleRunner> logger)
     {
-        _quizz = quizz;
+        _quizzGame = quizz;
         _logger = logger;
-        _quizz.ScoreChanged = (model) =>
+        _quizzGame.ScoreChanged = (model) =>
         {
             _logger.LogInformation("{CurrentState}", model);
             return Task.CompletedTask;
@@ -23,11 +23,11 @@ public class QuizzConsoleRunner : IRunner
 #pragma warning disable S2190 // Add a way to break out this method's recursion
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        await _quizz.InitRound(cancellationToken);
+        await _quizzGame.InitRound(cancellationToken);
         while (true)
         {
             var answerValue = DoubleReader.ReadDouble("Guessed rating ? : ");
-            await _quizz.Answer(answerValue);
+            await _quizzGame.Answer(answerValue);
         }
     }
 #pragma warning restore S2190 // Add a way to break out this method's recursion

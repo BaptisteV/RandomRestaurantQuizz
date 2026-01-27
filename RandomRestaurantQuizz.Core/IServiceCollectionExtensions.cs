@@ -26,7 +26,7 @@ public static class IServiceCollectionExtensions
             services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
             services.AddSingleton<ISoundEffect, SoundEffectGenerator>();
             services.AddSingleton<IScoreSaver, TempScoreSaver>();
-            services.AddSingleton<IQuizz, Quizz>();
+            services.AddSingleton<IQuizzGame, QuizzGame>();
 
             services.AddSecretsFromRessources();
         }
