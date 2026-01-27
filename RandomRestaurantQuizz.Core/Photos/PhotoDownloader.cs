@@ -51,7 +51,8 @@ public class PhotoDownloader : IPhotoDownloader
     private bool ShouldDownload(PlaceResult place, int photoIndex)
     {
         var filename = _fileNamer.GetFilename(place, photoIndex);
-        var rootDir = Path.GetDirectoryName(filename);
+
+        var rootDir = Path.GetDirectoryName(filename)!;
         if (!Directory.Exists(rootDir))
         {
             Directory.CreateDirectory(rootDir);
@@ -75,7 +76,7 @@ public class PhotoDownloader : IPhotoDownloader
         await Task.WhenAll(downloadTasks);
 
         var elapsed = sw.Elapsed;
-        _logger.LogInformation("Downloaded all photos in {DlElapsed}", elapsed);
+        _logger.LogInformation("Got all photos in {DlElapsed}", elapsed);
 
         return placeResults;
     }

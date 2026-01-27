@@ -46,6 +46,6 @@ public partial class RecapModal : ContentPage
 
     private async void CloseBtn_Clicked(object sender, EventArgs e)
     {
-        await Navigation.PopModalAsync();
+        await Navigation.PopModalAsync(true);
     }
 }
