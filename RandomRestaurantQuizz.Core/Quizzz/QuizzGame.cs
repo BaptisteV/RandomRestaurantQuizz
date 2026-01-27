@@ -62,8 +62,8 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         _logger.LogInformation("Answered {Guess} for {PlaceName}\tReal ranking {RealRank}", guess.GuessedRating, _model.CurrentPlace.DisplayName.Text, _model.CurrentPlace.Rating);
         _logger.LogInformation("Round score: {RoundScore}, Total: {TotalScore}", guess.RoundScore(), _model.Player.TotalScore());
 
-        await ScoreChanged(_model);
         await PhotoChanged(_model);
+        await ScoreChanged(_model);
     }
 
     public async Task NextPhoto()

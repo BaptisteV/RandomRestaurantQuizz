@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!--<TargetFrameworks>
+    <TargetFrameworks>
       net10.0-android36.0;
       net10.0-windows10.0.19041.0
-    </TargetFrameworks> -->
-     <TargetFrameworks>
-      net10.0-windows10.0.19041.0
     </TargetFrameworks>
+    <!--<TargetFrameworks>
+      net10.0-windows10.0.19041.0
+    </TargetFrameworks>-->
 
     <OutputType>Exe</OutputType>
     <RootNamespace>RandomRestaurantQuizz.App</RootNamespace>
@@ -83,11 +83,11 @@
     <ProjectReference Include="..\RandomRestaurantQuizz.Core\RandomRestaurantQuizz.Core.csproj" />
   </ItemGroup>
 
-    <ItemGroup>
-      <MauiXaml Update="RecapModal.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </MauiXaml>
-    </ItemGroup>
+  <ItemGroup>
+    <MauiXaml Update="RecapModal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.1" />

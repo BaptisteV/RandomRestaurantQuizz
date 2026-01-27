@@ -26,7 +26,7 @@ public partial class MainPage : ContentPage
     private async Task OnScoreChanged(QuizzModel model)
     {
         ScoreLabel.Text = $"Score: {model.Player.TotalScore()}";
-        RestaurantNameLabel.Text = $"{model.CurrentPlace.DisplayName.Text} ({model.CurrentPlace.UserRatingCount})";
+        RestaurantNameLabel.Text = $"{model.CurrentPlace.DisplayName.Text} ({model.CurrentPlace.UserRatingCount} 👤)";
 
         ScoreDiffLabel.Opacity = 0.0;
         if (model.LastGuess is null)
