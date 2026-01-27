@@ -4,8 +4,7 @@
              x:Class="RandomRestaurantQuizz.App.RecapModal"
              Title="RecapModal">
 
-    <VerticalStackLayout Padding="30"
-                         Spacing="25"
+    <VerticalStackLayout Spacing="25"
                          HorizontalOptions="Fill">
 
         <Label x:Name="ScoreLabel"
@@ -15,6 +14,11 @@
 
         <Grid x:Name="PbGrid" HorizontalOptions="Fill">
             <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />

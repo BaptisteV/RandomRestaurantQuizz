@@ -51,6 +51,12 @@ public class PhotoDownloader : IPhotoDownloader
     private bool ShouldDownload(PlaceResult place, int photoIndex)
     {
         var filename = _fileNamer.GetFilename(place, photoIndex);
+        var rootDir = Path.GetDirectoryName(filename);
+        if (!Directory.Exists(rootDir))
+        {
+            Directory.CreateDirectory(rootDir);
+        }
+
         if (!File.Exists(filename))
             return true;
 
@@ -91,6 +97,7 @@ public class PhotoDownloader : IPhotoDownloader
                 if (ShouldDownload(place, p))
                 {
                     var image = await GetImage(place.Photos[p], cancellationToken);
+                    await File.WriteAllBytesAsync(_fileNamer.GetFilename(place, p), image);
                     place.Photos[p].DownloadedImage = image;
                 }
                 else

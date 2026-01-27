@@ -24,6 +24,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         Cities.Data.TryGetValue("Dijon", out var city);
 
         var restaurants = await restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken);
+
         _model = new QuizzModel();
         _places.Clear();
         foreach (var restaurant in restaurants)

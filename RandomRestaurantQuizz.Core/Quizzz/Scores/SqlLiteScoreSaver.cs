@@ -1,30 +1,98 @@
-﻿using SQLite;
+﻿using Microsoft.Data.Sqlite;
+using System.Globalization;
 
 namespace RandomRestaurantQuizz.Core.Quizzz.Scores;
 
-public class SqlLiteScoreSaver : IScoreSaver
+public sealed class SqlLiteScoreSaver : IScoreSaver, IDisposable
 {
     private const string DbFilename = "scores.db";
-    private readonly SQLiteAsyncConnection _database;
+    private readonly SqliteConnection _connection;
 
     public SqlLiteScoreSaver()
     {
         var dbPath = Path.Combine(FileSystem.AppDataDirectory, DbFilename);
-        _database = new SQLiteAsyncConnection(dbPath);
+        var connectionString = $"Data Source={dbPath}";
+        _connection = new SqliteConnection(connectionString);
+    }
+
+    public void Dispose()
+    {
+        _connection.Close();
+        _connection.Dispose();
     }
 
     public async Task Init()
     {
-        await _database.CreateTableAsync<Score>();
+        await _connection.OpenAsync();
+
+        //await DropTable();
+
+        var command = _connection.CreateCommand();
+        command.CommandText =
+        """
+        CREATE TABLE IF NOT EXISTS Score (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ScoreValue TEXT NOT NULL,
+            Ts TEXT NOT NULL
+        );
+        """;
+
+        await command.ExecuteNonQueryAsync();
+    }
+
+    private async Task DropTable()
+    {
+        var command = _connection.CreateCommand();
+        command.CommandText =
+        """
+        DROP TABLE IF EXISTS Score;        
+        """;
+
+        await command.ExecuteNonQueryAsync();
     }
 
     public async Task<List<Score>> ReadScores()
     {
-        return await _database.Table<Score>().ToListAsync();
+        var scores = new List<Score>();
+
+        await _connection.OpenAsync();
+
+        var command = _connection.CreateCommand();
+        command.CommandText =
+        """
+        SELECT Id, ScoreValue, Ts
+        FROM Score
+        ORDER BY ScoreValue DESC;
+        """;
+
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            scores.Add(new Score
+            {
+                Id = reader.GetInt32(0),
+                Value = reader.GetInt32(1),
+                Timestamp = DateTime.ParseExact(reader.GetString(2), "O", CultureInfo.InvariantCulture),
+            });
+        }
+
+        return scores;
     }
 
     public async Task SaveScore(Score score)
     {
-        await _database.InsertAsync(score);
+        await _connection.OpenAsync();
+
+        var command = _connection.CreateCommand();
+        command.CommandText =
+        """
+        INSERT INTO Score (ScoreValue, Ts)
+        VALUES ($scoreValue, $ts);
+        """;
+
+        command.Parameters.AddWithValue("$scoreValue", score.Value);
+        command.Parameters.AddWithValue("$ts", score.Timestamp.ToString("O", CultureInfo.InvariantCulture));
+
+        await command.ExecuteNonQueryAsync();
     }
 }

@@ -16,8 +16,9 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-#if DEBUG
         builder.Logging.AddDebug();
+        builder.Logging.SetMinimumLevel(LogLevel.Information);
+#if DEBUG
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
         builder.Services.AddCoreServices();

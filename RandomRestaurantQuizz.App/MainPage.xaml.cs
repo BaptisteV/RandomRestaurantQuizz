@@ -49,8 +49,10 @@ public partial class MainPage : ContentPage
     private async Task OnRoundFinished(QuizzModel model)
     {
         _logger.LogDebug("Round finished");
-        await Navigation.PushModalAsync(new RecapModal(model));
+        //await Navigation.PushModalAsync(new RecapModal(model));
+        await Navigation.PushModalAsync(new SpinnerModal(), true);
         await _quizzGame.InitRound(CancellationToken.None);
+        await Navigation.PopModalAsync(true);
     }
 
     private void AnimateScoreDiff(double roundScore)
@@ -68,7 +70,9 @@ public partial class MainPage : ContentPage
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _soundEffects.Init();
+        await Navigation.PushModalAsync(new SpinnerModal(), true);
         await _quizzGame.InitRound(CancellationToken.None);
+        await Navigation.PopModalAsync(true);
         AnswerBtn.IsEnabled = true;
     }
 

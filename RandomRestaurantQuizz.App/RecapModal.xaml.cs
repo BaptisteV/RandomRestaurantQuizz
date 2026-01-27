@@ -27,7 +27,7 @@ public partial class RecapModal : ContentPage
             var pb = orderedScores[row];
             var lblTime = new Label()
             {
-                Text = pb.Timestamp.ToString("G") + ":" + pb.Timestamp.ToString("ss"),
+                Text = pb.Timestamp.ToString("G"),
                 FontSize = 17, // Medium,
                 HorizontalOptions = LayoutOptions.Center,
             };
