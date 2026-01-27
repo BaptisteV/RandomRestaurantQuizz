@@ -23,7 +23,7 @@ public class QuizzConsoleRunner : IRunner
 #pragma warning disable S2190 // Add a way to break out this method's recursion
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        await _quizz.DownloadRestaurants(cancellationToken);
+        await _quizz.InitRound(cancellationToken);
         while (true)
         {
             var answerValue = DoubleReader.ReadDouble("Guessed rating ? : ");

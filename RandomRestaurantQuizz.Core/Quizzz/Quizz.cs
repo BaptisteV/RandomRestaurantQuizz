@@ -9,32 +9,42 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger, ISco
 {
     private readonly ILogger<Quizz> _logger = logger;
 
-    private readonly Player _player = new();
+    private Player _player = new();
     private readonly Queue<PlaceResult> _places = [];
     private PlaceResult _currentPlace = new();
-    private readonly QuizzModel _model = new();
+    private QuizzModel _model = new();
     private readonly IScoreSaver _scoreSaver = scoreSaver;
 
     public Func<QuizzModel, Task> ScoreChanged { get; set; } = (_) => Task.CompletedTask;
     public Func<QuizzModel, Task> PhotoChanged { get; set; } = (_) => Task.CompletedTask;
     public Func<QuizzModel, Task> RoundFinished { get; set; } = (_) => Task.CompletedTask;
 
-    public async Task DownloadRestaurants(CancellationToken cancellationToken)
+    public async Task InitRound(CancellationToken cancellationToken)
     {
         Cities.Data.TryGetValue("Dijon", out var city);
+
         var restaurants = await restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken);
+        _model = new QuizzModel();
+        _player = new Player();
+        _places.Clear();
         foreach (var restaurant in restaurants)
         {
             _places.Enqueue(restaurant);
         }
-        _currentPlace = _places.Dequeue();
-
-        _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
-        _model.RatingCount = _currentPlace.UserRatingCount ?? 0;
-        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage ?? [];
+        await ChangeCurrentPlace();
 
         await ScoreChanged(_model);
         await PhotoChanged(_model);
+    }
+
+    private async Task ChangeCurrentPlace()
+    {
+        _currentPlace = _places.Dequeue();
+
+        _model = new QuizzModel();
+        _model.RestaurantName = _currentPlace.DisplayName?.Text ?? "";
+        _model.RatingCount = _currentPlace.UserRatingCount ?? 0;
+        _model.Image = _currentPlace.Photos?.FirstOrDefault()?.DownloadedImage ?? [];
     }
 
     public async Task Answer(double guessedValue)
@@ -46,7 +56,7 @@ public class Quizz(IGooglePlacesClient restauClient, ILogger<Quizz> logger, ISco
             return;
         }
 
-        _currentPlace = _places.Dequeue();
+        await ChangeCurrentPlace();
         var guess = new Guess()
         {
             GuessedScore = guessedValue,

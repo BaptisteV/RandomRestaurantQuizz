@@ -22,8 +22,7 @@ public partial class MainPage : ContentPage
 
         _quizz.ScoreChanged = async (model) =>
         {
-            ScoreLabel.Text = $"Score: {model.TotalScore}";
-            RestaurantNameLabel.Text = $"{model.RestaurantName} ({model.RatingCount})";
+            UpdateLabels(model);
 
             ScoreDiffLabel.Opacity = 0.0;
             if (model.LastScoreUpdate < 0)
@@ -43,8 +42,7 @@ public partial class MainPage : ContentPage
 
         _quizz.PhotoChanged = async model =>
         {
-            _logger.LogDebug("Photo changed");
-            RestaurantPhotoImage.Source = ImageSource.FromStream(() => new MemoryStream(model.Image));
+            UpdatePhoto(model);
         };
 
         _quizz.RoundFinished = async model =>
@@ -52,13 +50,27 @@ public partial class MainPage : ContentPage
             _logger.LogDebug("Round finished");
             await _scoreSaver.SaveScore(model.TotalScore);
             await Navigation.PushModalAsync(new RecapModal(model));
+
+            await _quizz.InitRound(CancellationToken.None);
         };
+    }
+
+    private void UpdateLabels(Core.Models.QuizzModel model)
+    {
+        ScoreLabel.Text = $"Score: {model.TotalScore}";
+        RestaurantNameLabel.Text = $"{model.RestaurantName} ({model.RatingCount})";
+    }
+
+    private void UpdatePhoto(Core.Models.QuizzModel model)
+    {
+        _logger.LogDebug("Photo changed");
+        RestaurantPhotoImage.Source = ImageSource.FromStream(() => new MemoryStream(model.Image));
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _soundEffects.Init();
-        await _quizz.DownloadRestaurants(CancellationToken.None);
+        await _quizz.InitRound(CancellationToken.None);
     }
 
     private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
