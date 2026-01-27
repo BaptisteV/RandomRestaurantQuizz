@@ -71,6 +71,7 @@ public partial class MainPage : ContentPage
     {
         await _soundEffects.Init();
         await _quizz.InitRound(CancellationToken.None);
+        AnswerBtn.IsEnabled = true;
     }
 
     private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)

@@ -6,7 +6,7 @@
              Loaded="ContentPage_Loaded">
 
     <ScrollView>
-        <VerticalStackLayout Padding="30,0"
+        <VerticalStackLayout Padding="30"
                              Spacing="25">
             
             <Label x:Name="RestaurantNameLabel"
@@ -49,7 +49,8 @@
                     Text="Answer"
                     SemanticProperties.Hint="Counts the number of times you click"
                     Clicked="AnswerBtn_Clicked"
-                    HorizontalOptions="Fill" />
+                    HorizontalOptions="Fill"
+                    IsEnabled="false"/>
 
             <FlexLayout JustifyContent="Center">
                 <Label x:Name="ScoreLabel"

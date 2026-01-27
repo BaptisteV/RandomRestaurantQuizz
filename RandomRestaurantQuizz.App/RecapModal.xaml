@@ -4,7 +4,8 @@
              x:Class="RandomRestaurantQuizz.App.RecapModal"
              Title="RecapModal">
 
-    <VerticalStackLayout Padding="20"
+    <VerticalStackLayout Padding="30"
+                         Spacing="25"
                          HorizontalOptions="Fill">
 
         <Label x:Name="ScoreLabel"
