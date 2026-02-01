@@ -3,7 +3,6 @@ using NAudio.Wave.SampleProviders;
 
 namespace RandomRestaurantQuizz.Core.SoundEffects;
 
-
 public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
 {
     private readonly WaveOutEvent waveOut = new WaveOutEvent();

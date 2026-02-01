@@ -15,11 +15,16 @@ public class QuizzConsoleRunner : IRunner
     {
         _quizzGame = quizz;
         _logger = logger;
-        _quizzGame.ScoreChanged = (model) =>
-        {
-            _logger.LogInformation("{CurrentState}", model);
-            return Task.CompletedTask;
-        };
+        _quizzGame.PhotoChanged = LogEvent;
+        _quizzGame.ScoreChanged = LogEvent;
+        _quizzGame.RoundFinished = LogEvent;
+    }
+
+    private Task LogEvent(object evt)
+    {
+        var t = evt.GetType().Name;
+        _logger.LogInformation("Event: {EventType}", t);
+        return Task.CompletedTask;
     }
 
 #pragma warning disable S2190 // Add a way to break out this method's recursion

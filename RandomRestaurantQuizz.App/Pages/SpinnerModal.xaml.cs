@@ -2,8 +2,8 @@ namespace RandomRestaurantQuizz.App;
 
 public partial class SpinnerModal : ContentPage
 {
-	public SpinnerModal()
-	{
-		InitializeComponent();
-	}
+    public SpinnerModal()
+    {
+        InitializeComponent();
+    }
 }

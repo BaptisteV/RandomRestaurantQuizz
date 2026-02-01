@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.App.ViewModels;
-using RandomRestaurantQuizz.Core.Data;
-using RandomRestaurantQuizz.Core.Models;
-using RandomRestaurantQuizz.Core.Quizzz;
-using RandomRestaurantQuizz.Core.Quizzz.Events;
+﻿using RandomRestaurantQuizz.Core.Quizzz.Events;
 using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
@@ -50,10 +45,6 @@ public partial class MainPage : ContentPage, IDisposable
             AnimateScoreDiff(scoreChangedEvent.RoundScore);
             await _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None);
         }
-        else
-        {
-            ScoreDiffLabel.Opacity = 0.0;
-        }
     }
 
     private void AnimateScoreDiff(double roundScore)
@@ -68,7 +59,7 @@ public partial class MainPage : ContentPage, IDisposable
                 await Task.Delay(2000, _cts.Token);
                 await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
             }
-            catch (TaskCanceledException) { ScoreDiffLabel.Opacity = 100.0; }
+            catch (TaskCanceledException) { }
         }, _cts.Token);
     }
 

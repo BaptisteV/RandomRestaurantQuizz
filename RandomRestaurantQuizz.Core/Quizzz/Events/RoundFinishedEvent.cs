@@ -1,6 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Quizzz.Scores;
-
-namespace RandomRestaurantQuizz.Core.Quizzz.Events;
+﻿namespace RandomRestaurantQuizz.Core.Quizzz.Events;
 
 public class RoundFinishedEvent
 {

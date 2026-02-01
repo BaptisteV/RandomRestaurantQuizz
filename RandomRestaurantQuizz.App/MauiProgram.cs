@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.App.ViewModels;
-using RandomRestaurantQuizz.Core;
-using RandomRestaurantQuizz.Core.Models;
+﻿using RandomRestaurantQuizz.Core;
 
 namespace RandomRestaurantQuizz.App;
 
@@ -38,7 +35,7 @@ public static class MauiProgram
         TaskScheduler.UnobservedTaskException += (s, e) =>
         {
             System.Diagnostics.Debug.WriteLine("Unobserved task exception: " + e.Exception);
-            e.SetObserved(); // prevents process termination in some scenarios
+            e.SetObserved();
         };
 
         return builder.Build();

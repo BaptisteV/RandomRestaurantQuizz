@@ -1,6 +1,3 @@
-using RandomRestaurantQuizz.App.ViewModels;
-using RandomRestaurantQuizz.Core.Quizzz.Scores;
-
 namespace RandomRestaurantQuizz.App;
 
 public partial class RecapModal : ContentPage

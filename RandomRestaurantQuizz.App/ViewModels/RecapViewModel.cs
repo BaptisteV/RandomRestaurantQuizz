@@ -1,6 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Quizzz.Scores;
-
-namespace RandomRestaurantQuizz.App.ViewModels;
+﻿namespace RandomRestaurantQuizz.App.ViewModels;
 
 public class RecapViewModel
 {

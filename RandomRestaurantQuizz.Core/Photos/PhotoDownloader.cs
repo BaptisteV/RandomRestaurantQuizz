@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using RandomRestaurantQuizz.Core.Models;
-using RandomRestaurantQuizz.Core.Places;
+﻿using RandomRestaurantQuizz.Core.Places;
 using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Core.Photos;

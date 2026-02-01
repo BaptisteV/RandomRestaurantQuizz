@@ -1,9 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.Core.Data;
-using RandomRestaurantQuizz.Core.Models;
-using RandomRestaurantQuizz.Core.Places;
+﻿using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz.Events;
-using RandomRestaurantQuizz.Core.Quizzz.Scores;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
@@ -57,15 +53,10 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
         _currentPlace = _places.Dequeue();
 
-        var guess = new Guess()
-        {
-            GuessedRating = guessedRating,
-            Place = _currentPlace,
-        };
-
+        var guess = new Guess(_currentPlace, guessedRating);
         _player.AddGuess(guess);
 
-        _logger.LogInformation("Answered {Guess} for {PlaceName}\tReal ranking {RealRank}", guess.GuessedRating, _currentPlace.DisplayName.Text, _currentPlace.Rating);
+        _logger.LogInformation("Answered {Guess} for {PlaceName}\tReal ranking {RealRank}", guessedRating, _currentPlace.DisplayName.Text, _currentPlace.Rating);
         _logger.LogInformation("Round score: {RoundScore}, Total: {TotalScore}", guess.RoundScore(), _player.TotalScore());
 
 

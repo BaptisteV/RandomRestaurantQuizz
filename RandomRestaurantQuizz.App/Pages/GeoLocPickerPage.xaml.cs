@@ -1,7 +1,3 @@
-using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.Core.Data;
-using RandomRestaurantQuizz.Core.Models;
-
 namespace RandomRestaurantQuizz.App;
 
 public partial class GeoLocPickerPage : ContentPage

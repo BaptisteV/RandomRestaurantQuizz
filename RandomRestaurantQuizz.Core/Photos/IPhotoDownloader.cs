@@ -1,6 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Models;
-
-namespace RandomRestaurantQuizz.Core.Photos
+﻿namespace RandomRestaurantQuizz.Core.Photos
 {
     public interface IPhotoDownloader
     {

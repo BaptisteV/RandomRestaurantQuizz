@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using RandomRestaurantQuizz.Core.Data;
-using RandomRestaurantQuizz.Core.Models;
-using RandomRestaurantQuizz.Core.Photos;
+﻿using RandomRestaurantQuizz.Core.Photos;
 using System.Text.Json;
 
 namespace RandomRestaurantQuizz.Core.Places;

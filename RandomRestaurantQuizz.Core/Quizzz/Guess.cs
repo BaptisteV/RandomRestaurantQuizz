@@ -1,11 +1,9 @@
-﻿using RandomRestaurantQuizz.Core.Models;
+﻿namespace RandomRestaurantQuizz.Core.Quizzz;
 
-namespace RandomRestaurantQuizz.Core.Quizzz;
-
-public class Guess
+public class Guess(PlaceResult place, double guessedRating)
 {
-    public required PlaceResult Place { get; set; }
-    public required double GuessedRating { get; set; }
+    public PlaceResult Place { get; } = place;
+    public double GuessedRating { get; } = guessedRating;
 
     public double RoundScore()
     {

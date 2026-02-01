@@ -1,5 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Models;
-using System.Text;
+﻿using System.Text;
 
 namespace RandomRestaurantQuizz.Core.Photos;
 
