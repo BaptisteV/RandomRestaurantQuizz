@@ -5,7 +5,8 @@
              xmlns:controls="clr-namespace:RandomRestaurantQuizz.App;assembly=RandomRestaurantQuizz.App"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              x:DataType="vm:MainPageViewModel"
-             Loaded="ContentPage_Loaded">
+             Loaded="ContentPage_Loaded"
+             Unloaded="ContentPage_Unloaded">
 
     <ScrollView>
         <VerticalStackLayout Padding="30"

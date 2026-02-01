@@ -2,7 +2,6 @@
 using RandomRestaurantQuizz.App.ViewModels;
 using RandomRestaurantQuizz.Core;
 using RandomRestaurantQuizz.Core.Models;
-using RandomRestaurantQuizz.Core.Quizzz;
 
 namespace RandomRestaurantQuizz.App;
 
@@ -26,7 +25,7 @@ public static class MauiProgram
 #endif
         builder.Services.AddCoreServices();
 
-        builder.Services.AddSingleton<IQuizzViewModel, MainPageViewModel>();
+        builder.Services.AddSingleton<MainPageViewModel>();
         builder.Services.AddSingleton<RecapViewModel>();
         builder.Services.AddSingleton<GeoLocPickerPage>();
 

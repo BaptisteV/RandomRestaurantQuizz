@@ -1,11 +1,21 @@
-﻿//using SQLite;
-
-namespace RandomRestaurantQuizz.Core.Quizzz.Scores;
+﻿namespace RandomRestaurantQuizz.Core.Quizzz.Scores;
 
 public class Score
 {
-    //[PrimaryKey, AutoIncrement]
     public int Id { get; set; }
     public int Value { get; init; }
     public DateTime Timestamp { get; init; }
+}
+
+public static class ScoresExtensions
+{
+    extension(IEnumerable<Score> scores)
+    {
+        public IEnumerable<Score> SortBest()
+        {
+            return scores
+                .OrderByDescending(s => s.Value)
+                .ThenByDescending(s => s.Timestamp);
+        }
+    }
 }

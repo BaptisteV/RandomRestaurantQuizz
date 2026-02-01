@@ -4,37 +4,42 @@
              x:Class="RandomRestaurantQuizz.App.RecapModal"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              x:DataType="vm:RecapViewModel"
-             Title="RecapModal">
+             Title="Score recap">
+    <ScrollView>
+        <VerticalStackLayout Spacing="25"
+                             HorizontalOptions="Fill">
 
-    <VerticalStackLayout Spacing="25"
-                         HorizontalOptions="Fill">
+            <Label x:Name="ScoreLabel"
+                   HorizontalOptions="Center"
+                   Text="{Binding ScoreText}"
+                   FontSize="Large" />
 
-        <Label x:Name="ScoreLabel"
-               HorizontalOptions="Center"
-               Text="{Binding ScoreText}"
-               FontSize="Large" />
+            <Grid x:Name="ScoresGrid"
+                  RowSpacing="4"
+                  ColumnSpacing="4"
+                  WidthRequest="600"
+                  HorizontalOptions="Fill">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+            </Grid>
 
-        <Grid x:Name="ScoresGrid" HorizontalOptions="Fill">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-        </Grid>
-
-        <Button x:Name="CloseBtn"
-                Text="Close"
-                Clicked="CloseBtn_Clicked" />
-    </VerticalStackLayout>
+            <Button x:Name="CloseBtn"
+                    Text="Close"
+                    Clicked="CloseBtn_Clicked" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

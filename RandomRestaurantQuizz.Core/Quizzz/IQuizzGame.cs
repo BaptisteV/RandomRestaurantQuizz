@@ -1,4 +1,5 @@
 ﻿using RandomRestaurantQuizz.Core.Models;
+using RandomRestaurantQuizz.Core.Quizzz.Events;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 

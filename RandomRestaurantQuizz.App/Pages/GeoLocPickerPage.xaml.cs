@@ -36,8 +36,8 @@ public partial class GeoLocPickerPage : ContentPage
         _logger.LogInformation("Picked {City}", city);
 
         var geoloc = Cities.Data[city];
-        await NewLocation(city, geoloc);
         CurrentLocation = (city, geoloc);
+        await NewLocation(city, geoloc);
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
     }
 }

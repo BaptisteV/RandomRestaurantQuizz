@@ -21,13 +21,13 @@ public partial class RecapModal : ContentPage
             var lblTime = new Label()
             {
                 Text = pb.Timestamp.ToString("G"),
-                FontSize = 17, // Medium,
+                FontSize = 18,
                 HorizontalOptions = LayoutOptions.Center,
             };
             var lblScore = new Label()
             {
                 Text = pb.Value.ToString(),
-                FontSize = 17, // Medium,
+                FontSize = 18,
                 HorizontalOptions = LayoutOptions.Center,
             };
 

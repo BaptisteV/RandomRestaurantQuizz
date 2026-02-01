@@ -3,21 +3,23 @@ using RandomRestaurantQuizz.App.ViewModels;
 using RandomRestaurantQuizz.Core.Data;
 using RandomRestaurantQuizz.Core.Models;
 using RandomRestaurantQuizz.Core.Quizzz;
+using RandomRestaurantQuizz.Core.Quizzz.Events;
 using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
 
-public partial class MainPage : ContentPage
+public partial class MainPage : ContentPage, IDisposable
 {
-    private readonly IQuizzViewModel _vm;
-
     private readonly ILogger<MainPage> _logger;
+
+    private readonly MainPageViewModel _vm;
+
     private readonly ISoundEffect _soundEffects;
     private readonly IQuizzGame _quizzGame;
-
     private readonly GeoLocPickerPage _geoPage;
+    private readonly CancellationTokenSource _cts = new();
 
-    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, IQuizzViewModel vm, GeoLocPickerPage geoPage)
+    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, MainPageViewModel vm, GeoLocPickerPage geoPage)
     {
         _vm = vm;
         BindingContext = _vm;
@@ -30,23 +32,44 @@ public partial class MainPage : ContentPage
 
         _geoPage.NewLocation = OnNewLocation;
 
-        //_quizzGame.PhotoChanged = OnPhotoChanged;
         _quizzGame.RoundFinished = OnRoundFinished;
-        _quizzGame.ScoreChanged = OnScoreChangedE;
+        _quizzGame.ScoreChanged = OnScoreChanged;
         _quizzGame.PhotoChanged = OnPhotoChanged;
 
-        _ = Task.Run(() => Navigation.PushAsync(_geoPage, true));
+        _ = Task.Run(() => Navigation.PushAsync(_geoPage, true), _cts.Token);
     }
 
-    private async Task OnScoreChangedE(ScoreChangedEvent scoreChangedEvent)
+    private async Task OnScoreChanged(ScoreChangedEvent scoreChangedEvent)
     {
         _vm.Score = scoreChangedEvent.TotalScore;
         _vm.LocationName = scoreChangedEvent.LocationLabel;
         _vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
 
-        AnimateScoreDiff(scoreChangedEvent.RoundScore);
+        if (scoreChangedEvent.FromAnswer)
+        {
+            AnimateScoreDiff(scoreChangedEvent.RoundScore);
+            await _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None);
+        }
+        else
+        {
+            ScoreDiffLabel.Opacity = 0.0;
+        }
+    }
 
-        await _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None);
+    private void AnimateScoreDiff(double roundScore)
+    {
+        ScoreDiffLabel.Opacity = 0.0;
+        ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await ScoreDiffLabel.FadeToAsync(100, 1000, Easing.CubicIn);
+                await Task.Delay(2000, _cts.Token);
+                await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
+            }
+            catch (TaskCanceledException) { ScoreDiffLabel.Opacity = 100.0; }
+        }, _cts.Token);
     }
 
     private Task OnPhotoChanged(PhotoChangedEvent photoChangedEvent)
@@ -60,41 +83,33 @@ public partial class MainPage : ContentPage
     {
         _logger.LogDebug("Round finished");
         var recapVm = new RecapViewModel(roundFinishedEvent.TotalScore, roundFinishedEvent.PersonalBests);
+        await Navigation.PushAsync(_geoPage, true);
         await Navigation.PushModalAsync(new RecapModal(recapVm), true);
-        await Navigation.PopModalAsync(true);
-        await Navigation.PushModalAsync(_geoPage, true);
-        await Navigation.PushModalAsync(new SpinnerModal(), true);
         await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
-        await Navigation.PopModalAsync(true);
     }
 
-    private void AnimateScoreDiff(double roundScore)
-    {
-        ScoreDiffLabel.Opacity = 0.0;
-        ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
-        _ = Task.Run(async () =>
-        {
-            await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
-            await Task.Delay(2000);
-            await ScoreDiffLabel.FadeToAsync(0, 2000, Easing.CubicOut);
-        });
-    }
-
-    private Task OnNewLocation(string name, GeoLoc geoloc)
+    private async Task OnNewLocation(string name, GeoLoc geoloc)
     {
         _logger.LogInformation("New location picked: {Location}", name);
         _quizzGame.SetSearchLocation(geoloc, Cities.DefaultRadius);
-        return Task.CompletedTask;
+        await Navigation.PushModalAsync(new SpinnerModal(), true);
+        await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
+        await Navigation.PopModalAsync(true);
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _soundEffects.Init();
+        await InitWithSpinner();
+
+        AnswerBtn.IsEnabled = true;
+    }
+
+    private async Task InitWithSpinner()
+    {
         await Navigation.PushModalAsync(new SpinnerModal(), true);
         await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
         await Navigation.PopModalAsync(true);
-
-        AnswerBtn.IsEnabled = true;
     }
 
     private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
@@ -123,5 +138,20 @@ public partial class MainPage : ContentPage
     private void AnswerBtn_Clicked(object sender, EventArgs e)
     {
         _quizzGame.Answer(RatingSlider.Value);
+    }
+
+    private void ContentPage_Unloaded(object sender, EventArgs e)
+    {
+        _cts.Cancel();
+    }
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        _cts.Dispose();
     }
 }

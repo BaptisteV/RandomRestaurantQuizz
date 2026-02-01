@@ -54,7 +54,7 @@ public sealed class Photo
     [JsonPropertyName("photoMetadata")]
     public PhotoMetadata? PhotoMetadata { get; set; }
 
-    public byte[]? DownloadedImage { get; set; }
+    public byte[] DownloadedImage { get; set; } = [];
 }
 
 public sealed class PhotoMetadata
