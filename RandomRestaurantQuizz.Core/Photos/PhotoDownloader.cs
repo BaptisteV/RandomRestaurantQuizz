@@ -30,14 +30,6 @@ public class PhotoDownloader : IPhotoDownloader
         return url;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="photo"></param>
-    /// <param name="cancellationToken"></param>
-    /// <exception cref="HttpRequestException">Failed to fetch</exception>
-    /// <exception cref="OperationCanceledException">Download cancelled</exception>
-    /// <returns></returns>
     private async Task<byte[]> GetImage(Photo photo, CancellationToken cancellationToken)
     {
         var url = GetPhotoUrl(photo.Name!);
@@ -48,7 +40,7 @@ public class PhotoDownloader : IPhotoDownloader
         return await response.Content.ReadAsByteArrayAsync(cancellationToken);
     }
 
-    private bool ShouldDownload(PlaceResult place, int photoIndex)
+    private bool PhotoInCache(PlaceResult place, int photoIndex)
     {
         var filename = _fileNamer.GetFilename(place, photoIndex);
 
@@ -85,8 +77,6 @@ public class PhotoDownloader : IPhotoDownloader
     {
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (place.Photos.Count == 0)
             {
                 _logger.LogWarning("No photo for {PlaceName}", place.DisplayName.Text);
@@ -95,10 +85,12 @@ public class PhotoDownloader : IPhotoDownloader
 
             for (var p = 0; p < place.Photos.Count; p++)
             {
-                if (ShouldDownload(place, p))
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (PhotoInCache(place, p))
                 {
                     var image = await GetImage(place.Photos[p], cancellationToken);
-                    await File.WriteAllBytesAsync(_fileNamer.GetFilename(place, p), image);
+                    await File.WriteAllBytesAsync(_fileNamer.GetFilename(place, p), image, cancellationToken);
                     place.Photos[p].DownloadedImage = image;
                 }
                 else

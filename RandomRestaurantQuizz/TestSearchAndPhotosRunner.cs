@@ -15,7 +15,8 @@ public partial class TestSearchAndPhotosRunner(IGooglePlacesClient restauClient,
     {
         Cities.Data.TryGetValue("Dijon", out var city);
 
-        foreach (var restaurant in await _restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken))
+        _restauClient.SetSearchLocation(city, Cities.DefaultRadius);
+        foreach (var restaurant in await _restauClient.GetRestaurants(cancellationToken))
         {
             LogRestaurant(restaurant.DisplayName.Text, restaurant.Rating, restaurant.UserRatingCount ?? 0, restaurant.FormattedAddress, restaurant.Photos.Count);
             await _photoManager.SaveTempJpgs(restaurant);

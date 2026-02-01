@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.App.ViewModels;
+using RandomRestaurantQuizz.Core.Data;
+using RandomRestaurantQuizz.Core.Models;
 using RandomRestaurantQuizz.Core.Quizzz;
 using RandomRestaurantQuizz.Core.SoundEffects;
 
@@ -6,26 +9,38 @@ namespace RandomRestaurantQuizz.App;
 
 public partial class MainPage : ContentPage
 {
+    private readonly IQuizzViewModel _vm;
+
     private readonly ILogger<MainPage> _logger;
     private readonly ISoundEffect _soundEffects;
     private readonly IQuizzGame _quizzGame;
 
-    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects)
+    private readonly GeoLocPickerPage _geoPage;
+
+    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, IQuizzViewModel vm)
     {
+        BindingContext = vm;
+        _vm = vm;
         _quizzGame = quizz;
         _logger = logger;
         _soundEffects = soundEffects;
+        _geoPage = new(logger);
 
         InitializeComponent();
+
+        _geoPage.NewLocation = OnNewLocation;
 
         _quizzGame.ScoreChanged = OnScoreChanged;
         _quizzGame.PhotoChanged = OnPhotoChanged;
         _quizzGame.RoundFinished = OnRoundFinished;
+
+        _ = Task.Run(() => Navigation.PushAsync(_geoPage, true));
     }
 
     private async Task OnScoreChanged(QuizzModel model)
     {
-        ScoreLabel.Text = $"Score: {model.Player.TotalScore()}";
+        _vm.Score = model.Player.TotalScore();
+        //ScoreLabel.Text = $"Score: {model.Player.TotalScore()}";
         RestaurantNameLabel.Text = $"{model.CurrentPlace.DisplayName.Text} ({model.CurrentPlace.UserRatingCount} 👤)";
 
         ScoreDiffLabel.Opacity = 0.0;
@@ -67,12 +82,21 @@ public partial class MainPage : ContentPage
         });
     }
 
+    private Task OnNewLocation(string name, GeoLoc geoloc)
+    {
+        _logger.LogInformation("New location picked: {Location}", name);
+        _quizzGame.SetSearchLocation(geoloc, Cities.DefaultRadius);
+        return Task.CompletedTask;
+    }
+
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _soundEffects.Init();
+
         await Navigation.PushModalAsync(new SpinnerModal(), true);
         await _quizzGame.InitRound(CancellationToken.None);
         await Navigation.PopModalAsync(true);
+
         AnswerBtn.IsEnabled = true;
     }
 

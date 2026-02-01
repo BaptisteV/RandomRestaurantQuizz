@@ -18,9 +18,8 @@ public static class IServiceCollectionExtensions
             {
                 a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
             });
+
             services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
-
-
             services.AddTransient<IFileNamer, FileNamer>();
             services.AddTransient<PhotoFileManager>();
 

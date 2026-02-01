@@ -13,6 +13,9 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
     private readonly IPhotoDownloader _photoDownloader;
     private readonly ILogger<GooglePlacesClient> _logger;
 
+    private GeoLoc _center = new();
+    private int _radius = 1_000;
+
     public GooglePlacesClient(HttpClient httpClient, IOptionsMonitor<SecretsJson> config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
     {
         _httpClient = httpClient;
@@ -37,9 +40,9 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         };
     }
 
-    private async Task<List<PlaceResult>> GetRestaurantsInCity(GeoLoc center, int radiusSize, CancellationToken cancellationToken)
+    private async Task<List<PlaceResult>> RestaurantsAround(CancellationToken cancellationToken)
     {
-        var request = CreateRequest(center, radiusSize);
+        var request = CreateRequest(_center, _radius);
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
         {
@@ -56,10 +59,10 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         return json?.Places ?? [];
     }
 
-    public async Task<List<PlaceResult>> GetRestaurants(GeoLoc center, int radiusSize, CancellationToken cancellationToken)
+    public async Task<List<PlaceResult>> GetRestaurants(CancellationToken cancellationToken)
     {
         // Get all possible restaurants
-        var restaurantsInCity = (await GetRestaurantsInCity(center, radiusSize, cancellationToken)).ToList();
+        var restaurantsInCity = (await RestaurantsAround(cancellationToken)).ToList();
 
         // Remove restaurants with no photo to download or no rating
         var restaurants = restaurantsInCity.WithRatingAndPhotos();
@@ -74,5 +77,11 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
         // Enrich with photos
         return await _photoDownloader.GetPhotos(restaurants, cancellationToken);
+    }
+
+    public void SetSearchLocation(GeoLoc location, int radius)
+    {
+        _center = location;
+        _radius = radius;
     }
 }

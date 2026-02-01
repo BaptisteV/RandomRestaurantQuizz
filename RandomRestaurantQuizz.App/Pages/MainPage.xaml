@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RandomRestaurantQuizz.App.MainPage"
              xmlns:controls="clr-namespace:RandomRestaurantQuizz.App;assembly=RandomRestaurantQuizz.App"
+             xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
+             x:DataType="vm:MainPageViewModel"
              Loaded="ContentPage_Loaded">
 
     <ScrollView>
@@ -54,7 +56,7 @@
 
             <FlexLayout JustifyContent="Center">
                 <Label x:Name="ScoreLabel"
-                       Text="0.00"
+                       Text="{Binding VmScore}"
                        FontSize="Large"/>
                 <Label x:Name="ScoreDiffLabel"
                        Text=""

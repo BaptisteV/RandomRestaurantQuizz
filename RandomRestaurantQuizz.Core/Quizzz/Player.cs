@@ -9,6 +9,8 @@ public class Player
         _guesses.Add(guess);
     }
 
+    public int Score { get => TotalScore(); set; }
+
     public int TotalScore()
     {
         var score = 0.0;

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.App.ViewModels;
 using RandomRestaurantQuizz.Core;
+using RandomRestaurantQuizz.Core.Quizzz;
 
 namespace RandomRestaurantQuizz.App;
 
@@ -22,6 +24,21 @@ public static class MauiProgram
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
         builder.Services.AddCoreServices();
+
+        builder.Services.AddSingleton<IQuizzViewModel, MainPageViewModel>();
+
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            var ex = e.ExceptionObject as Exception;
+            System.Diagnostics.Debug.WriteLine("AppDomain exception: " + ex);
+        };
+
+        TaskScheduler.UnobservedTaskException += (s, e) =>
+        {
+            System.Diagnostics.Debug.WriteLine("Unobserved task exception: " + e.Exception);
+            e.SetObserved(); // prevents process termination in some scenarios
+        };
+
         return builder.Build();
     }
 }

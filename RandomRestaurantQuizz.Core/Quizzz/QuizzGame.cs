@@ -14,16 +14,17 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
     private QuizzModel _model = new();
     private readonly IScoreSaver _scoreSaver = scoreSaver;
 
-    public Func<QuizzModel, Task> ScoreChanged { get; set; } = (_) => Task.CompletedTask;
-    public Func<QuizzModel, Task> PhotoChanged { get; set; } = (_) => Task.CompletedTask;
-    public Func<QuizzModel, Task> RoundFinished { get; set; } = (_) => Task.CompletedTask;
+    public Func<QuizzModel, Task> ScoreChanged { /*private*/ get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(ScoreChanged)} handler");
+    public Func<QuizzModel, Task> PhotoChanged { /*private*/ get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(PhotoChanged)} handler");
+    public Func<QuizzModel, Task> RoundFinished { /*private*/ get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RoundFinished)} handler");
 
     public async Task InitRound(CancellationToken cancellationToken)
     {
         await _scoreSaver.Init();
         Cities.Data.TryGetValue("Dijon", out var city);
 
-        var restaurants = await restauClient.GetRestaurants(city, Cities.DefaultRadius, cancellationToken);
+        restauClient.SetSearchLocation(city, Cities.DefaultRadius);
+        var restaurants = await restauClient.GetRestaurants(cancellationToken);
 
         _model = new QuizzModel();
         _places.Clear();
@@ -65,6 +66,11 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
         await PhotoChanged(_model);
         await ScoreChanged(_model);
+    }
+
+    public void SetSearchLocation(GeoLoc geoloc, int radius)
+    {
+        restauClient.SetSearchLocation(geoloc, radius);
     }
 
     public async Task NextPhoto()

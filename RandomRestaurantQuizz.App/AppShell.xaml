@@ -5,8 +5,12 @@
        xmlns:local="clr-namespace:RandomRestaurantQuizz.App"
        Title="RandomRestaurantQuizz.App">
 
-    <ShellContent Title="Restaurant Quizz"
-                  ContentTemplate="{DataTemplate local:MainPage}"
-                  Route="MainPage" />
-
+    <ShellContent Title="Quizz"
+              ContentTemplate="{DataTemplate local:MainPage}"
+              Route="MainPage" />
+    <!--<ShellContent Title="Location"
+              ContentTemplate="{DataTemplate local:GeoLocPickerPage}"
+              Route="GeoLocPickerPage" />
+    -->
+    
 </Shell>

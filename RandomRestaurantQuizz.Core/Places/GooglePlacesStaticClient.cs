@@ -9,7 +9,8 @@ namespace RandomRestaurantQuizz.Core.Places;
 public class GooglePlacesStaticClient(HttpClient _, IPhotoDownloader photoDownloader, ILogger<GooglePlacesStaticClient> logger) : IGooglePlacesClient
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-    public async Task<List<PlaceResult>> GetRestaurants(GeoLoc center, int radiusSize, CancellationToken cancellationToken)
+
+    public async Task<List<PlaceResult>> GetRestaurants(CancellationToken cancellationToken)
     {
         // Read "fake" JSON to avoid hitting Search API to debug
         var json = JsonSerializer.Deserialize<PlacesApiResponse>(TestData.JsonDij, _jsonOptions);
@@ -29,4 +30,6 @@ public class GooglePlacesStaticClient(HttpClient _, IPhotoDownloader photoDownlo
 
         return await photoDownloader.GetPhotos(restaurants, cancellationToken);
     }
+
+    public void SetSearchLocation(GeoLoc location, int radius) { }
 }
