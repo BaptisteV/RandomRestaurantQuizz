@@ -1,6 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using RandomRestaurantQuizz.Core;
+using RandomRestaurantQuizz.Core.Places;
+using System.Text.Json.Serialization;
 
-namespace RandomRestaurantQuizz.Core.Models;
+namespace RandomRestaurantQuizz.Core.Places;
 
 public sealed class PlaceResult
 {
@@ -18,6 +20,9 @@ public sealed class PlaceResult
 
     [JsonPropertyName("photos")]
     public List<Photo> Photos { get; set; } = [];
+
+    [JsonPropertyName("reviews")]
+    public List<Review> Reviews { get; set; } = [];
 }
 
 public static class PlaceResultsExtensions
@@ -73,4 +78,43 @@ public sealed class PhotoMetadata
 public sealed class PlacesApiResponse
 {
     public List<PlaceResult> Places { get; set; } = [];
+}
+
+public sealed class Review
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("relativePublishTimeDescription")]
+    public string RelativePublishTimeDescription { get; set; } = string.Empty;
+
+    [JsonPropertyName("rating")]
+    public int Rating { get; set; }
+
+    [JsonPropertyName("text")]
+    public TextContent Text { get; set; } = new();
+
+    [JsonPropertyName("authorAttribution")]
+    public AuthorAttribution AuthorAttribution { get; set; } = new();
+}
+
+public sealed class TextContent
+{
+    [JsonPropertyName("text")]
+    public string Text { get; set; } = string.Empty;
+
+    [JsonPropertyName("languageCode")]
+    public string LanguageCode { get; set; } = string.Empty;
+}
+
+public sealed class AuthorAttribution
+{
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; } = string.Empty;
+
+    [JsonPropertyName("uri")]
+    public string Uri { get; set; } = string.Empty;
+
+    [JsonPropertyName("photoUri")]
+    public string PhotoUri { get; set; } = string.Empty;
 }

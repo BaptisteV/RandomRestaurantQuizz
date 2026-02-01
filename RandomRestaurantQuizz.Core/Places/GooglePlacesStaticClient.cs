@@ -1,4 +1,5 @@
 ﻿using RandomRestaurantQuizz.Core.Photos;
+using RandomRestaurantQuizz.Core.Places;
 using System.Text.Json;
 
 namespace RandomRestaurantQuizz.Core.Places;

@@ -37,7 +37,7 @@ public partial class MainPage : ContentPage, IDisposable
     private async Task OnScoreChanged(ScoreChangedEvent scoreChangedEvent)
     {
         _vm.Score = scoreChangedEvent.TotalScore;
-        _vm.LocationName = scoreChangedEvent.LocationLabel;
+        _vm.RestaurantName = scoreChangedEvent.LocationLabel;
         _vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
 
         if (scoreChangedEvent.FromAnswer)
@@ -49,7 +49,7 @@ public partial class MainPage : ContentPage, IDisposable
 
     private void AnimateScoreDiff(double roundScore)
     {
-        ScoreDiffLabel.Opacity = 0.0;
+        ScoreDiffLabel.Opacity = 100.0;
         ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
         _ = Task.Run(async () =>
         {
@@ -59,8 +59,8 @@ public partial class MainPage : ContentPage, IDisposable
                 await Task.Delay(2000, _cts.Token);
                 await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
             }
-            catch (TaskCanceledException) { }
-        }, _cts.Token);
+            catch (TaskCanceledException) { ScoreDiffLabel.CancelAnimations(); }
+        });
     }
 
     private Task OnPhotoChanged(PhotoChangedEvent photoChangedEvent)
@@ -76,20 +76,21 @@ public partial class MainPage : ContentPage, IDisposable
         var recapVm = new RecapViewModel(roundFinishedEvent.TotalScore, roundFinishedEvent.PersonalBests);
         await Navigation.PushAsync(_geoPage, true);
         await Navigation.PushModalAsync(new RecapModal(recapVm), true);
-        await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
+        await InitWithSpinner();
     }
 
     private async Task OnNewLocation(string name, GeoLoc geoloc)
     {
         _logger.LogInformation("New location picked: {Location}", name);
+        _vm.LocationName = name;
         _quizzGame.SetSearchLocation(geoloc, Cities.DefaultRadius);
-        await Navigation.PushModalAsync(new SpinnerModal(), true);
-        await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
-        await Navigation.PopModalAsync(true);
+
+        await InitWithSpinner();
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
+        _cts.TryReset();
         await _soundEffects.Init();
         await InitWithSpinner();
 

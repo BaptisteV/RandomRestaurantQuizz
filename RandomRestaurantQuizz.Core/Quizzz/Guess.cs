@@ -1,4 +1,6 @@
-﻿namespace RandomRestaurantQuizz.Core.Quizzz;
+﻿using RandomRestaurantQuizz.Core.Places;
+
+namespace RandomRestaurantQuizz.Core.Quizzz;
 
 public class Guess(PlaceResult place, double guessedRating)
 {

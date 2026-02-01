@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using RandomRestaurantQuizz.Core.Places;
+using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Core.Photos;
 

@@ -6,14 +6,15 @@
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              x:DataType="vm:MainPageViewModel"
              Loaded="ContentPage_Loaded"
-             Unloaded="ContentPage_Unloaded">
+             Unloaded="ContentPage_Unloaded"
+             Title="{Binding LocationName}">
 
     <ScrollView>
         <VerticalStackLayout Padding="30"
                              Spacing="25">
             
             <Label x:Name="RestaurantNameLabel"
-                   Text="{Binding LocationName}"
+                   Text="{Binding RestaurantName}"
                    HorizontalOptions="Center"
                    FontSize="Subtitle" />
             
@@ -31,6 +32,45 @@
                 </Image>
             </FlexLayout>
 
+            <CollectionView ItemsSource="{Binding Reviews}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Stroke="LightGray"
+                                StrokeThickness="1"
+                                Padding="15"
+                                Margin="0,0,0,10"
+                                BackgroundColor="White"
+                                StrokeShape="RoundRectangle 8">
+                            <VerticalStackLayout Spacing="8">
+                                <!-- Author Name -->
+                                <Label Text="{Binding AuthorAttribution.DisplayName}"
+                                       FontAttributes="Bold"
+                                       FontSize="16" />
+
+                                <!-- Rating -->
+                                <HorizontalStackLayout Spacing="5">
+                                    <Label Text="★"
+                                           TextColor="Gold"
+                                           FontSize="18" />
+                                    <Label Text="{Binding Rating}"
+                                           FontSize="14" />
+                                </HorizontalStackLayout>
+
+                                <!-- Review Text -->
+                                <Label Text="{Binding Text.Text}"
+                                       LineBreakMode="WordWrap"
+                                       FontSize="14" />
+
+                                <!-- Publish Time -->
+                                <Label Text="{Binding RelativePublishTimeDescription}"
+                                       TextColor="Gray"
+                                       FontSize="12" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            
             <Label x:Name="RatingLabel"
                    Text="2.5"
                    FontSize="Large"
@@ -62,6 +102,7 @@
                        FontSize="Large"/>
                 <Label x:Name="ScoreDiffLabel"
                        Text="{Binding ScoreDiff}"
+                       Opacity="0.0"
                        FontSize="Medium"/>
             </FlexLayout>
         </VerticalStackLayout>

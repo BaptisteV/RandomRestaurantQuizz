@@ -1,4 +1,5 @@
 ﻿using RandomRestaurantQuizz.Core.Photos;
+using RandomRestaurantQuizz.Core.Places;
 using System.Net.Http.Json;
 
 namespace RandomRestaurantQuizz.Core.Places;
@@ -47,7 +48,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         };
 
         httpRequest.Headers.Add("X-Goog-Api-Key", _apiKey);
-        httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress");
+        httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews");
 
         var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
         response.EnsureSuccessStatusCode();

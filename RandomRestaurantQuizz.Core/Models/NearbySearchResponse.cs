@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using RandomRestaurantQuizz.Core.Places;
+using System.Text.Json.Serialization;
 
 namespace RandomRestaurantQuizz.Core.Models;
 

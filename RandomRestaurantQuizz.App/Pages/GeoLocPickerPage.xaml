@@ -5,6 +5,7 @@
              Title="Pick a location">
 
     <VerticalStackLayout x:Name="BtnContainer"
+                         WidthRequest="600"
                          Padding="30"
                          Spacing="25">
     </VerticalStackLayout>
