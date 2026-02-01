@@ -2,22 +2,15 @@
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public interface IEventHandler
-{
-    Task ScoreChanged(QuizzModel quizz);
-    Task PhotoChanged(QuizzModel quizz);
-    Task RoundFinished(QuizzModel quizz);
-}
-
 public interface IQuizzGame
 {
-    Task InitRound(CancellationToken cancellationToken);
+    Task InitRound((string Name, GeoLoc Geoloc) location, CancellationToken cancellationToken);
     Task Answer(double guessedRating);
     Task NextPhoto();
     Task PreviousPhoto();
     void SetSearchLocation(GeoLoc geoloc, int radius);
 
-    Func<QuizzModel, Task> ScoreChanged { get; set; }
-    Func<QuizzModel, Task> PhotoChanged { get; set; }
-    Func<QuizzModel, Task> RoundFinished { get; set; }
+    Func<ScoreChangedEvent, Task> ScoreChanged { get; set; }
+    Func<PhotoChangedEvent, Task> PhotoChanged { get; set; }
+    Func<RoundFinishedEvent, Task> RoundFinished { get; set; }
 }

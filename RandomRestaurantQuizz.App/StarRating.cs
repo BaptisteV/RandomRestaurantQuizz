@@ -186,14 +186,14 @@ public class StarRating : ContentView
 
     private void UpdateStarColors()
     {
-        foreach (var star in _stars)
+        foreach (var star in _stars.Select(s => s.Children))
         {
-            if (star.Children.Count >= 2)
+            if (star.Count >= 2)
             {
-                if (star.Children[0] is Label backgroundStar)
+                if (star[0] is Label backgroundStar)
                     backgroundStar.TextColor = EmptyStarColor;
 
-                if (star.Children[1] is Grid foregroundClip &&
+                if (star[1] is Grid foregroundClip &&
                     foregroundClip.Children[0] is Label foregroundStar)
                     foregroundStar.TextColor = StarColor;
             }

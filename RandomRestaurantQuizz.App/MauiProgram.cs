@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz.App.ViewModels;
 using RandomRestaurantQuizz.Core;
+using RandomRestaurantQuizz.Core.Models;
 using RandomRestaurantQuizz.Core.Quizzz;
 
 namespace RandomRestaurantQuizz.App;
@@ -26,6 +27,8 @@ public static class MauiProgram
         builder.Services.AddCoreServices();
 
         builder.Services.AddSingleton<IQuizzViewModel, MainPageViewModel>();
+        builder.Services.AddSingleton<RecapViewModel>();
+        builder.Services.AddSingleton<GeoLocPickerPage>();
 
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {

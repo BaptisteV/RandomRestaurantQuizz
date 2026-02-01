@@ -18,7 +18,7 @@ public partial class TestSearchAndPhotosRunner(IGooglePlacesClient restauClient,
         _restauClient.SetSearchLocation(city, Cities.DefaultRadius);
         foreach (var restaurant in await _restauClient.GetRestaurants(cancellationToken))
         {
-            LogRestaurant(restaurant.DisplayName.Text, restaurant.Rating, restaurant.UserRatingCount ?? 0, restaurant.FormattedAddress, restaurant.Photos.Count);
+            LogRestaurant(restaurant.DisplayName.Text, restaurant.Rating, restaurant.UserRatingCount, restaurant.FormattedAddress, restaurant.Photos.Count);
             await _photoManager.SaveTempJpgs(restaurant);
         }
 
@@ -33,5 +33,5 @@ public partial class TestSearchAndPhotosRunner(IGooglePlacesClient restauClient,
         Address: {Address}
         PhotoCount: {PhotoCount}
         """)]
-    private partial void LogRestaurant(string? name, double? rating, int? userRatingCount, string? address, int? photoCount);
+    private partial void LogRestaurant(string? name, double rating, int userRatingCount, string? address, int? photoCount);
 }

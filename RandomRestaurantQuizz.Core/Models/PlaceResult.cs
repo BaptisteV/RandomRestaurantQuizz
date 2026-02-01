@@ -8,10 +8,10 @@ public sealed class PlaceResult
     public DisplayName DisplayName { get; set; } = new();
 
     [JsonPropertyName("rating")]
-    public double? Rating { get; set; }
+    public double Rating { get; set; }
 
     [JsonPropertyName("userRatingCount")]
-    public int? UserRatingCount { get; set; }
+    public int UserRatingCount { get; set; }
 
     [JsonPropertyName("formattedAddress")]
     public string? FormattedAddress { get; set; }

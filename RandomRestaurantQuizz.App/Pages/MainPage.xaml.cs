@@ -17,68 +17,66 @@ public partial class MainPage : ContentPage
 
     private readonly GeoLocPickerPage _geoPage;
 
-    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, IQuizzViewModel vm)
+    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, IQuizzViewModel vm, GeoLocPickerPage geoPage)
     {
-        BindingContext = vm;
         _vm = vm;
+        BindingContext = _vm;
         _quizzGame = quizz;
         _logger = logger;
         _soundEffects = soundEffects;
-        _geoPage = new(logger);
+        _geoPage = geoPage;
 
         InitializeComponent();
 
         _geoPage.NewLocation = OnNewLocation;
 
-        _quizzGame.ScoreChanged = OnScoreChanged;
-        _quizzGame.PhotoChanged = OnPhotoChanged;
+        //_quizzGame.PhotoChanged = OnPhotoChanged;
         _quizzGame.RoundFinished = OnRoundFinished;
+        _quizzGame.ScoreChanged = OnScoreChangedE;
+        _quizzGame.PhotoChanged = OnPhotoChanged;
 
         _ = Task.Run(() => Navigation.PushAsync(_geoPage, true));
     }
 
-    private async Task OnScoreChanged(QuizzModel model)
+    private async Task OnScoreChangedE(ScoreChangedEvent scoreChangedEvent)
     {
-        _vm.Score = model.Player.TotalScore();
-        //ScoreLabel.Text = $"Score: {model.Player.TotalScore()}";
-        RestaurantNameLabel.Text = $"{model.CurrentPlace.DisplayName.Text} ({model.CurrentPlace.UserRatingCount} 👤)";
+        _vm.Score = scoreChangedEvent.TotalScore;
+        _vm.LocationName = scoreChangedEvent.LocationLabel;
+        _vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
 
-        ScoreDiffLabel.Opacity = 0.0;
-        if (model.LastGuess is null)
-            return;
+        AnimateScoreDiff(scoreChangedEvent.RoundScore);
 
-        var roundScore = model.LastGuess.RoundScore();
-
-        AnimateScoreDiff(roundScore);
-
-        await _soundEffects.PlayAnswer(correctnessPercentage: roundScore, CancellationToken.None);
+        await _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None);
     }
 
-    private Task OnPhotoChanged(QuizzModel model)
+    private Task OnPhotoChanged(PhotoChangedEvent photoChangedEvent)
     {
         _logger.LogDebug("Photo changed");
-        RestaurantPhotoImage.Source = ImageSource.FromStream(() => new MemoryStream(model.Image));
+        _vm.ImageSource = photoChangedEvent.Source;
         return Task.CompletedTask;
     }
 
-    private async Task OnRoundFinished(QuizzModel model)
+    private async Task OnRoundFinished(RoundFinishedEvent roundFinishedEvent)
     {
         _logger.LogDebug("Round finished");
-        await Navigation.PushModalAsync(new RecapModal(model), true);
+        var recapVm = new RecapViewModel(roundFinishedEvent.TotalScore, roundFinishedEvent.PersonalBests);
+        await Navigation.PushModalAsync(new RecapModal(recapVm), true);
+        await Navigation.PopModalAsync(true);
+        await Navigation.PushModalAsync(_geoPage, true);
         await Navigation.PushModalAsync(new SpinnerModal(), true);
-        await _quizzGame.InitRound(CancellationToken.None);
+        await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
         await Navigation.PopModalAsync(true);
     }
 
     private void AnimateScoreDiff(double roundScore)
     {
+        ScoreDiffLabel.Opacity = 0.0;
         ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
-        ScoreDiffLabel.Text = $"+{roundScore} ({roundScore:n1})";
         _ = Task.Run(async () =>
         {
             await ScoreDiffLabel.FadeToAsync(100, 500, Easing.CubicIn);
-            await Task.Delay(500);
-            await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
+            await Task.Delay(2000);
+            await ScoreDiffLabel.FadeToAsync(0, 2000, Easing.CubicOut);
         });
     }
 
@@ -92,9 +90,8 @@ public partial class MainPage : ContentPage
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _soundEffects.Init();
-
         await Navigation.PushModalAsync(new SpinnerModal(), true);
-        await _quizzGame.InitRound(CancellationToken.None);
+        await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
         await Navigation.PopModalAsync(true);
 
         AnswerBtn.IsEnabled = true;

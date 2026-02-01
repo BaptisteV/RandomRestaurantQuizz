@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Core.Data;
 using RandomRestaurantQuizz.Core.Quizzz;
 using System.Globalization;
 
@@ -8,6 +9,7 @@ public class QuizzConsoleRunner : IRunner
 {
     private readonly IQuizzGame _quizzGame;
     private readonly ILogger<QuizzConsoleRunner> _logger;
+    private const string CityName = "Dijon";
 
     public QuizzConsoleRunner(IQuizzGame quizz, ILogger<QuizzConsoleRunner> logger)
     {
@@ -23,7 +25,8 @@ public class QuizzConsoleRunner : IRunner
 #pragma warning disable S2190 // Add a way to break out this method's recursion
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        await _quizzGame.InitRound(cancellationToken);
+        Cities.Data.TryGetValue(CityName, out var city);
+        await _quizzGame.InitRound((Name: CityName, Geoloc: city), cancellationToken);
         while (true)
         {
             var answerValue = DoubleReader.ReadDouble("Guessed rating ? : ");

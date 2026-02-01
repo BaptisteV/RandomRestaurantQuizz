@@ -10,7 +10,7 @@ public class Guess
     public double RoundScore()
     {
         var score = 0.0;
-        var dist = Math.Abs(GuessedRating - (Place.Rating ?? 0));
+        var dist = Math.Abs(GuessedRating - Place.Rating);
         if (dist <= 1.5)
         {
             // Linear scaling: 0 distance = 100 points, 1.5 distance = 0 points

@@ -11,19 +11,29 @@ public partial class MainPageViewModel : ObservableObject, IQuizzViewModel
     public partial int Score { get; set; }
 
     [ObservableProperty]
-    public partial int ScoreDiff { get; set; }
+    public partial string ScoreDiff { get; set; }
 
     [ObservableProperty]
     public partial string LocationName { get; set; }
 
     [ObservableProperty]
-    public partial byte[] ImageData { get; set; }
+    public partial ImageSource ImageSource { get; set; }
 
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
-    public partial int SliderValue { get; set; }
+    public partial double SliderValue { get; set; }
+
+    public void Reset()
+    {
+        Score = 0;
+        ScoreDiff = "";
+        LocationName = "";
+        ImageSource = "";
+        IsLoading = false;
+        SliderValue = 2.5;
+    }
 
     public byte[] Image => CurrentPlace.Photos[_currentPhotoIndex].DownloadedImage ?? [];
 

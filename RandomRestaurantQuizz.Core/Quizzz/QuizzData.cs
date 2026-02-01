@@ -3,7 +3,7 @@ using RandomRestaurantQuizz.Core.Quizzz.Scores;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public class QuizzModel
+public class QuizzData
 {
     public byte[] Image => CurrentPlace.Photos[_currentPhotoIndex].DownloadedImage ?? [];
 
@@ -15,7 +15,7 @@ public class QuizzModel
 
     public List<Score> PersonalBests { get; set; } = [];
 
-    public QuizzModel NextRestaurant(PlaceResult newRestaurant, Guess? lastGuess)
+    public QuizzData NextRestaurant(PlaceResult newRestaurant, Guess? lastGuess)
     {
         CurrentPlace = newRestaurant;
         LastGuess = lastGuess;
@@ -25,7 +25,7 @@ public class QuizzModel
 
     private int _currentPhotoIndex = 0;
 
-    public QuizzModel NextPhoto()
+    public QuizzData NextPhoto()
     {
         var maxIndex = CurrentPlace.Photos.Count - 1;
         var nextIndex = Math.Min(_currentPhotoIndex + 1, maxIndex);
@@ -34,7 +34,7 @@ public class QuizzModel
         return this;
     }
 
-    public QuizzModel PreviousPhoto()
+    public QuizzData PreviousPhoto()
     {
         var prevIndex = Math.Max(0, _currentPhotoIndex - 1);
         _currentPhotoIndex = prevIndex;
@@ -50,11 +50,11 @@ public class QuizzModel
 
 public static class QuizzModelExtensions
 {
-    extension(QuizzModel model)
+    extension(IEnumerable<Score> scores)
     {
         public IEnumerable<Score> SortBest()
         {
-            return model.PersonalBests
+            return scores
                 .OrderByDescending(s => s.Value)
                 .ThenByDescending(s => s.Timestamp);
         }

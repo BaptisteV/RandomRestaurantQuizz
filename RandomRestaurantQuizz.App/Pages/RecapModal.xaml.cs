@@ -1,30 +1,23 @@
-using RandomRestaurantQuizz.Core.Quizzz;
+using RandomRestaurantQuizz.App.ViewModels;
+using RandomRestaurantQuizz.Core.Quizzz.Scores;
 
 namespace RandomRestaurantQuizz.App;
 
 public partial class RecapModal : ContentPage
 {
-    private const int MaxScoreCount = 10;
-
-    public RecapModal(QuizzModel quizzModel)
+    public RecapModal(RecapViewModel vm)
     {
+        BindingContext = vm;
         InitializeComponent();
-        InitUI(quizzModel);
+        FillScoresGrid(vm.Scores);
     }
 
-    private void InitUI(QuizzModel quizzModel)
+    private void FillScoresGrid(List<Score> scores)
     {
-        ScoreLabel.Text = $"Score: {quizzModel.Player.TotalScore()}";
-
-        var orderedScores = quizzModel
-            .SortBest()
-            .Take(MaxScoreCount)
-            .ToList();
-
-        PbGrid.BatchBegin();
-        for (var row = 0; row < orderedScores.Count; row++)
+        ScoresGrid.BatchBegin();
+        for (var row = 0; row < scores.Count; row++)
         {
-            var pb = orderedScores[row];
+            var pb = scores[row];
             var lblTime = new Label()
             {
                 Text = pb.Timestamp.ToString("G"),
@@ -38,10 +31,10 @@ public partial class RecapModal : ContentPage
                 HorizontalOptions = LayoutOptions.Center,
             };
 
-            PbGrid.Add(lblTime, 0, row);
-            PbGrid.Add(lblScore, 1, row);
+            ScoresGrid.Add(lblTime, 0, row);
+            ScoresGrid.Add(lblScore, 1, row);
         }
-        PbGrid.BatchCommit();
+        ScoresGrid.BatchCommit();
     }
 
     private async void CloseBtn_Clicked(object sender, EventArgs e)

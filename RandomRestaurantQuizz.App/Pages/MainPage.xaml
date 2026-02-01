@@ -12,7 +12,7 @@
                              Spacing="25">
             
             <Label x:Name="RestaurantNameLabel"
-                   Text=""
+                   Text="{Binding LocationName}"
                    HorizontalOptions="Center"
                    FontSize="Subtitle" />
             
@@ -23,6 +23,7 @@
                 </FlexLayout.GestureRecognizers>
 
                 <Image x:Name="RestaurantPhotoImage"
+                       Source="{Binding ImageSource}"
                        HeightRequest="400"
                        Aspect="AspectFit"
                        SemanticProperties.Description="Restaurant photo">
@@ -56,10 +57,10 @@
 
             <FlexLayout JustifyContent="Center">
                 <Label x:Name="ScoreLabel"
-                       Text="{Binding VmScore}"
+                       Text="{Binding Score}"
                        FontSize="Large"/>
                 <Label x:Name="ScoreDiffLabel"
-                       Text=""
+                       Text="{Binding ScoreDiff}"
                        FontSize="Medium"/>
             </FlexLayout>
         </VerticalStackLayout>

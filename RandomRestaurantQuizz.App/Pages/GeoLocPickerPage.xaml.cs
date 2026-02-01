@@ -6,14 +6,16 @@ namespace RandomRestaurantQuizz.App;
 
 public partial class GeoLocPickerPage : ContentPage
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<GeoLocPickerPage> _logger;
+    public (string Name, GeoLoc Geoloc) CurrentLocation;
 
     public Func<string, GeoLoc, Task> NewLocation { get; set; } = (_, _) => Task.CompletedTask;
-    public GeoLocPickerPage(ILogger logger)
+
+    public GeoLocPickerPage(ILogger<GeoLocPickerPage> logger)
     {
         InitializeComponent();
         var cities = Cities.Data.Keys;
-        foreach (var city in cities)
+        foreach (var city in cities.Order())
         {
             var btn = new Button()
             {
@@ -35,6 +37,7 @@ public partial class GeoLocPickerPage : ContentPage
 
         var geoloc = Cities.Data[city];
         await NewLocation(city, geoloc);
+        CurrentLocation = (city, geoloc);
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
     }
 }
