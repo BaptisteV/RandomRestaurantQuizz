@@ -12,7 +12,7 @@ public static class IServiceCollectionExtensions
     {
         public void AddCoreServices()
         {
-            services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
+            services.AddHttpClient<IGooglePlacesClient, GooglePlacesStaticClient>(a =>
             {
                 a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
             });

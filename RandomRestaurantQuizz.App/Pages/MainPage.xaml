@@ -10,22 +10,23 @@
              Title="{Binding LocationName}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="30"
-                             Spacing="25">
-            
+        <VerticalStackLayout Padding="16"
+                             Spacing="8">
+
             <Label x:Name="RestaurantNameLabel"
                    Text="{Binding RestaurantName}"
                    HorizontalOptions="Center"
                    FontSize="Subtitle" />
 
             <FlexLayout x:Name="PhotoContainer"
-                        JustifyContent="Center"
-                        HeightRequest="600">
+                        HeightRequest="300"
+                        JustifyContent="Center">
                 <FlexLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
                 </FlexLayout.GestureRecognizers>
 
                 <Image x:Name="RestaurantPhotoImage"
+                       HeightRequest="300"
                        Source="{Binding ImageSource}"
                        Aspect="AspectFit"
                        SemanticProperties.Description="Restaurant photo">
@@ -35,36 +36,36 @@
                             SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:VmReview">
-                        <Border Stroke="LightGray"
-                                StrokeThickness="1"
-                                Padding="4"
-                                Margin="0,0,0,0"
-                                StrokeShape="RoundRectangle 8">
-                            <VerticalStackLayout Spacing="8">
-                                <HorizontalStackLayout Spacing="8">
-                                    <!-- Author Name -->
-                                    <Label Text="{Binding AuthorName}"
-                                           FontAttributes="Bold"
-                                           VerticalTextAlignment="End"
-                                           FontSize="14" />
+                        <StackLayout>
+                            <Border Stroke="DarkGrey"
+                                    StrokeThickness="1"
+                                    Padding="2"
+                                    Margin="0,2"
+                                    StrokeShape="RoundRectangle 4">
 
-                                    <!-- Publish Time -->
-                                    <Label Text="{Binding RelativePublishTimeDescription}"
-                                           VerticalTextAlignment="End"
-                                           FontSize="10" />
-                                </HorizontalStackLayout>
-                                
-                                <!-- Review Text -->
-                                <Label Text="{Binding Text}"
-                                       LineBreakMode="WordWrap"
-                                       FontSize="12" />
+                                <VerticalStackLayout>
+                                    <HorizontalStackLayout Spacing="8">
 
-                            </VerticalStackLayout>
-                        </Border>
+                                        <Label Text="{Binding AuthorName}"
+                                               FontAttributes="Bold"
+                                               VerticalTextAlignment="End"
+                                               FontSize="14" />
+                                        <Label Text="{Binding RelativePublishTimeDescription}"
+                                               VerticalTextAlignment="End"
+                                               FontSize="10" />
+
+                                    </HorizontalStackLayout>
+
+                                    <Label Text="{Binding Text}"
+                                           LineBreakMode="WordWrap"
+                                           FontSize="12" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </StackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            
+
             <Label x:Name="RatingLabel"
                    Text="2.5"
                    FontSize="Large"
@@ -88,16 +89,16 @@
                     SemanticProperties.Hint="Counts the number of times you click"
                     Clicked="AnswerBtn_Clicked"
                     HorizontalOptions="Fill"
-                    IsEnabled="false"/>
+                    IsEnabled="false" />
 
             <FlexLayout JustifyContent="Center">
                 <Label x:Name="ScoreLabel"
                        Text="{Binding Score}"
-                       FontSize="Large"/>
+                       FontSize="Large" />
                 <Label x:Name="ScoreDiffLabel"
                        Text="{Binding ScoreDiff}"
                        Opacity="0.0"
-                       FontSize="Medium"/>
+                       FontSize="Medium" />
             </FlexLayout>
         </VerticalStackLayout>
     </ScrollView>

@@ -1,6 +1,7 @@
 ﻿using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace RandomRestaurantQuizz.Core.Places;
 
@@ -8,7 +9,10 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
+    private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
     private readonly IPhotoDownloader _photoDownloader;
+
     private readonly ILogger<GooglePlacesClient> _logger;
 
     private GeoLoc _center = new();
@@ -50,11 +54,22 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         httpRequest.Headers.Add("X-Goog-Api-Key", _apiKey);
         httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews");
 
-        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        var json = await response.Content.ReadFromJsonAsync<PlacesApiResponse>(cancellationToken: cancellationToken);
+        var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
+        httpResponse.EnsureSuccessStatusCode();
 
-        return json?.Places ?? [];
+        var jsonContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+        var response = JsonSerializer.Deserialize<PlacesApiResponse?>(jsonContent, _jsonOptions);
+
+        if (response is null)
+        {
+            _logger.LogError("Error deserializing json : {Json}", jsonContent);
+            return [];
+        }
+
+        if (response.Places?.Count == 0)
+            _logger.LogWarning("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}m", _center.Latitude, _center.Longitude, _radius);
+
+        return response.Places ?? [];
     }
 
     public async Task<List<PlaceResult>> GetRestaurants(CancellationToken cancellationToken)

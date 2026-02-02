@@ -30,11 +30,10 @@ public partial class MainPage : ContentPage, IDisposable
         _quizzGame.RoundFinished = OnRoundFinished;
         _quizzGame.ScoreChanged = OnScoreChanged;
         _quizzGame.PhotoChanged = OnPhotoChanged;
-
-        _ = Task.Run(() => Navigation.PushAsync(_geoPage, true), _cts.Token);
+        Navigation.PushAsync(_geoPage, true).Wait();
     }
 
-    private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
+    private async Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
     {
         _vm.Score = startedEvent.ScoreChangedEvent.TotalScore;
         _vm.RestaurantName = startedEvent.RestaurantName;
@@ -42,7 +41,7 @@ public partial class MainPage : ContentPage, IDisposable
 
         _vm.ImageSource = startedEvent.PhotoChangedEvent.Source;
         _vm.Reviews = [.. startedEvent.Reviews.Select(VmReview.FromCoreReview)];
-        return Task.CompletedTask;
+        //return Task.CompletedTask;
     }
 
     private async Task OnScoreChanged(ScoreChangedEvent scoreChangedEvent)
@@ -91,8 +90,6 @@ public partial class MainPage : ContentPage, IDisposable
         _logger.LogInformation("New location picked: {Location}", name);
         _vm.LocationName = name;
         _quizzGame.SetSearchLocation(geoloc, Cities.DefaultRadius);
-
-        await InitWithSpinner();
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)

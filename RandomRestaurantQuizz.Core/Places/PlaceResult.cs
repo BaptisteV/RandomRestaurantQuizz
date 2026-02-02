@@ -77,7 +77,7 @@ public sealed class PhotoMetadata
 
 public sealed class PlacesApiResponse
 {
-    public List<PlaceResult> Places { get; set; } = [];
+    public List<PlaceResult>? Places { get; set; }
 }
 
 public sealed class Review

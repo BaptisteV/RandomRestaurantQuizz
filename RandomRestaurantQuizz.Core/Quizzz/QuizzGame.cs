@@ -35,6 +35,13 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         {
             _places.Enqueue(restaurant);
         }
+
+        if (_places.Count == 0)
+        {
+            _logger.LogError("No restaurants found for location {LocationName}", location.Name);
+            return;
+        }
+
         _currentPlace = _places.Dequeue();
 
         var scoreEvent = new ScoreChangedEvent(0, 0, _currentPlace.Rating);
