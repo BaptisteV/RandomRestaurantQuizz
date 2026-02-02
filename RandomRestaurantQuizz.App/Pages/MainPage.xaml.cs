@@ -33,7 +33,7 @@ public partial class MainPage : ContentPage, IDisposable
         Navigation.PushAsync(_geoPage, true).Wait();
     }
 
-    private async Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
+    private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
     {
         _vm.Score = startedEvent.ScoreChangedEvent.TotalScore;
         _vm.RestaurantName = startedEvent.RestaurantName;
@@ -41,7 +41,8 @@ public partial class MainPage : ContentPage, IDisposable
 
         _vm.ImageSource = startedEvent.PhotoChangedEvent.Source;
         _vm.Reviews = [.. startedEvent.Reviews.Select(VmReview.FromCoreReview)];
-        //return Task.CompletedTask;
+
+        return Task.CompletedTask;
     }
 
     private async Task OnScoreChanged(ScoreChangedEvent scoreChangedEvent)

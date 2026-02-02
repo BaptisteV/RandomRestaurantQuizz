@@ -4,11 +4,16 @@
              x:Class="RandomRestaurantQuizz.App.MainPage"
              xmlns:controls="clr-namespace:RandomRestaurantQuizz.App;assembly=RandomRestaurantQuizz.App"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
+             xmlns:conv="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              x:DataType="vm:MainPageViewModel"
              Loaded="ContentPage_Loaded"
              Unloaded="ContentPage_Unloaded"
              Title="{Binding LocationName}">
-
+    <ContentPage.Resources>
+        <conv:BoolToMaxLinesConverter x:Key="BoolToMaxLinesConverter"
+                                      CollapsedLines="1"
+                                      ExpandedLines="0" />
+    </ContentPage.Resources>
     <ScrollView>
         <VerticalStackLayout Padding="16"
                              Spacing="8">
@@ -44,6 +49,10 @@
                                     StrokeShape="RoundRectangle 4">
 
                                 <VerticalStackLayout>
+                                    <VerticalStackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=BindingContext.ToggleReviewCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </VerticalStackLayout.GestureRecognizers>
                                     <HorizontalStackLayout Spacing="8">
 
                                         <Label Text="{Binding AuthorName}"
@@ -57,8 +66,9 @@
                                     </HorizontalStackLayout>
 
                                     <Label Text="{Binding Text}"
-                                           LineBreakMode="WordWrap"
-                                           FontSize="12" />
+                                           MaxLines="{Binding IsExpanded, Converter={StaticResource BoolToMaxLinesConverter}}"
+                                           FontSize="12">
+                                    </Label>
                                 </VerticalStackLayout>
                             </Border>
                         </StackLayout>
