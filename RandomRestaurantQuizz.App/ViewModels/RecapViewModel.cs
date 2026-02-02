@@ -1,14 +1,35 @@
-﻿namespace RandomRestaurantQuizz.App.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 
-public class RecapViewModel
+namespace RandomRestaurantQuizz.App.ViewModels;
+
+public partial class VmScore : ObservableObject
 {
-    public RecapViewModel(double totalScore, List<Score> personalBests)
+    [ObservableProperty]
+    public partial string Timestamp { get; set; }
+
+    [ObservableProperty]
+    public partial double Value { get; set; }
+}
+
+public partial class RecapViewModel : ObservableObject
+{
+    public RecapViewModel(double totalScore, List<Score> scores)
     {
         TotalScore = totalScore;
-        Scores = personalBests;
+        var vmScores = scores.ConvertAll<VmScore>(s => new VmScore()
+        {
+            Timestamp = s.Timestamp.ToString("G"),
+            Value = s.Value,
+        });
+        Scores = new(vmScores);
         ScoreText = $"Score: {TotalScore:n1}";
     }
-    public double TotalScore { get; }
-    public string ScoreText { get; }
-    public List<Score> Scores { get; }
+
+    [ObservableProperty]
+    public partial double TotalScore { get; set; }
+    [ObservableProperty]
+    public partial string ScoreText { get; set; }
+    [ObservableProperty]
+    public partial ObservableCollection<VmScore> Scores { get; set; }
 }

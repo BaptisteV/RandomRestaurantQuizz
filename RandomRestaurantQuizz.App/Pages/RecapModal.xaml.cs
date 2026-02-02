@@ -6,32 +6,6 @@ public partial class RecapModal : ContentPage
     {
         BindingContext = vm;
         InitializeComponent();
-        FillScoresGrid(vm.Scores);
-    }
-
-    private void FillScoresGrid(List<Score> scores)
-    {
-        ScoresGrid.BatchBegin();
-        for (var row = 0; row < scores.Count; row++)
-        {
-            var pb = scores[row];
-            var lblTime = new Label()
-            {
-                Text = pb.Timestamp.ToString("G"),
-                FontSize = 18,
-                HorizontalOptions = LayoutOptions.Center,
-            };
-            var lblScore = new Label()
-            {
-                Text = pb.Value.ToString(),
-                FontSize = 18,
-                HorizontalOptions = LayoutOptions.Center,
-            };
-
-            ScoresGrid.Add(lblTime, 0, row);
-            ScoresGrid.Add(lblScore, 1, row);
-        }
-        ScoresGrid.BatchCommit();
     }
 
     private async void CloseBtn_Clicked(object sender, EventArgs e)

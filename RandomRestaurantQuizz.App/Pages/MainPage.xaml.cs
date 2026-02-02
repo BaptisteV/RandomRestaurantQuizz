@@ -30,7 +30,8 @@ public partial class MainPage : ContentPage, IDisposable
         _quizzGame.RoundFinished = OnRoundFinished;
         _quizzGame.ScoreChanged = OnScoreChanged;
         _quizzGame.PhotoChanged = OnPhotoChanged;
-        Navigation.PushAsync(_geoPage, true).Wait();
+
+        _ = Task.Run(async () => Navigation.PushAsync(_geoPage, true));
     }
 
     private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
@@ -83,7 +84,6 @@ public partial class MainPage : ContentPage, IDisposable
         var recapVm = new RecapViewModel(roundFinishedEvent.TotalScore, roundFinishedEvent.PersonalBests);
         await Navigation.PushAsync(_geoPage, true);
         await Navigation.PushModalAsync(new RecapModal(recapVm), true);
-        await InitWithSpinner();
     }
 
     private async Task OnSearchLocationChanged(string name, GeoLoc geoloc)
