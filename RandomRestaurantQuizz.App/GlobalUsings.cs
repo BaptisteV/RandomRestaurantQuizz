@@ -4,4 +4,5 @@ global using RandomRestaurantQuizz.Core.Data;
 global using RandomRestaurantQuizz.Core.Models;
 global using RandomRestaurantQuizz.Core.Places;
 global using RandomRestaurantQuizz.Core.Quizzz;
+global using RandomRestaurantQuizz.Core.Quizzz.Events;
 global using RandomRestaurantQuizz.Core.Quizzz.Scores;

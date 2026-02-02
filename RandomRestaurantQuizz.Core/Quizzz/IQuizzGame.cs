@@ -10,6 +10,7 @@ public interface IQuizzGame
     Task PreviousPhoto();
     void SetSearchLocation(GeoLoc geoloc, int radius);
 
+    Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; }
     Func<ScoreChangedEvent, Task> ScoreChanged { get; set; }
     Func<PhotoChangedEvent, Task> PhotoChanged { get; set; }
     Func<RoundFinishedEvent, Task> RoundFinished { get; set; }

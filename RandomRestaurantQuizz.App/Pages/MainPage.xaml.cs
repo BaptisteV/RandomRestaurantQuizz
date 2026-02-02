@@ -1,5 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Quizzz.Events;
-using RandomRestaurantQuizz.Core.SoundEffects;
+﻿using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
 
@@ -25,8 +24,9 @@ public partial class MainPage : ContentPage, IDisposable
 
         InitializeComponent();
 
-        _geoPage.NewLocation = OnNewLocation;
+        _geoPage.SearchLocationChanged = OnSearchLocationChanged;
 
+        _quizzGame.RestaurantChanged = OnRestaurantChanged;
         _quizzGame.RoundFinished = OnRoundFinished;
         _quizzGame.ScoreChanged = OnScoreChanged;
         _quizzGame.PhotoChanged = OnPhotoChanged;
@@ -34,17 +34,24 @@ public partial class MainPage : ContentPage, IDisposable
         _ = Task.Run(() => Navigation.PushAsync(_geoPage, true), _cts.Token);
     }
 
+    private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
+    {
+        _vm.Score = startedEvent.ScoreChangedEvent.TotalScore;
+        _vm.RestaurantName = startedEvent.RestaurantName;
+        _vm.ScoreDiff = startedEvent.ScoreChangedEvent.ScoreDiff;
+
+        _vm.ImageSource = startedEvent.PhotoChangedEvent.Source;
+        _vm.Reviews = [.. startedEvent.Reviews.Select(VmReview.FromCoreReview)];
+        return Task.CompletedTask;
+    }
+
     private async Task OnScoreChanged(ScoreChangedEvent scoreChangedEvent)
     {
         _vm.Score = scoreChangedEvent.TotalScore;
-        _vm.RestaurantName = scoreChangedEvent.LocationLabel;
         _vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
 
-        if (scoreChangedEvent.FromAnswer)
-        {
-            AnimateScoreDiff(scoreChangedEvent.RoundScore);
-            await _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None);
-        }
+        AnimateScoreDiff(scoreChangedEvent.RoundScore);
+        await _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None);
     }
 
     private void AnimateScoreDiff(double roundScore)
@@ -79,7 +86,7 @@ public partial class MainPage : ContentPage, IDisposable
         await InitWithSpinner();
     }
 
-    private async Task OnNewLocation(string name, GeoLoc geoloc)
+    private async Task OnSearchLocationChanged(string name, GeoLoc geoloc)
     {
         _logger.LogInformation("New location picked: {Location}", name);
         _vm.LocationName = name;

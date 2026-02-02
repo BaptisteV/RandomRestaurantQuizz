@@ -17,54 +17,48 @@
                    Text="{Binding RestaurantName}"
                    HorizontalOptions="Center"
                    FontSize="Subtitle" />
-            
+
             <FlexLayout x:Name="PhotoContainer"
-                        JustifyContent="Center">
+                        JustifyContent="Center"
+                        HeightRequest="600">
                 <FlexLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
                 </FlexLayout.GestureRecognizers>
 
                 <Image x:Name="RestaurantPhotoImage"
                        Source="{Binding ImageSource}"
-                       HeightRequest="400"
                        Aspect="AspectFit"
                        SemanticProperties.Description="Restaurant photo">
                 </Image>
             </FlexLayout>
-
-            <CollectionView ItemsSource="{Binding Reviews}">
+            <CollectionView ItemsSource="{Binding Reviews}"
+                            SelectionMode="None">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="vm:VmReview">
                         <Border Stroke="LightGray"
                                 StrokeThickness="1"
-                                Padding="15"
-                                Margin="0,0,0,10"
-                                BackgroundColor="White"
+                                Padding="4"
+                                Margin="0,0,0,0"
                                 StrokeShape="RoundRectangle 8">
                             <VerticalStackLayout Spacing="8">
-                                <!-- Author Name -->
-                                <Label Text="{Binding AuthorAttribution.DisplayName}"
-                                       FontAttributes="Bold"
-                                       FontSize="16" />
-
-                                <!-- Rating -->
-                                <HorizontalStackLayout Spacing="5">
-                                    <Label Text="★"
-                                           TextColor="Gold"
-                                           FontSize="18" />
-                                    <Label Text="{Binding Rating}"
+                                <HorizontalStackLayout Spacing="8">
+                                    <!-- Author Name -->
+                                    <Label Text="{Binding AuthorName}"
+                                           FontAttributes="Bold"
+                                           VerticalTextAlignment="End"
                                            FontSize="14" />
+
+                                    <!-- Publish Time -->
+                                    <Label Text="{Binding RelativePublishTimeDescription}"
+                                           VerticalTextAlignment="End"
+                                           FontSize="10" />
                                 </HorizontalStackLayout>
-
+                                
                                 <!-- Review Text -->
-                                <Label Text="{Binding Text.Text}"
+                                <Label Text="{Binding Text}"
                                        LineBreakMode="WordWrap"
-                                       FontSize="14" />
-
-                                <!-- Publish Time -->
-                                <Label Text="{Binding RelativePublishTimeDescription}"
-                                       TextColor="Gray"
                                        FontSize="12" />
+
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>
