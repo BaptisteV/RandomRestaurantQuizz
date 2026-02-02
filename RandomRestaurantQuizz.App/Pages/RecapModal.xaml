@@ -17,7 +17,7 @@
             <Grid x:Name="ScoresGrid"
                   RowSpacing="4"
                   ColumnSpacing="4"
-                  WidthRequest="600"
+                  MaximumWidthRequest="600"
                   HorizontalOptions="Fill">
                 <Grid.RowDefinitions>
                     <RowDefinition />

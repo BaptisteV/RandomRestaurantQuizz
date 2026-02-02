@@ -2,26 +2,23 @@ namespace RandomRestaurantQuizz.App;
 
 public partial class GeoLocPickerPage : ContentPage
 {
+    private readonly GeoLocPickerViewModel _vm;
     private readonly ILogger<GeoLocPickerPage> _logger;
     public (string Name, GeoLoc Geoloc) CurrentLocation;
 
     public Func<string, GeoLoc, Task> SearchLocationChanged { get; set; } = (_, _) => Task.CompletedTask;
 
-    public GeoLocPickerPage(ILogger<GeoLocPickerPage> logger)
+    public GeoLocPickerPage(GeoLocPickerViewModel vm, ILogger<GeoLocPickerPage> logger)
     {
+        _vm = vm;
+        BindingContext = _vm;
         _logger = logger;
         InitializeComponent();
 
         var cities = Cities.Data.Keys;
         foreach (var city in cities.Order())
         {
-            var btn = new Button()
-            {
-                Text = city,
-                IsEnabled = true,
-            };
-            btn.Clicked += Btn_Clicked;
-            BtnContainer.Add(btn);
+            _vm.Cities.Add(city);
         }
     }
 

@@ -63,7 +63,7 @@ public partial class MainPage : ContentPage, IDisposable
             try
             {
                 await ScoreDiffLabel.FadeToAsync(100, 1000, Easing.CubicIn);
-                await Task.Delay(2000, _cts.Token);
+                await Task.Delay(4000, _cts.Token);
                 await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
             }
             catch (TaskCanceledException) { ScoreDiffLabel.CancelAnimations(); }
@@ -141,6 +141,7 @@ public partial class MainPage : ContentPage, IDisposable
     {
         _cts.Cancel();
     }
+
     public void Dispose()
     {
         Dispose(true);

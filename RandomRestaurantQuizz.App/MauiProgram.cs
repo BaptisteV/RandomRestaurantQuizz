@@ -24,6 +24,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<MainPageViewModel>();
         builder.Services.AddSingleton<RecapViewModel>();
+        builder.Services.AddSingleton<GeoLocPickerViewModel>();
         builder.Services.AddSingleton<GeoLocPickerPage>();
 
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
