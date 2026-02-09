@@ -9,15 +9,16 @@
              Loaded="ContentPage_Loaded"
              Unloaded="ContentPage_Unloaded"
              Title="{Binding LocationName}">
+
     <ContentPage.Resources>
         <conv:BoolToMaxLinesConverter x:Key="BoolToMaxLinesConverter"
                                       CollapsedLines="1"
                                       ExpandedLines="0" />
+        <conv:ProgressToStarInput x:Key="ProgressToStarInputConverter" />
     </ContentPage.Resources>
-    <ScrollView>
-        <VerticalStackLayout Padding="16"
-                             Spacing="8">
 
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="8" MaximumWidthRequest="600">
             <Label x:Name="RestaurantNameLabel"
                    Text="{Binding RestaurantName}"
                    HorizontalOptions="Center"
@@ -29,7 +30,6 @@
                 <FlexLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
                 </FlexLayout.GestureRecognizers>
-
                 <Image x:Name="RestaurantPhotoImage"
                        HeightRequest="300"
                        Source="{Binding ImageSource}"
@@ -37,6 +37,7 @@
                        SemanticProperties.Description="Restaurant photo">
                 </Image>
             </FlexLayout>
+
             <CollectionView ItemsSource="{Binding Reviews}"
                             SelectionMode="None">
                 <CollectionView.ItemTemplate>
@@ -54,15 +55,14 @@
                                                               CommandParameter="{Binding .}" />
                                     </VerticalStackLayout.GestureRecognizers>
                                     <HorizontalStackLayout Spacing="8">
-
                                         <Label Text="{Binding AuthorName}"
                                                FontAttributes="Bold"
                                                VerticalTextAlignment="End"
                                                FontSize="14" />
+
                                         <Label Text="{Binding RelativePublishTimeDescription}"
                                                VerticalTextAlignment="End"
                                                FontSize="10" />
-
                                     </HorizontalStackLayout>
 
                                     <Label Text="{Binding Text}"
@@ -76,40 +76,44 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Label x:Name="RatingLabel"
-                   Text="2.5"
-                   FontSize="Large"
-                   HorizontalOptions="Center" />
-
-            <controls:StarRating x:Name="Stars"
-                                 StarSize="40"
-                                 HorizontalOptions="Center"
-                                 Rating="2.5" />
-
-            <Slider x:Name="RatingSlider"
-                    HeightRequest="40"
-                    Minimum="0"
-                    Maximum="5"
-                    Value="2.5"
-                    ValueChanged="RatingSlider_ValueChanged"
-                    SemanticProperties.Description="Select your rating from 1 to 5 stars" />
-
-            <Button x:Name="AnswerBtn"
-                    Text="Answer"
-                    SemanticProperties.Hint="Counts the number of times you click"
-                    Clicked="AnswerBtn_Clicked"
-                    HorizontalOptions="Fill"
-                    IsEnabled="false" />
-
             <FlexLayout JustifyContent="Center">
                 <Label x:Name="ScoreLabel"
                        Text="{Binding Score}"
                        FontSize="Large" />
+
                 <Label x:Name="ScoreDiffLabel"
                        Text="{Binding ScoreDiff}"
-                       Opacity="0.0"
                        FontSize="Medium" />
             </FlexLayout>
+
+            <Border x:Name="StarsContainer"
+                    Stroke="Gold"
+                    StrokeThickness="2"
+                    Shadow="2,2,4,Gold"
+                    Opacity="0.8"
+                    StrokeShape="RoundRectangle 8"
+                    HorizontalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
+                </Border.GestureRecognizers>
+                <Grid HorizontalOptions="Center">
+                    <controls:StarRating x:Name="Stars"
+                                         Opacity="1.0"
+                                         ZIndex="2"
+                                         StarSize="64"
+                                         HorizontalOptions="Fill"
+                                         Rating="{Binding RatingInput}">
+                    </controls:StarRating>
+                </Grid>
+            </Border>
+
+            <Button x:Name="AnswerBtn"
+                    Text="{Binding RatingInput}"
+                    SemanticProperties.Hint="Answer"
+                    Clicked="AnswerBtn_Clicked"
+                    HorizontalOptions="Fill"
+                    IsEnabled="false"
+                    FontSize="Medium" />
         </VerticalStackLayout>
     </ScrollView>
 

@@ -3,7 +3,7 @@
 public class Score
 {
     public int Id { get; set; }
-    public int Value { get; init; }
+    public double Value { get; init; }
     public DateTime Timestamp { get; init; }
 }
 

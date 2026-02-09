@@ -4,6 +4,7 @@
              x:Class="RandomRestaurantQuizz.App.GeoLocPickerPage"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              x:DataType="vm:GeoLocPickerViewModel"
+             Loaded="ContentPage_Loaded"
              Title="Pick a location">
 
     <StackLayout VerticalOptions="Center"

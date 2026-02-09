@@ -25,14 +25,14 @@ public sealed class SqlLiteScoreSaver : IScoreSaver, IDisposable
     {
         await _connection.OpenAsync();
 
-        //await DropTable();
+        await DropTable();
 
         var command = _connection.CreateCommand();
         command.CommandText =
         """
         CREATE TABLE IF NOT EXISTS Score (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            ScoreValue TEXT NOT NULL,
+            ScoreValue DOUBLE PRECISION NOT NULL,
             Ts TEXT NOT NULL
         );
         """;
@@ -71,7 +71,7 @@ public sealed class SqlLiteScoreSaver : IScoreSaver, IDisposable
             scores.Add(new Score
             {
                 Id = reader.GetInt32(0),
-                Value = reader.GetInt32(1),
+                Value = reader.GetDouble(1),
                 Timestamp = DateTime.ParseExact(reader.GetString(2), "O", CultureInfo.InvariantCulture),
             });
         }

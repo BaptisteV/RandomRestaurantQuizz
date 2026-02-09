@@ -27,18 +27,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<GeoLocPickerViewModel>();
         builder.Services.AddSingleton<GeoLocPickerPage>();
 
-        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-        {
-            var ex = e.ExceptionObject as Exception;
-            System.Diagnostics.Debug.WriteLine("AppDomain exception: " + ex);
-        };
-
-        TaskScheduler.UnobservedTaskException += (s, e) =>
-        {
-            System.Diagnostics.Debug.WriteLine("Unobserved task exception: " + e.Exception);
-            e.SetObserved();
-        };
-
         return builder.Build();
     }
 }

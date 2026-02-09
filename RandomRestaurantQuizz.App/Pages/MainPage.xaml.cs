@@ -126,15 +126,9 @@ public partial class MainPage : ContentPage, IDisposable
         }
     }
 
-    private void RatingSlider_ValueChanged(object sender, ValueChangedEventArgs slideEvent)
-    {
-        RatingLabel.Text = $"{slideEvent.NewValue:F1}";
-        Stars.Rating = slideEvent.NewValue;
-    }
-
     private void AnswerBtn_Clicked(object sender, EventArgs e)
     {
-        _quizzGame.Answer(RatingSlider.Value);
+        _quizzGame.Answer(_vm.RatingInput);
     }
 
     private void ContentPage_Unloaded(object sender, EventArgs e)
@@ -151,5 +145,14 @@ public partial class MainPage : ContentPage, IDisposable
     protected virtual void Dispose(bool disposing)
     {
         _cts.Dispose();
+    }
+
+    private void RatingPbInput_Tapped(object sender, TappedEventArgs e)
+    {
+        var x = e.GetPosition(StarsContainer)!.Value.X;
+        var width = StarsContainer.Width - 20 - 16;
+
+        var horizontalRatio = (x - 20) / width; // From 0.0 to 1.0
+        _vm.RatingInput = (double)new ProgressToStarInput().ConvertBack(horizontalRatio, typeof(double), null, CultureInfo.CurrentCulture);
     }
 }

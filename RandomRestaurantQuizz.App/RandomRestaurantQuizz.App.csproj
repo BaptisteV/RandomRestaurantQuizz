@@ -21,7 +21,7 @@
     <ApplicationTitle>RestauQuizz</ApplicationTitle>
 
     <!-- App Identifier -->
-    <ApplicationId>com.companyname.randomrestaurantquizz.app</ApplicationId>
+    <ApplicationId>com.bvi.restauquizz.app</ApplicationId>
 
     <!-- Versions -->
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>

@@ -9,13 +9,13 @@ public class Player
         _guesses.Add(guess);
     }
 
-    public int TotalScore()
+    public double TotalScore()
     {
         var score = 0.0;
         foreach (var guess in _guesses)
         {
             score += guess.RoundScore();
         }
-        return (int)Math.Round(score);
+        return Math.Round(score, 2);
     }
 }

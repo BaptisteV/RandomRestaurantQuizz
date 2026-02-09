@@ -14,7 +14,7 @@ public class GooglePlacesStaticClient(HttpClient _, IPhotoDownloader photoDownlo
         var json = JsonSerializer.Deserialize<PlacesApiResponse>(TestData.JsonDij, _jsonOptions);
 
         // Get all possible restaurants
-        var restaurantsInCity = json!.Places;
+        var restaurantsInCity = json!.Places ?? [];
 
         // Remove restaurants with no photo to download or no rating
         var restaurants = restaurantsInCity.WithRatingAndPhotos();

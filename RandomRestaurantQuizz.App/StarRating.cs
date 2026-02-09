@@ -1,6 +1,6 @@
 ﻿namespace RandomRestaurantQuizz.App;
 
-public class StarRating : ContentView
+public partial class StarRating : ContentView
 {
     public static readonly BindableProperty RatingProperty =
         BindableProperty.Create(
@@ -58,23 +58,23 @@ public class StarRating : ContentView
         set => SetValue(EmptyStarColorProperty, value);
     }
 
-    private readonly HorizontalStackLayout _container;
+    private readonly FlexLayout _container = new()
+    {
+        Direction = Microsoft.Maui.Layouts.FlexDirection.Row,
+    };
+
     private readonly List<Grid> _stars = [];
 
     public StarRating()
     {
-        _container = new HorizontalStackLayout
-        {
-            Spacing = 4
-        };
-
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             var starContainer = new Grid
             {
                 IsClippedToBounds = true,
                 WidthRequest = StarSize,
-                HeightRequest = StarSize
+                HorizontalOptions = LayoutOptions.Start,
+                VerticalOptions = LayoutOptions.Fill,
             };
 
             var backgroundStar = new Label
@@ -83,9 +83,9 @@ public class StarRating : ContentView
                 FontSize = StarSize,
                 TextColor = EmptyStarColor,
                 VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Start,
                 VerticalTextAlignment = TextAlignment.Center,
-                HorizontalTextAlignment = TextAlignment.Center
+                HorizontalTextAlignment = TextAlignment.Start,
             };
 
             var foregroundClip = new Grid
@@ -93,7 +93,7 @@ public class StarRating : ContentView
                 IsClippedToBounds = true,
                 WidthRequest = 0,
                 HorizontalOptions = LayoutOptions.Start,
-                VerticalOptions = LayoutOptions.Fill
+                VerticalOptions = LayoutOptions.Fill,
             };
 
             var foregroundStar = new Label
@@ -102,10 +102,10 @@ public class StarRating : ContentView
                 FontSize = StarSize,
                 TextColor = StarColor,
                 VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Start,
                 VerticalTextAlignment = TextAlignment.Center,
-                HorizontalTextAlignment = TextAlignment.Center,
-                WidthRequest = StarSize
+                HorizontalTextAlignment = TextAlignment.Start,
+                WidthRequest = StarSize,
             };
 
             foregroundClip.Add(foregroundStar);
@@ -116,7 +116,23 @@ public class StarRating : ContentView
             _container.Add(starContainer);
         }
 
-        Content = _container;
+        var bv = new BoxView
+        {
+            Color = Colors.Transparent,
+            WidthRequest = 16,
+        };
+
+        var hl = new HorizontalStackLayout
+        {
+            Spacing = 0,
+            Children =
+            {
+                bv,
+                _container,
+            }
+        };
+
+        Content = hl;
         UpdateStars();
     }
 
@@ -148,26 +164,22 @@ public class StarRating : ContentView
     {
         var rating = Math.Clamp(Rating, 0, 5);
 
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
-            if (_stars[i].Children.Count >= 2)
+            if ((_stars[i].Children.Count >= 2) && (_stars[i].Children[1] is Grid foregroundClip))
             {
-                var foregroundClip = _stars[i].Children[1] as Grid;
-                if (foregroundClip != null)
-                {
-                    double fillAmount = Math.Clamp(rating - i, 0, 1);
-                    foregroundClip.WidthRequest = fillAmount * StarSize;
-                }
+                const double adjustment = 0.05; // To avoid sligtly off center for 2.5
+                var fillAmount = Math.Clamp(rating - i - adjustment, 0, 1);
+                foregroundClip.WidthRequest = (fillAmount) * StarSize;
             }
         }
     }
 
     private void UpdateStarSizes()
     {
-        for (int i = 0; i < _stars.Count; i++)
+        for (var i = 0; i < _stars.Count; i++)
         {
             _stars[i].WidthRequest = StarSize;
-            _stars[i].HeightRequest = StarSize;
 
             if (_stars[i].Children[0] is Label backgroundStar)
             {

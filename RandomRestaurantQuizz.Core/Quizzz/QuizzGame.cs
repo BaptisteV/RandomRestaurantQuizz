@@ -44,7 +44,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
         _currentPlace = _places.Dequeue();
 
-        var scoreEvent = new ScoreChangedEvent(0, 0, _currentPlace.Rating);
+        var scoreEvent = new ScoreChangedEvent(0, 0, 0);
         var photoEvent = new PhotoChangedEvent(_currentPlace.Photos[0].DownloadedImage!);
         await RestaurantChanged(new RestaurantChangedEvent(_currentPlace.DisplayName.Text, location.Name, _currentPlace.UserRatingCount, _currentPlace.Reviews, scoreEvent, photoEvent));
     }
