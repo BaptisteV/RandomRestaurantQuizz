@@ -1,20 +1,25 @@
-namespace RandomRestaurantQuizz.App;
+﻿namespace RandomRestaurantQuizz.App;
 
 public partial class GeoLocPickerPage : ContentPage
 {
     private readonly GeoLocPickerViewModel _vm;
+    private readonly IGeolocationService _geoService;
     private readonly ILogger<GeoLocPickerPage> _logger;
+    private const string AroundMe = "📌 Around me";
+
     public (string Name, GeoLoc Geoloc) CurrentLocation;
 
     public Func<string, GeoLoc, Task> SearchLocationChanged { get; set; } = (_, _) => Task.CompletedTask;
 
-    public GeoLocPickerPage(GeoLocPickerViewModel vm, ILogger<GeoLocPickerPage> logger)
+    public GeoLocPickerPage(GeoLocPickerViewModel vm, IGeolocationService geoService, ILogger<GeoLocPickerPage> logger)
     {
         _vm = vm;
+        _geoService = geoService;
         BindingContext = _vm;
         _logger = logger;
         InitializeComponent();
 
+        _vm.Cities.Add(AroundMe);
         var cities = Cities.Data.Keys;
         foreach (var city in cities.Order())
         {
@@ -28,9 +33,19 @@ public partial class GeoLocPickerPage : ContentPage
         var city = btn.Text;
         _logger.LogInformation("Picked {City}", city);
 
-        var geoloc = Cities.Data[city];
+        GeoLoc geoloc;
+        if (city == AroundMe)
+        {
+            geoloc = await _geoService.GetCurrentLocation();
+            await SearchLocationChanged(city, geoloc);
+        }
+        else
+        {
+            geoloc = Cities.Data[city];
+            await SearchLocationChanged(city, geoloc);
+        }
+
         CurrentLocation = (city, geoloc);
-        await SearchLocationChanged(city, geoloc);
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
     }
 

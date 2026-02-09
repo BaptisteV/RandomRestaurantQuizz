@@ -26,6 +26,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<RecapViewModel>();
         builder.Services.AddSingleton<GeoLocPickerViewModel>();
         builder.Services.AddSingleton<GeoLocPickerPage>();
+        builder.Services.AddTransient<IGeolocationService, GeolocationService>();
 
         return builder.Build();
     }
