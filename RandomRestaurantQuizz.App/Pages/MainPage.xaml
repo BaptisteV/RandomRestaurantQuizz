@@ -8,34 +8,60 @@
              x:DataType="vm:MainPageViewModel"
              Loaded="ContentPage_Loaded"
              Unloaded="ContentPage_Unloaded"
-             Title="{Binding LocationName}">
+             Title="{Binding Round.LocationName}">
 
     <ContentPage.Resources>
         <conv:BoolToMaxLinesConverter x:Key="BoolToMaxLinesConverter"
                                       CollapsedLines="1"
                                       ExpandedLines="0" />
-        <conv:ProgressToStarInput x:Key="ProgressToStarInputConverter" />
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="4" MaximumWidthRequest="600">
-            <Label x:Name="RestaurantNameLabel"
-                   Text="{Binding RestaurantName}"
-                   HorizontalOptions="Center"
-                   FontSize="Subtitle" />
+        <VerticalStackLayout Padding="16"
+                             Spacing="4"
+                             MaximumWidthRequest="720">
+            <Grid>
+                <Label Text="{Binding Round.RestaurantName}"
+                       HorizontalOptions="Start"
+                       FontSize="Small" />
 
-            <FlexLayout x:Name="PhotoContainer"
-                        JustifyContent="Center">
-                <FlexLayout.GestureRecognizers>
+                <Label Text="{Binding Round.Progress}"
+                       HorizontalOptions="End"
+                       FontSize="Small" />
+            </Grid>
+
+            <Grid x:Name="PhotoContainer">
+                <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
-                </FlexLayout.GestureRecognizers>
-                <Image x:Name="RestaurantPhotoImage"
+                </Grid.GestureRecognizers>
+                <Border BackgroundColor="#80000000"
+                        Padding="4,0"
+                        ZIndex="2"
+                        Stroke="{StaticResource Secondary}"
+                        Opacity="0.8"
+                        StrokeShape="RoundRectangle 8"
+                        StrokeThickness="2"
+                        HorizontalOptions="End"
+                        VerticalOptions="Start">
+                    <AbsoluteLayout HorizontalOptions="End">
+                        <FlexLayout JustifyContent="Center">
+                            <Label Text="{Binding Score}"
+                                   FontSize="Large" />
+
+                            <Label x:Name="ScoreDiffLabel"
+                                   Text="{Binding ScoreDiff}"
+                                   Opacity="1.0"
+                                   FontSize="Medium" />
+                        </FlexLayout>
+                    </AbsoluteLayout>
+                </Border>
+                <Image ZIndex="1"
                        HeightRequest="240"
                        Source="{Binding ImageSource}"
                        Aspect="AspectFit"
                        SemanticProperties.Description="Restaurant photo">
                 </Image>
-            </FlexLayout>
+            </Grid>
 
             <CollectionView ItemsSource="{Binding Reviews}"
                             SelectionMode="None">
@@ -75,16 +101,6 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <FlexLayout JustifyContent="Center">
-                <Label x:Name="ScoreLabel"
-                       Text="{Binding Score}"
-                       FontSize="Large" />
-
-                <Label x:Name="ScoreDiffLabel"
-                       Text="{Binding ScoreDiff}"
-                       FontSize="Medium" />
-            </FlexLayout>
-
             <Border x:Name="StarsContainer"
                     Stroke="Gold"
                     StrokeThickness="2"
@@ -96,8 +112,7 @@
                     <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
                 </Border.GestureRecognizers>
                 <Grid HorizontalOptions="Center">
-                    <controls:StarRating x:Name="Stars"
-                                         ZIndex="2"
+                    <controls:StarRating ZIndex="2"
                                          StarSize="64"
                                          HorizontalOptions="Fill"
                                          Rating="{Binding RatingInput}">

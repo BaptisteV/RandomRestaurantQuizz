@@ -34,12 +34,11 @@ public partial class GeoLocPickerPage : ContentPage
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
     }
 
-    private Button FakeBtnDijon = new Button { Text = "Dijon" };
+    //private Button FakeBtnDijon = new Button { Text = "Dijon" };
     private void ContentPage_Loaded(object sender, EventArgs e)
     {
-        // TODO Only for debugging
 #if DEBUG
-        Btn_Clicked(FakeBtnDijon, EventArgs.Empty);
+        //Btn_Clicked(FakeBtnDijon, EventArgs.Empty);
 #endif
     }
 }

@@ -7,24 +7,22 @@
              Loaded="ContentPage_Loaded"
              Title="Pick a location">
 
-    <StackLayout VerticalOptions="Center"
-                 MaximumWidthRequest="600">
-        
+    <VerticalStackLayout VerticalOptions="Center"
+                 Padding="16"
+                 Spacing="4"
+                 MaximumWidthRequest="720">
+
         <CollectionView ItemsSource="{Binding Cities}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
-                    
-                    <StackLayout>
-                        <Button Text="{Binding .}"
-                                Margin="0,2"
-                                IsEnabled="true"
-                                Clicked="Btn_Clicked" />
-                    </StackLayout>
-                    
+                    <Button Text="{Binding .}"
+                            Margin="0,2"
+                            IsEnabled="true"
+                            Clicked="Btn_Clicked" />
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-        
-    </StackLayout>
+
+    </VerticalStackLayout>
 
 </ContentPage>

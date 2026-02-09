@@ -13,5 +13,5 @@ public interface IQuizzGame
     Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; }
     Func<ScoreChangedEvent, Task> ScoreChanged { get; set; }
     Func<PhotoChangedEvent, Task> PhotoChanged { get; set; }
-    Func<RoundFinishedEvent, Task> RoundFinished { get; set; }
+    Func<RoundsFinishedEvent, Task> RoundFinished { get; set; }
 }

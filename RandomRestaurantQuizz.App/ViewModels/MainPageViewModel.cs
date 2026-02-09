@@ -8,13 +8,11 @@ namespace RandomRestaurantQuizz.App.ViewModels;
 public partial class MainPageViewModel : ObservableObject
 {
     [ObservableProperty]
-    public partial string LocationName { get; set; }
+    public partial VmRound Round { get; set; } = new();
     [ObservableProperty]
     public partial string Score { get; set; }
     [ObservableProperty]
     public partial string ScoreDiff { get; set; }
-    [ObservableProperty]
-    public partial string RestaurantName { get; set; }
     [ObservableProperty]
     public partial ImageSource ImageSource { get; set; }
     [ObservableProperty]
@@ -30,6 +28,17 @@ public partial class MainPageViewModel : ObservableObject
         if (review == null) return;
         review.IsExpanded = !review.IsExpanded;
     });
+}
+
+public partial class VmRound : ObservableObject
+{
+    [ObservableProperty]
+    public partial string RestaurantName { get; set; } = "";
+    [ObservableProperty]
+    public partial string LocationName { get; set; } = "";
+    [ObservableProperty]
+    public partial string Progress { get; set; } = "";
+
 }
 
 public partial class VmReview : ObservableObject

@@ -7,14 +7,14 @@
           BackgroundColor="#80000000"
           HorizontalOptions="Fill"
           VerticalOptions="Fill">
-        
+
         <BoxView BackgroundColor="Transparent"
                  HorizontalOptions="Fill"
                  VerticalOptions="Fill" />
 
         <Border WidthRequest="120"
                 HeightRequest="120"
-                BackgroundColor="White"
+                BackgroundColor="{StaticResource Secondary}"
                 HorizontalOptions="Center"
                 VerticalOptions="Center">
 
@@ -29,7 +29,7 @@
             </Border.Shadow>
 
             <ActivityIndicator IsRunning="True"
-                               Color="#0078D7"
+                               Color="{StaticResource Primary}"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"
                                WidthRequest="40"

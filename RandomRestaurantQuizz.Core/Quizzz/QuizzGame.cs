@@ -9,17 +9,20 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
     private readonly ILogger<QuizzGame> _logger = logger;
 
     private readonly IGooglePlacesClient _restauClient = restauClient;
-    private readonly Queue<PlaceResult> _places = [];
+    private readonly Queue<PlaceResult> _nextRestaurants = [];
     private readonly IScoreRepository _scoreSaver = scoreSaver;
 
     private Player _player = new();
     private PlaceResult _currentPlace = new();
     private int photoIndex = 0;
+    private int _roundNumber = 1;
+    private int _roundCount = 0;
+    private string _latestLocationName = "";
     private byte[] Image => _currentPlace.Photos[photoIndex].DownloadedImage;
 
     public Func<ScoreChangedEvent, Task> ScoreChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(ScoreChanged)} handler");
     public Func<PhotoChangedEvent, Task> PhotoChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(PhotoChanged)} handler");
-    public Func<RoundFinishedEvent, Task> RoundFinished { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RoundFinished)} handler");
+    public Func<RoundsFinishedEvent, Task> RoundFinished { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RoundFinished)} handler");
     public Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RestaurantChanged)} handler");
 
     public async Task InitRound((string Name, GeoLoc Geoloc) location, CancellationToken cancellationToken)
@@ -27,32 +30,43 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         await _scoreSaver.Init();
 
         _player = new Player();
-        _places.Clear();
+        _nextRestaurants.Clear();
 
         _restauClient.SetSearchLocation(location.Geoloc, Cities.DefaultRadius);
         var restaurants = await _restauClient.GetRestaurants(cancellationToken);
 
         foreach (var restaurant in restaurants)
         {
-            _places.Enqueue(restaurant);
+            _nextRestaurants.Enqueue(restaurant);
         }
 
-        if (_places.Count == 0)
+        if (_nextRestaurants.Count == 0)
         {
             _logger.LogError("No restaurants found for location {LocationName}", location.Name);
             return;
         }
 
-        _currentPlace = _places.Dequeue();
+        _roundNumber = 1;
+        _roundCount = _nextRestaurants.Count;
+        _latestLocationName = location.Name;
+
+        _currentPlace = _nextRestaurants.Dequeue();
 
         var scoreEvent = new ScoreChangedEvent(0, 0, 0);
         var photoEvent = new PhotoChangedEvent(_currentPlace.Photos[0].DownloadedImage!);
-        await RestaurantChanged(new RestaurantChangedEvent(_currentPlace.DisplayName.Text, location.Name, _currentPlace.UserRatingCount, _currentPlace.Reviews, scoreEvent, photoEvent));
+        var round = new Round(
+            _currentPlace.DisplayName.Text,
+            _latestLocationName,
+            _currentPlace.UserRatingCount,
+            _roundCount,
+            _roundNumber);
+
+        await RestaurantChanged(new RestaurantChangedEvent(round, _currentPlace.Reviews, scoreEvent, photoEvent));
     }
 
     public async Task Answer(double guessedRating)
     {
-        if (_places.Count == 0)
+        if (_nextRestaurants.Count == 0)
         {
             await _scoreSaver.SaveScore(new Score { Value = _player.TotalScore(), Timestamp = DateTime.Now });
 
@@ -61,11 +75,11 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
                 //.Take(20)
                 .ToList();
 
-            await RoundFinished(new RoundFinishedEvent(_player.TotalScore(), pbs));
+            await RoundFinished(new RoundsFinishedEvent(_player.TotalScore(), pbs));
             return;
         }
 
-        _currentPlace = _places.Dequeue();
+        _currentPlace = _nextRestaurants.Dequeue();
 
         var guess = new Guess(_currentPlace, guessedRating);
         _player.AddGuess(guess);
@@ -75,15 +89,17 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
         var scoreEvent = new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating);
         var photoEvent = new PhotoChangedEvent(Image);
-
-        await RestaurantChanged(new RestaurantChangedEvent(
-            _currentPlace.DisplayName.Text,
-            // TODO : localization
-            "",
+        var round = new Round(_currentPlace.DisplayName.Text,
+            _latestLocationName,
             _currentPlace.UserRatingCount,
+            _roundCount,
+            ++_roundNumber);
+        await RestaurantChanged(new RestaurantChangedEvent(
+            round,
             _currentPlace.Reviews,
             scoreEvent,
             photoEvent));
+
         await PhotoChanged(new PhotoChangedEvent(Image));
         await ScoreChanged(new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating));
     }

@@ -1,8 +1,8 @@
 ﻿namespace RandomRestaurantQuizz.Core.Quizzz.Events;
 
-public class RoundFinishedEvent
+public class RoundsFinishedEvent
 {
-    public RoundFinishedEvent(double totalScore, List<Score> pbs)
+    public RoundsFinishedEvent(double totalScore, List<Score> pbs)
     {
         TotalScore = totalScore;
         PersonalBests = pbs;

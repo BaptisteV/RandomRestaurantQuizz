@@ -37,8 +37,11 @@ public partial class MainPage : ContentPage, IDisposable
     private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
     {
         _vm.Score = startedEvent.ScoreChangedEvent.TotalScore;
-        _vm.RestaurantName = startedEvent.RestaurantName;
         _vm.ScoreDiff = startedEvent.ScoreChangedEvent.ScoreDiff;
+
+        _vm.Round.RestaurantName = startedEvent.Round.RestaurantName;
+        _vm.Round.LocationName = startedEvent.Round.LocationName;
+        _vm.Round.Progress = startedEvent.Round.Progress;
 
         _vm.ImageSource = startedEvent.PhotoChangedEvent.Source;
         _vm.Reviews = [.. startedEvent.Reviews.ConvertAll(VmReview.FromCoreReview)];
@@ -76,7 +79,7 @@ public partial class MainPage : ContentPage, IDisposable
         return Task.CompletedTask;
     }
 
-    private async Task OnRoundFinished(RoundFinishedEvent roundFinishedEvent)
+    private async Task OnRoundFinished(RoundsFinishedEvent roundFinishedEvent)
     {
         _logger.LogDebug("Round finished");
         var recapVm = new RecapViewModel(roundFinishedEvent.TotalScore, roundFinishedEvent.PersonalBests);
@@ -87,7 +90,7 @@ public partial class MainPage : ContentPage, IDisposable
     private async Task OnSearchLocationChanged(string name, GeoLoc geoloc)
     {
         _logger.LogInformation("New location picked: {Location}", name);
-        _vm.LocationName = name;
+        _vm.Round.LocationName = name;
         _quizzGame.SetSearchLocation(geoloc, Cities.DefaultRadius);
     }
 
@@ -151,7 +154,7 @@ public partial class MainPage : ContentPage, IDisposable
         var width = StarsContainer.Width - 12 - 12;
 
         var horizontalRatio = (x - 8) / width; // From 0.0 to 1.0
-        _vm.RatingInput = (double)new ProgressToStarInput().ConvertBack(horizontalRatio, typeof(double), null, CultureInfo.CurrentCulture);
+        _vm.RatingInput = Math.Clamp(Math.Round(horizontalRatio * 5.0, 2), 0.0, 5.0);
         _vm.RatingInputText = $"{_vm.RatingInput:F2}";
     }
 }

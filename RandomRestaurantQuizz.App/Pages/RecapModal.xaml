@@ -8,7 +8,7 @@
     <ScrollView>
         <VerticalStackLayout Spacing="25"
                              HorizontalOptions="Fill"
-                             MaximumWidthRequest="600">
+                             MaximumWidthRequest="720">
 
             <Label x:Name="ScoreLabel"
                    HorizontalOptions="Center"
@@ -29,7 +29,7 @@
                                        FontAttributes="Bold" />
                             </FlexLayout>
                             <BoxView HeightRequest="1"
-                                     Color="DarkGray"
+                                     Color="{StaticResource PrimaryDarkText}"
                                      Margin="0,0,0,8"/>
                         </VerticalStackLayout>
                     </DataTemplate>
