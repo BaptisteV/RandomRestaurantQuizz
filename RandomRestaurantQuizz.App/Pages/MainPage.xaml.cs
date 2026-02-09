@@ -41,7 +41,7 @@ public partial class MainPage : ContentPage, IDisposable
         _vm.ScoreDiff = startedEvent.ScoreChangedEvent.ScoreDiff;
 
         _vm.ImageSource = startedEvent.PhotoChangedEvent.Source;
-        _vm.Reviews = [.. startedEvent.Reviews.Select(VmReview.FromCoreReview)];
+        _vm.Reviews = [.. startedEvent.Reviews.ConvertAll(VmReview.FromCoreReview)];
 
         return Task.CompletedTask;
     }
@@ -57,7 +57,7 @@ public partial class MainPage : ContentPage, IDisposable
 
     private void AnimateScoreDiff(double roundScore)
     {
-        ScoreDiffLabel.Opacity = 100.0;
+        ScoreDiffLabel.Opacity = 1.0;
         ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
         _ = Task.Run(async () =>
         {
@@ -126,9 +126,9 @@ public partial class MainPage : ContentPage, IDisposable
         }
     }
 
-    private void AnswerBtn_Clicked(object sender, EventArgs e)
+    private async void AnswerBtn_Clicked(object sender, EventArgs e)
     {
-        _quizzGame.Answer(_vm.RatingInput);
+        await _quizzGame.Answer(_vm.RatingInput);
     }
 
     private void ContentPage_Unloaded(object sender, EventArgs e)

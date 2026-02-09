@@ -10,10 +10,14 @@ public class ResourceSoundEffect(IAudioManager audioManager) : ISoundEffect
     private AsyncAudioPlayer _looseSound;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
+    private const float Volume = 0.75f;
+
     public async Task Init()
     {
-        _winSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("win2.wav"));
-        _looseSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("loose2.wav"));
+        _winSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("win.wav"));
+        _winSound.Volume = Volume;
+        _looseSound = _audioManager.CreateAsyncPlayer(await FileSystem.OpenAppPackageFileAsync("loose.wav"));
+        _looseSound.Volume = Volume;
     }
 
     public async Task PlayAnswer(double correctnessPercentage, CancellationToken cancellationToken)

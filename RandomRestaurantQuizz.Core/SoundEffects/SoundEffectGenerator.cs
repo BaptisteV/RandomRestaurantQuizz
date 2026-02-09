@@ -5,13 +5,13 @@ namespace RandomRestaurantQuizz.Core.SoundEffects;
 
 public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
 {
-    private readonly WaveOutEvent waveOut = new WaveOutEvent();
+    private WaveOutEvent waveOut;
 
     public void PlayVictorySound()
     {
         // Create a rising arpeggio for victory (C-E-G-C major chord)
         var sound = CreateArpeggio(
-            new[] { 523.25f, 659.25f, 783.99f, 1046.50f }, // C5, E5, G5, C6
+            [523.25f, 659.25f, 783.99f, 1046.50f], // C5, E5, G5, C6
             150, // Duration of each note in ms
             0.3f // Volume
         );
@@ -32,7 +32,7 @@ public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
         PlaySound(sound);
     }
 
-    private ISampleProvider CreateArpeggio(float[] frequencies, int noteDurationMs, float volume)
+    private static ConcatenatingSampleProvider CreateArpeggio(float[] frequencies, int noteDurationMs, float volume)
     {
         var sampleRate = 44100;
         var noteProviders = new List<ISampleProvider>();
@@ -55,7 +55,7 @@ public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
         return new ConcatenatingSampleProvider(noteProviders);
     }
 
-    private ISampleProvider CreateDescendingTone(float startFreq, float endFreq, int durationMs, float volume)
+    private static ISampleProvider CreateDescendingTone(float startFreq, float endFreq, int durationMs, float volume)
     {
         var sampleRate = 44100;
         var samples = (int)(sampleRate * durationMs / 1000.0);
@@ -81,21 +81,24 @@ public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
     private void PlaySound(ISampleProvider sound)
     {
         // Stop any currently playing sound
-        waveOut?.Stop();
+        waveOut.Stop();
 
         // Initialize with the new sound
-        waveOut?.Init(sound);
-        waveOut?.Play();
+        waveOut.Init(sound);
+        waveOut.Play();
     }
 
     public void Dispose()
     {
-        waveOut?.Stop();
-        waveOut?.Dispose();
+        waveOut.Stop();
+        waveOut.Dispose();
     }
 
     public Task Init()
     {
+        waveOut = new();
+        var silence = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 1)).ToSampleProvider();
+        waveOut.Init(silence);
         return Task.CompletedTask;
     }
 

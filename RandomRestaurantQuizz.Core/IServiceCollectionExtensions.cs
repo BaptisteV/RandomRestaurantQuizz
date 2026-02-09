@@ -22,7 +22,7 @@ public static class IServiceCollectionExtensions
             services.AddTransient<PhotoFileManager>();
 
             services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-            services.AddSingleton<ISoundEffect, SoundEffectGenerator>();
+            services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
             services.AddSingleton<IScoreSaver, SqlLiteScoreSaver>();
             services.AddSingleton<IQuizzGame, QuizzGame>();
 
