@@ -1,6 +1,6 @@
 ﻿namespace RandomRestaurantQuizz.Core.Quizzz.Scores;
 
-public class TempScoreSaver : IScoreSaver
+public class TempScoreRepository : IScoreRepository
 {
     private readonly List<Score> _scores = [];
 

@@ -50,25 +50,23 @@ public partial class MainPage : ContentPage, IDisposable
     {
         _vm.Score = scoreChangedEvent.TotalScore;
         _vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
-
-        AnimateScoreDiff(scoreChangedEvent.RoundScore);
-        await _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None);
+        await Task.WhenAll(AnimateScoreDiff(scoreChangedEvent.RoundScore), _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None));
     }
 
-    private void AnimateScoreDiff(double roundScore)
+    private async Task AnimateScoreDiff(double roundScore)
     {
-        ScoreDiffLabel.Opacity = 1.0;
-        ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
-        _ = Task.Run(async () =>
+        try
         {
-            try
-            {
-                await ScoreDiffLabel.FadeToAsync(100, 1000, Easing.CubicIn);
-                await Task.Delay(4000, _cts.Token);
-                await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
-            }
-            catch (TaskCanceledException) { ScoreDiffLabel.CancelAnimations(); }
-        });
+            ScoreDiffLabel.CancelAnimations();
+
+            ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
+            ScoreDiffLabel.Opacity = 1.0;
+
+            await ScoreDiffLabel.FadeToAsync(100, 1000, Easing.CubicIn);
+            await Task.Delay(4000, _cts.Token);
+            await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
+        }
+        catch (TaskCanceledException) { }
     }
 
     private Task OnPhotoChanged(PhotoChangedEvent photoChangedEvent)

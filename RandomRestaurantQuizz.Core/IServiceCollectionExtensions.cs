@@ -23,7 +23,7 @@ public static class IServiceCollectionExtensions
 
             services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
             services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
-            services.AddSingleton<IScoreSaver, SqlLiteScoreSaver>();
+            services.AddSingleton<IScoreRepository, SqlLiteScoreRepository>();
             services.AddSingleton<IQuizzGame, QuizzGame>();
 
             services.AddSecretsFromRessources();

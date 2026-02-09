@@ -5,7 +5,7 @@ namespace RandomRestaurantQuizz.Core.SoundEffects;
 
 public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
 {
-    private WaveOutEvent waveOut;
+    private readonly WaveOutEvent waveOut = new();
 
     public void PlayVictorySound()
     {
@@ -96,7 +96,6 @@ public sealed class SoundEffectGenerator : ISoundEffect, IDisposable
 
     public Task Init()
     {
-        waveOut = new();
         var silence = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 1)).ToSampleProvider();
         waveOut.Init(silence);
         return Task.CompletedTask;

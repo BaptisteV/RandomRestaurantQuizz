@@ -53,11 +53,8 @@ public static class DoubleReader
             if (string.IsNullOrWhiteSpace(input))
                 continue;
 
-            // Normalize decimal separator
-            input = input.Trim().Replace(',', '.');
-
             if (double.TryParse(
-                    input,
+                    input.Trim().Replace(',', '.'),
                     NumberStyles.Float | NumberStyles.AllowThousands,
                     CultureInfo.InvariantCulture,
                     out double result))

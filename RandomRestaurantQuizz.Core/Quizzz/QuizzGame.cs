@@ -1,15 +1,16 @@
 ﻿using RandomRestaurantQuizz.Core.Places;
+using RandomRestaurantQuizz.Core.Places.Api;
 using RandomRestaurantQuizz.Core.Quizzz.Events;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logger, IScoreSaver scoreSaver) : IQuizzGame
+public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logger, IScoreRepository scoreSaver) : IQuizzGame
 {
     private readonly ILogger<QuizzGame> _logger = logger;
 
     private readonly IGooglePlacesClient _restauClient = restauClient;
     private readonly Queue<PlaceResult> _places = [];
-    private readonly IScoreSaver _scoreSaver = scoreSaver;
+    private readonly IScoreRepository _scoreSaver = scoreSaver;
 
     private Player _player = new();
     private PlaceResult _currentPlace = new();

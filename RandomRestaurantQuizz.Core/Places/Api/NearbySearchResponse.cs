@@ -1,7 +1,6 @@
-﻿using RandomRestaurantQuizz.Core.Places;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace RandomRestaurantQuizz.Core.Models;
+namespace RandomRestaurantQuizz.Core.Places.Api;
 
 public sealed class NearbySearchResponse
 {

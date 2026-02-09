@@ -1,4 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Places;
+﻿using RandomRestaurantQuizz.Core.Places.Api;
 
 namespace RandomRestaurantQuizz.Core.Quizzz.Events;
 

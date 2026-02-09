@@ -1,6 +1,6 @@
 ﻿namespace RandomRestaurantQuizz.Core.Quizzz.Scores;
 
-public interface IScoreSaver
+public interface IScoreRepository
 {
     Task Init();
     Task<List<Score>> ReadScores();
