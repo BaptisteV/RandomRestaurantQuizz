@@ -9,7 +9,7 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     public partial string LocationName { get; set; }
     [ObservableProperty]
-    public partial double Score { get; set; }
+    public partial string Score { get; set; }
     [ObservableProperty]
     public partial string ScoreDiff { get; set; }
     [ObservableProperty]
@@ -18,6 +18,9 @@ public partial class MainPageViewModel : ObservableObject
     public partial ImageSource ImageSource { get; set; }
     [ObservableProperty]
     public partial double RatingInput { get; set; } = 2.5;
+    [ObservableProperty]
+    public partial string RatingInputText { get; set; } = $"{2.5:F2}";
+
     [ObservableProperty]
     public partial ObservableCollection<VmReview> Reviews { get; set; } = new();
 

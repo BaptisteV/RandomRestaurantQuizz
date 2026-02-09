@@ -106,7 +106,7 @@
             </Border>
 
             <Button x:Name="AnswerBtn"
-                    Text="{Binding RatingInput}"
+                    Text="{Binding RatingInputText}"
                     SemanticProperties.Hint="Answer"
                     Clicked="AnswerBtn_Clicked"
                     HorizontalOptions="Fill"

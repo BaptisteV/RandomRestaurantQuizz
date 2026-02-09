@@ -17,13 +17,13 @@ public partial class RecapViewModel : ObservableObject
     public RecapViewModel(double totalScore, List<Score> scores)
     {
         TotalScore = totalScore;
-        var vmScores = scores.ConvertAll<VmScore>(s => new VmScore()
+        var vmScores = scores.ConvertAll(s => new VmScore()
         {
             Timestamp = s.Timestamp.ToString("G"),
             Value = s.Value,
         });
         Scores = new(vmScores);
-        ScoreText = $"Score: {TotalScore:n1}";
+        ScoreText = $"Score: {TotalScore:F2}";
     }
 
     [ObservableProperty]

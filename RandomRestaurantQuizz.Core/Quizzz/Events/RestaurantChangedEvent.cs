@@ -12,7 +12,7 @@ public class RestaurantChangedEvent
 
     public RestaurantChangedEvent(string restaurantName, string location, int userRatingCount, List<Review> reviews, ScoreChangedEvent scoreChangedEvent, PhotoChangedEvent photoChangedEvent)
     {
-        RestaurantName = $"{restaurantName} ({userRatingCount} 👤)"; ;
+        RestaurantName = $"{restaurantName} ({userRatingCount} 👤)";
         LocationLabel = location;
         Reviews = reviews;
         ScoreChangedEvent = scoreChangedEvent;
