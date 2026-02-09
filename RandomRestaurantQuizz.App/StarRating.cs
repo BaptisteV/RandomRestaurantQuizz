@@ -119,7 +119,8 @@ public partial class StarRating : ContentView
         var bv = new BoxView
         {
             Color = Colors.Transparent,
-            WidthRequest = 16,
+            Background = Colors.Transparent,
+            WidthRequest = 8,
         };
 
         var hl = new HorizontalStackLayout
@@ -168,9 +169,9 @@ public partial class StarRating : ContentView
         {
             if ((_stars[i].Children.Count >= 2) && (_stars[i].Children[1] is Grid foregroundClip))
             {
-                const double adjustment = 0.05; // To avoid sligtly off center for 2.5
-                var fillAmount = Math.Clamp(rating - i - adjustment, 0, 1);
-                foregroundClip.WidthRequest = (fillAmount) * StarSize;
+                var fillAmount = Math.Clamp(rating - i, 0, 1);
+                const double adjustment = 5; // To avoid sligtly off center for 2.5
+                foregroundClip.WidthRequest = fillAmount * StarSize - adjustment;
             }
         }
     }

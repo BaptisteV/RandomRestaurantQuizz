@@ -18,20 +18,19 @@
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="8" MaximumWidthRequest="600">
+        <VerticalStackLayout Padding="16" Spacing="4" MaximumWidthRequest="600">
             <Label x:Name="RestaurantNameLabel"
                    Text="{Binding RestaurantName}"
                    HorizontalOptions="Center"
                    FontSize="Subtitle" />
 
             <FlexLayout x:Name="PhotoContainer"
-                        HeightRequest="300"
                         JustifyContent="Center">
                 <FlexLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
                 </FlexLayout.GestureRecognizers>
                 <Image x:Name="RestaurantPhotoImage"
-                       HeightRequest="300"
+                       HeightRequest="240"
                        Source="{Binding ImageSource}"
                        Aspect="AspectFit"
                        SemanticProperties.Description="Restaurant photo">
@@ -98,7 +97,6 @@
                 </Border.GestureRecognizers>
                 <Grid HorizontalOptions="Center">
                     <controls:StarRating x:Name="Stars"
-                                         Opacity="1.0"
                                          ZIndex="2"
                                          StarSize="64"
                                          HorizontalOptions="Fill"

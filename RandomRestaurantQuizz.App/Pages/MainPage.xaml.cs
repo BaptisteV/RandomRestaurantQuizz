@@ -150,9 +150,9 @@ public partial class MainPage : ContentPage, IDisposable
     private void RatingPbInput_Tapped(object sender, TappedEventArgs e)
     {
         var x = e.GetPosition(StarsContainer)!.Value.X;
-        var width = StarsContainer.Width - 20 - 16;
+        var width = StarsContainer.Width - 12 - 12;
 
-        var horizontalRatio = (x - 20) / width; // From 0.0 to 1.0
+        var horizontalRatio = (x - 10) / width; // From 0.0 to 1.0
         _vm.RatingInput = (double)new ProgressToStarInput().ConvertBack(horizontalRatio, typeof(double), null, CultureInfo.CurrentCulture);
     }
 }
