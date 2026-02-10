@@ -6,8 +6,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var builder = MauiApp.CreateBuilder();
-        builder
+        var builder = MauiApp.CreateBuilder()
             .UseMauiApp<App>()
             .ConfigureFonts(fonts =>
             {
@@ -20,6 +19,7 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
+        builder.Configuration.AddSecretsFromRessources();
         builder.Services.AddCoreServices();
 
         builder.Services.AddSingleton<MainPageViewModel>();
@@ -27,6 +27,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<GeoLocPickerViewModel>();
         builder.Services.AddSingleton<GeoLocPickerPage>();
         builder.Services.AddTransient<IGeolocationService, GeolocationService>();
+        builder.Services.AddTransient((_) => new SqliteDbPath() { DbPath = Path.Combine(FileSystem.AppDataDirectory, "scores.db") });
 
         return builder.Build();
     }

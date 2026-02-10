@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz.Core;
+using RandomRestaurantQuizz.Core.Quizzz.Scores;
 
 namespace RandomRestaurantQuizz.Console;
 
@@ -9,7 +10,8 @@ internal static class Program
     private static async Task Main(string[] args)
     {
         System.Console.WriteLine("Starting...");
-        var host = Host.CreateDefaultBuilder(args)
+
+        var builder = Host.CreateDefaultBuilder(args)
             .ConfigureLogging(logging =>
             {
                 logging.AddSimpleConsole(options =>
@@ -23,15 +25,18 @@ internal static class Program
             .ConfigureServices((context, services) =>
             {
                 services.AddCoreServices();
+                services.AddTransient((_) => new SqliteDbPath() { DbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
                 services.AddSingleton<IRunner, QuizzConsoleRunner>();
             })
             .UseDefaultServiceProvider(o =>
             {
                 o.ValidateScopes = true;
                 o.ValidateOnBuild = true;
-            })
-            .Build();
+            });
 
-        await host.Services.GetRequiredService<IRunner>().RunAsync(CancellationToken.None);
+        var host = builder.Build();
+
+        var runner = host.Services.GetRequiredService<IRunner>();
+        await runner.RunAsync(CancellationToken.None);
     }
 }

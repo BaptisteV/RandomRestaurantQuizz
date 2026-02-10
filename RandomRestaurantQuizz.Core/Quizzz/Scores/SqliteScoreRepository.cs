@@ -3,16 +3,13 @@ using System.Globalization;
 
 namespace RandomRestaurantQuizz.Core.Quizzz.Scores;
 
-public sealed class SqlLiteScoreRepository : IScoreRepository, IDisposable
+public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
 {
-    private const string DbFilename = "scores.db";
     private readonly SqliteConnection _connection;
 
-    public SqlLiteScoreRepository()
+    public SqliteScoreRepository(SqliteDbPath sqliteDbPath)
     {
-        var dbPath = Path.Combine(FileSystem.AppDataDirectory, DbFilename);
-        var connectionString = $"Data Source={dbPath}";
-        _connection = new SqliteConnection(connectionString);
+        _connection = new SqliteConnection(sqliteDbPath.ConnectionString);
     }
 
     public void Dispose()

@@ -10,10 +10,10 @@ public class PhotoDownloader : IPhotoDownloader
     private readonly IFileNamer _fileNamer;
     private readonly ILogger<PhotoDownloader> _logger;
 
-    public PhotoDownloader(HttpClient httpClient, IOptionsMonitor<SecretsJson> config, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
+    public PhotoDownloader(HttpClient httpClient, SecretsJson config, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
     {
         _httpClient = httpClient;
-        _apiKey = config.CurrentValue.GooglePlacesApiKey;
+        _apiKey = config.GooglePlacesApiKey;
         _logger = logger;
         _fileNamer = fileNamer;
     }

@@ -11,7 +11,7 @@ public static class IServiceCollectionExtensions
     {
         public void AddCoreServices()
         {
-            services.AddHttpClient<IGooglePlacesClient, GooglePlacesStaticClient>(a =>
+            services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
             {
                 a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
             });
@@ -22,36 +22,48 @@ public static class IServiceCollectionExtensions
 
             services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
             services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
-            services.AddSingleton<IScoreRepository, SqlLiteScoreRepository>();
+            services.AddSingleton<IScoreRepository, SqliteScoreRepository>();
             services.AddSingleton<IQuizzGame, QuizzGame>();
 
-            services.AddSecretsFromRessources();
-        }
-
-        private void AddSecretsFromRessources()
-        {
-            var secretsPath = $"{typeof(ICoreProject).Namespace}.secrets.json";
-
-            // Load embedded JSON secrets file
-            using var stream = Assembly
-                .GetExecutingAssembly()
-                .GetManifestResourceStream(secretsPath) ?? throw new InvalidOperationException(secretsPath);
-
-            var secrets = new ConfigurationBuilder()
-                .AddJsonStream(stream)
-                .Build();
-
-            var apiKey = secrets.GetRequiredSection("GOOGLE_PLACES_API_KEY").Value;
-
-            if (string.IsNullOrWhiteSpace(apiKey))
+            services.AddSingleton(sp =>
             {
-                throw new InvalidOperationException("GOOGLE_PLACES_API_KEY not found");
-            }
+                var apiKey = sp.GetRequiredService<IConfiguration>().GetRequiredSection("GOOGLE_PLACES_API_KEY").Value;
+                if (string.IsNullOrWhiteSpace(apiKey))
+                {
+                    throw new InvalidOperationException("GOOGLE_PLACES_API_KEY not found");
+                }
 
-            services.Configure<SecretsJson>(c =>
-            {
-                c.GooglePlacesApiKey = apiKey;
+                return new SecretsJson() { GooglePlacesApiKey = apiKey };
             });
         }
     }
+
+    private static Stream ReadSecretsJson()
+    {
+        var secretsPath = $"{typeof(ICoreProject).Namespace}.secrets.json";
+        // Load embedded JSON secrets file
+        var stream = Assembly
+            .GetExecutingAssembly()
+            .GetManifestResourceStream(secretsPath) ?? throw new InvalidOperationException(secretsPath);
+
+        return stream;
+    }
+
+    extension(IConfigurationBuilder configBuilder)
+    {
+        public void AddSecretsFromRessources()
+        {
+            using var stream = ReadSecretsJson();
+            configBuilder.AddJsonStream(stream);
+        }
+    }
+
+    extension(IConfigurationManager configManager)
+    {
+        public void AddSecretsFromRessources()
+        {
+            ((IConfigurationBuilder)configManager).AddSecretsFromRessources();
+        }
+    }
+
 }

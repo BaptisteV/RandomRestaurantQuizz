@@ -3,11 +3,12 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Configuration.AddSecretsFromRessources();
 builder.Services.AddCoreServices();
+builder.Services.AddTransient((_) => new SqliteDbPath() { DbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
 builder.Services.AddSingleton<IPhotoDownloader, NoOpPhotoDownloader>();
 
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
