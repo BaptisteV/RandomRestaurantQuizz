@@ -1,9 +1,4 @@
-﻿namespace RandomRestaurantQuizz.App;
-
-public interface IGeolocationService
-{
-    Task<SearchLocation> GetCurrentLocation();
-}
+﻿namespace RandomRestaurantQuizz.App.Services;
 
 public class GeolocationService : IGeolocationService
 {
@@ -15,7 +10,8 @@ public class GeolocationService : IGeolocationService
         return location is null ? default : new SearchLocation
         {
             Latitude = location.Latitude,
-            Longitude = location.Longitude
+            Longitude = location.Longitude,
+            Name = $"({location.Latitude},{location.Longitude})",
         };
     }
 }

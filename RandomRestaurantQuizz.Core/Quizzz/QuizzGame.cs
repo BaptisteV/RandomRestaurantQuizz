@@ -1,6 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Places;
-using RandomRestaurantQuizz.Core.Places.Api;
-using RandomRestaurantQuizz.Core.Quizzz.Events;
+﻿using RandomRestaurantQuizz.Core.Places.Api;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
@@ -17,7 +15,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
     private int photoIndex = 0;
     private int _roundNumber = 1;
     private int _roundCount = 0;
-    private SearchLocation _searchLocation = new();
+    private SearchLocation _searchLocation;
     private byte[] Image => _currentPlace.Photos[photoIndex].DownloadedImage;
 
     public Func<ScoreChangedEvent, Task> ScoreChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(ScoreChanged)} handler");

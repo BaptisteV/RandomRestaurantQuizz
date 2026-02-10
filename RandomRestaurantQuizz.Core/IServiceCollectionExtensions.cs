@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RandomRestaurantQuizz.Core.Photos;
-using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.SoundEffects;
 using System.Reflection;
 

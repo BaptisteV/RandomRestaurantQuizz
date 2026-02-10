@@ -1,4 +1,4 @@
-﻿using RandomRestaurantQuizz.Core;
+﻿using RandomRestaurantQuizz.App.Services;
 
 namespace RandomRestaurantQuizz.App;
 

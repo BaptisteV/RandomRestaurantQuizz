@@ -11,11 +11,13 @@ public partial class TestSearchAndPhotosRunner(IGooglePlacesClient restauClient,
     private readonly PhotoFileManager _photoManager = photoManager;
     private readonly ILogger<TestSearchAndPhotosRunner> _logger = logger;
 
+    private const string CityName = "Dijon";
+
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        Cities.Data.TryGetValue("Dijon", out var city);
+        var searchLocation = Locations.Cities.Single(l => l.Name == CityName);
 
-        foreach (var restaurant in await _restauClient.GetRestaurants(city, cancellationToken))
+        foreach (var restaurant in await _restauClient.GetRestaurants(searchLocation, cancellationToken))
         {
             LogRestaurant(restaurant.DisplayName.Text, restaurant.Rating, restaurant.UserRatingCount, restaurant.FormattedAddress, restaurant.Photos.Count);
             await _photoManager.SaveTempJpgs(restaurant);

@@ -1,4 +1,6 @@
-﻿namespace RandomRestaurantQuizz.App;
+﻿using RandomRestaurantQuizz.App.Services;
+
+namespace RandomRestaurantQuizz.App;
 
 public partial class GeoLocPickerPage : ContentPage
 {
@@ -6,7 +8,7 @@ public partial class GeoLocPickerPage : ContentPage
     private readonly IGeolocationService _geoService;
     private readonly ILogger<GeoLocPickerPage> _logger;
 
-    private const string AroundMe = "🚩 Around me 🚩";
+    private const string AroundMe = "📌 Around me 📌";
 
     public Func<SearchLocation, Task> SearchLocationChanged { get; set; } = (_) => Task.CompletedTask;
 
@@ -14,15 +16,20 @@ public partial class GeoLocPickerPage : ContentPage
     {
         _vm = vm;
         _geoService = geoService;
-        BindingContext = _vm;
         _logger = logger;
-        InitializeComponent();
 
-        _vm.Cities.Add(AroundMe);
-        var cities = Cities.Data.Keys;
-        foreach (var city in cities.Order())
+        BindingContext = _vm;
+        InitializeComponent();
+        CreateLocationButtons();
+    }
+
+    private void CreateLocationButtons()
+    {
+        _vm.Locations.Add(AroundMe);
+        var cities = Locations.Cities.Select(c => c.Name).Order();
+        foreach (var city in cities)
         {
-            _vm.Cities.Add(city);
+            _vm.Locations.Add(city);
         }
     }
 
@@ -40,18 +47,10 @@ public partial class GeoLocPickerPage : ContentPage
         }
         else
         {
-            geoloc = Cities.Data[city];
+            geoloc = Locations.Cities.Single(l => l.Name == city);
             await SearchLocationChanged(geoloc);
         }
 
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
-    }
-
-    //private Button FakeBtnDijon = new Button { Text = "Dijon" };
-    private void ContentPage_Loaded(object sender, EventArgs e)
-    {
-#if DEBUG
-        //Btn_Clicked(FakeBtnDijon, EventArgs.Empty);
-#endif
     }
 }

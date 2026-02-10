@@ -1,7 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Places;
-using RandomRestaurantQuizz.Core.Quizzz.Events;
-
-namespace RandomRestaurantQuizz.Core.Quizzz;
+﻿namespace RandomRestaurantQuizz.Core.Quizzz;
 
 public interface IQuizzGame
 {

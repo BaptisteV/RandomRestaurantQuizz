@@ -1,6 +1,4 @@
-﻿using RandomRestaurantQuizz.Core;
-using RandomRestaurantQuizz.Core.Places;
-using RandomRestaurantQuizz.Core.Places.Api;
+﻿using RandomRestaurantQuizz.Core.Places.Api;
 
 namespace RandomRestaurantQuizz.Core.Places;
 

@@ -4,7 +4,6 @@
              x:Class="RandomRestaurantQuizz.App.GeoLocPickerPage"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              x:DataType="vm:GeoLocPickerViewModel"
-             Loaded="ContentPage_Loaded"
              Title="Pick a location">
 
     <VerticalStackLayout VerticalOptions="Center"
@@ -12,7 +11,7 @@
                  Spacing="4"
                  MaximumWidthRequest="720">
 
-        <CollectionView ItemsSource="{Binding Cities}">
+        <CollectionView ItemsSource="{Binding Locations}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
                     <Button Text="{Binding .}"
