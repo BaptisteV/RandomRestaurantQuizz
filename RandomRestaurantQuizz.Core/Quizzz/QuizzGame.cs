@@ -17,7 +17,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
     private int photoIndex = 0;
     private int _roundNumber = 1;
     private int _roundCount = 0;
-    private string _latestLocationName = "";
+    private SearchLocation _searchLocation = new();
     private byte[] Image => _currentPlace.Photos[photoIndex].DownloadedImage;
 
     public Func<ScoreChangedEvent, Task> ScoreChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(ScoreChanged)} handler");
@@ -25,14 +25,15 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
     public Func<RoundsFinishedEvent, Task> RoundFinished { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RoundFinished)} handler");
     public Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RestaurantChanged)} handler");
 
-    public async Task InitRound((string Name, GeoLoc Geoloc) location, CancellationToken cancellationToken)
+    public async Task InitRound(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
+        _searchLocation = searchLocation;
         await _scoreSaver.Init();
 
         _player = new Player();
         _nextRestaurants.Clear();
 
-        _restauClient.SetSearchLocation(location.Geoloc, Cities.DefaultRadius);
+        _restauClient.SetSearchLocation(_searchLocation);
         var restaurants = await _restauClient.GetRestaurants(cancellationToken);
 
         foreach (var restaurant in restaurants)
@@ -42,13 +43,12 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
         if (_nextRestaurants.Count == 0)
         {
-            _logger.LogError("No restaurants found for location {LocationName}", location.Name);
+            _logger.LogError("No restaurants found for location {LocationName}", _searchLocation.Name);
             return;
         }
 
         _roundNumber = 1;
         _roundCount = _nextRestaurants.Count;
-        _latestLocationName = location.Name;
 
         _currentPlace = _nextRestaurants.Dequeue();
 
@@ -56,7 +56,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         var photoEvent = new PhotoChangedEvent(_currentPlace.Photos[0].DownloadedImage!);
         var round = new Round(
             _currentPlace.DisplayName.Text,
-            _latestLocationName,
+            _searchLocation.Name,
             _currentPlace.UserRatingCount,
             _roundCount,
             _roundNumber);
@@ -90,7 +90,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         var scoreEvent = new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating);
         var photoEvent = new PhotoChangedEvent(Image);
         var round = new Round(_currentPlace.DisplayName.Text,
-            _latestLocationName,
+            _searchLocation.Name,
             _currentPlace.UserRatingCount,
             _roundCount,
             ++_roundNumber);
@@ -104,9 +104,9 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         await ScoreChanged(new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating));
     }
 
-    public void SetSearchLocation(GeoLoc geoloc, int radius)
+    public void SetSearchLocation(SearchLocation searchLocation)
     {
-        _restauClient.SetSearchLocation(geoloc, radius);
+        _restauClient.SetSearchLocation(searchLocation);
     }
 
     public async Task NextPhoto()

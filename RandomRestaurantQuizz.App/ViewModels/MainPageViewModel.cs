@@ -8,6 +8,8 @@ namespace RandomRestaurantQuizz.App.ViewModels;
 public partial class MainPageViewModel : ObservableObject
 {
     [ObservableProperty]
+    public partial VmSearchLocation SearchLocation { get; set; }
+    [ObservableProperty]
     public partial VmRound Round { get; set; } = new();
     [ObservableProperty]
     public partial string Score { get; set; }
@@ -30,15 +32,22 @@ public partial class MainPageViewModel : ObservableObject
     });
 }
 
+public partial class VmSearchLocation : ObservableObject
+{
+    [ObservableProperty]
+    public partial string Name { get; set; } = "";
+    [ObservableProperty]
+    public partial double Latitude { get; set; }
+    [ObservableProperty]
+    public partial double Longitude { get; set; }
+}
+
 public partial class VmRound : ObservableObject
 {
     [ObservableProperty]
     public partial string RestaurantName { get; set; } = "";
     [ObservableProperty]
-    public partial string LocationName { get; set; } = "";
-    [ObservableProperty]
     public partial string Progress { get; set; } = "";
-
 }
 
 public partial class VmReview : ObservableObject
@@ -66,7 +75,6 @@ public partial class VmReview : ObservableObject
     }
 }
 
-
 public class BoolToMaxLinesConverter : IValueConverter
 {
     public int CollapsedLines { get; set; } = 1;
@@ -80,7 +88,6 @@ public class BoolToMaxLinesConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
 }
-
 
 public class ProgressToStarInput : IValueConverter
 {

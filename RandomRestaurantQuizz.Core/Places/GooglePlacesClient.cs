@@ -16,8 +16,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
     private readonly ILogger<GooglePlacesClient> _logger;
 
-    private GeoLoc _center = new();
-    private int _radius = 1_000;
+    private SearchLocation _searchLocation = new();
 
     public GooglePlacesClient(HttpClient httpClient, IOptionsMonitor<SecretsJson> config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
     {
@@ -27,7 +26,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         _apiKey = config.CurrentValue.GooglePlacesApiKey;
     }
 
-    private static NearbySearchRequest CreateRequest(GeoLoc center, int radiusSize)
+    private static NearbySearchRequest CreateRequest(SearchLocation center)
     {
         return new NearbySearchRequest
         {
@@ -36,7 +35,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
                 Circle = new Circle
                 {
                     Center = center,
-                    Radius = radiusSize,
+                    Radius = SearchLocation.SearchRadius,
                 }
             },
             IncludedTypes = ["restaurant"]
@@ -45,7 +44,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
     private async Task<List<PlaceResult>> RestaurantsAround(CancellationToken cancellationToken)
     {
-        var request = CreateRequest(_center, _radius);
+        var request = CreateRequest(_searchLocation);
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
         {
@@ -68,7 +67,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         }
 
         if (response.Places?.Count == 0)
-            _logger.LogWarning("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}m", _center.Latitude, _center.Longitude, _radius);
+            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}m", _searchLocation.Latitude, _searchLocation.Longitude, _searchLocation.Name);
 
         return response.Places ?? [];
     }
@@ -92,9 +91,8 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         return await _photoDownloader.GetPhotos(restaurants, cancellationToken);
     }
 
-    public void SetSearchLocation(GeoLoc location, int radius)
+    public void SetSearchLocation(SearchLocation searchLocation)
     {
-        _center = location;
-        _radius = radius;
+        _searchLocation = searchLocation;
     }
 }

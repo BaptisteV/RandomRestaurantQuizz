@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RandomRestaurantQuizz.Core.Data;
+using RandomRestaurantQuizz.Core.Places;
 using RandomRestaurantQuizz.Core.Quizzz;
 using System.Globalization;
 
@@ -31,7 +32,13 @@ public class QuizzConsoleRunner : IRunner
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         Cities.Data.TryGetValue(CityName, out var city);
-        await _quizzGame.InitRound((Name: CityName, Geoloc: city), cancellationToken);
+        await _quizzGame.InitRound(new SearchLocation()
+        {
+            Latitude = city.Latitude,
+            Longitude = city.Longitude,
+            Name = city.Name
+        }, cancellationToken);
+
         while (true)
         {
             var answerValue = DoubleReader.ReadDouble("Guessed rating ? : ");

@@ -5,11 +5,10 @@ public partial class GeoLocPickerPage : ContentPage
     private readonly GeoLocPickerViewModel _vm;
     private readonly IGeolocationService _geoService;
     private readonly ILogger<GeoLocPickerPage> _logger;
-    private const string AroundMe = "📌 Around me";
 
-    public (string Name, GeoLoc Geoloc) CurrentLocation;
+    private const string AroundMe = "🚩 Around me 🚩";
 
-    public Func<string, GeoLoc, Task> SearchLocationChanged { get; set; } = (_, _) => Task.CompletedTask;
+    public Func<string, SearchLocation, Task> SearchLocationChanged { get; set; } = (_, _) => Task.CompletedTask;
 
     public GeoLocPickerPage(GeoLocPickerViewModel vm, IGeolocationService geoService, ILogger<GeoLocPickerPage> logger)
     {
@@ -33,7 +32,7 @@ public partial class GeoLocPickerPage : ContentPage
         var city = btn.Text;
         _logger.LogInformation("Picked {City}", city);
 
-        GeoLoc geoloc;
+        SearchLocation geoloc;
         if (city == AroundMe)
         {
             geoloc = await _geoService.GetCurrentLocation();
@@ -45,7 +44,6 @@ public partial class GeoLocPickerPage : ContentPage
             await SearchLocationChanged(city, geoloc);
         }
 
-        CurrentLocation = (city, geoloc);
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
     }
 

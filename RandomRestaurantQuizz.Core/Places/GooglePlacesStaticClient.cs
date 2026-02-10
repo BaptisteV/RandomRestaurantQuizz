@@ -30,5 +30,5 @@ public class GooglePlacesStaticClient(HttpClient _, IPhotoDownloader photoDownlo
         return await photoDownloader.GetPhotos(restaurants, cancellationToken);
     }
 
-    public void SetSearchLocation(GeoLoc location, int radius) { }
+    public void SetSearchLocation(SearchLocation searchLocation) { }
 }

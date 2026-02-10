@@ -1,14 +1,15 @@
-﻿using RandomRestaurantQuizz.Core.Quizzz.Events;
+﻿using RandomRestaurantQuizz.Core.Places;
+using RandomRestaurantQuizz.Core.Quizzz.Events;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
 public interface IQuizzGame
 {
-    Task InitRound((string Name, GeoLoc Geoloc) location, CancellationToken cancellationToken);
+    Task InitRound(SearchLocation searchLocation, CancellationToken cancellationToken);
     Task Answer(double guessedRating);
     Task NextPhoto();
     Task PreviousPhoto();
-    void SetSearchLocation(GeoLoc geoloc, int radius);
+    void SetSearchLocation(SearchLocation searchLocation);
 
     Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; }
     Func<ScoreChangedEvent, Task> ScoreChanged { get; set; }

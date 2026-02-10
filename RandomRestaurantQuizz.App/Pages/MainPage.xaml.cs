@@ -40,7 +40,7 @@ public partial class MainPage : ContentPage, IDisposable
         _vm.ScoreDiff = startedEvent.ScoreChangedEvent.ScoreDiff;
 
         _vm.Round.RestaurantName = startedEvent.Round.RestaurantName;
-        _vm.Round.LocationName = startedEvent.Round.LocationName;
+        _vm.SearchLocation.Name = startedEvent.Round.LocationName;
         _vm.Round.Progress = startedEvent.Round.Progress;
 
         _vm.ImageSource = startedEvent.PhotoChangedEvent.Source;
@@ -87,11 +87,11 @@ public partial class MainPage : ContentPage, IDisposable
         await Navigation.PushModalAsync(new RecapModal(recapVm), true);
     }
 
-    private async Task OnSearchLocationChanged(string name, GeoLoc geoloc)
+    private async Task OnSearchLocationChanged(string name, SearchLocation geoloc)
     {
         _logger.LogInformation("New location picked: {Location}", name);
-        _vm.Round.LocationName = name;
-        _quizzGame.SetSearchLocation(geoloc, Cities.DefaultRadius);
+        _vm.SearchLocation.Name = name;
+        _quizzGame.SetSearchLocation(geoloc);
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
@@ -106,7 +106,12 @@ public partial class MainPage : ContentPage, IDisposable
     private async Task InitWithSpinner()
     {
         await Navigation.PushModalAsync(new SpinnerModal(), true);
-        await _quizzGame.InitRound(_geoPage.CurrentLocation, CancellationToken.None);
+        await _quizzGame.InitRound(new SearchLocation()
+        {
+            Latitude = _vm.SearchLocation.Latitude,
+            Longitude = _vm.SearchLocation.Longitude,
+            Name = _vm.SearchLocation.Name,
+        }, CancellationToken.None);
         await Navigation.PopModalAsync(true);
     }
 
