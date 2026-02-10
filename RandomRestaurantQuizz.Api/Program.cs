@@ -1,10 +1,10 @@
-using RandomRestaurantQuizz.Api;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddCoreServices();
+builder.Services.AddSingleton<IPhotoDownloader, NoOpPhotoDownloader>();
 
 var app = builder.Build();
 

@@ -7,7 +7,7 @@ public static class RestaurantsEndpoints
 {
     public static async Task<Results<Ok<PlacesApiResponse>, NotFound>> GetRestaurantsByCity(
             [FromServices] IGooglePlacesClient googlePlacesClient,
-            [FromQuery(Name = "city")] string city,
+            [FromRoute(Name = "city")] string city,
             CancellationToken cancellationToken)
     {
         var foundCities = Locations.Cities.Where(l => string.Equals(l.Name, city, StringComparison.OrdinalIgnoreCase)).ToList();
