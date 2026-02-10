@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path="README.md" />
   </Folder>
+  <Project Path="RandomRestaurantQuizz.Api/RandomRestaurantQuizz.Api.csproj" Id="d9307efc-830a-49f3-826e-9d1d42e245f4" />
   <Project Path="RandomRestaurantQuizz.App/RandomRestaurantQuizz.App.csproj" Id="3b158963-bd22-4121-9de6-dd1bd0f5e2d5">
     <Deploy Solution="Debug|*" />
   </Project>

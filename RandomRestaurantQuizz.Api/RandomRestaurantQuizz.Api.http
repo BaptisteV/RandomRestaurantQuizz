@@ -1,0 +1,6 @@
+@RandomRestaurantQuizz.Api_HostAddress = http://localhost:5028
+
+GET {{RandomRestaurantQuizz.Api_HostAddress}}/cities
+Accept: application/json
+
+###
