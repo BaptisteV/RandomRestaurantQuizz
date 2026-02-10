@@ -87,11 +87,15 @@ public partial class MainPage : ContentPage, IDisposable
         await Navigation.PushModalAsync(new RecapModal(recapVm), true);
     }
 
-    private async Task OnSearchLocationChanged(string name, SearchLocation geoloc)
+    private async Task OnSearchLocationChanged(SearchLocation searchLocation)
     {
-        _logger.LogInformation("New location picked: {Location}", name);
-        _vm.SearchLocation.Name = name;
-        _quizzGame.SetSearchLocation(geoloc);
+        _logger.LogInformation("New location picked: {SearchLocation}", searchLocation.Name);
+        _vm.SearchLocation = new VmSearchLocation
+        {
+            Latitude = searchLocation.Latitude,
+            Longitude = searchLocation.Longitude,
+            Name = searchLocation.Name,
+        };
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)

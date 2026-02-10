@@ -16,8 +16,6 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
     private readonly ILogger<GooglePlacesClient> _logger;
 
-    private SearchLocation _searchLocation = new();
-
     public GooglePlacesClient(HttpClient httpClient, IOptionsMonitor<SecretsJson> config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
     {
         _httpClient = httpClient;
@@ -42,9 +40,9 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         };
     }
 
-    private async Task<List<PlaceResult>> RestaurantsAround(CancellationToken cancellationToken)
+    private async Task<List<PlaceResult>> RestaurantsAround(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
-        var request = CreateRequest(_searchLocation);
+        var request = CreateRequest(searchLocation);
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
         {
@@ -67,15 +65,15 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         }
 
         if (response.Places?.Count == 0)
-            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}m", _searchLocation.Latitude, _searchLocation.Longitude, _searchLocation.Name);
+            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}m", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
 
         return response.Places ?? [];
     }
 
-    public async Task<List<PlaceResult>> GetRestaurants(CancellationToken cancellationToken)
+    public async Task<List<PlaceResult>> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
         // Get all possible restaurants
-        var restaurantsInCity = (await RestaurantsAround(cancellationToken)).ToList();
+        var restaurantsInCity = (await RestaurantsAround(searchLocation, cancellationToken)).ToList();
 
         // Remove restaurants with no photo to download or no rating
         var restaurants = restaurantsInCity.WithRatingAndPhotos();
@@ -89,10 +87,5 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
         // Enrich with photos
         return await _photoDownloader.GetPhotos(restaurants, cancellationToken);
-    }
-
-    public void SetSearchLocation(SearchLocation searchLocation)
-    {
-        _searchLocation = searchLocation;
     }
 }

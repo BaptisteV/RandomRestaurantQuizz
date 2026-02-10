@@ -4,6 +4,5 @@ namespace RandomRestaurantQuizz.Core.Places;
 
 public interface IGooglePlacesClient
 {
-    void SetSearchLocation(SearchLocation searchLocation);
-    Task<List<PlaceResult>> GetRestaurants(CancellationToken cancellationToken);
+    Task<List<PlaceResult>> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken);
 }

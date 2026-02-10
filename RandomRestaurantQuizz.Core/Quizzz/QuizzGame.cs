@@ -33,8 +33,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
         _player = new Player();
         _nextRestaurants.Clear();
 
-        _restauClient.SetSearchLocation(_searchLocation);
-        var restaurants = await _restauClient.GetRestaurants(cancellationToken);
+        var restaurants = await _restauClient.GetRestaurants(_searchLocation, cancellationToken);
 
         foreach (var restaurant in restaurants)
         {
@@ -102,11 +101,6 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
         await PhotoChanged(new PhotoChangedEvent(Image));
         await ScoreChanged(new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating));
-    }
-
-    public void SetSearchLocation(SearchLocation searchLocation)
-    {
-        _restauClient.SetSearchLocation(searchLocation);
     }
 
     public async Task NextPhoto()

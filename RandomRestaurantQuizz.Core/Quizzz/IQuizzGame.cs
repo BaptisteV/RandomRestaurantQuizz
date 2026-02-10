@@ -9,7 +9,6 @@ public interface IQuizzGame
     Task Answer(double guessedRating);
     Task NextPhoto();
     Task PreviousPhoto();
-    void SetSearchLocation(SearchLocation searchLocation);
 
     Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; }
     Func<ScoreChangedEvent, Task> ScoreChanged { get; set; }

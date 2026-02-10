@@ -8,7 +8,7 @@ public partial class GeoLocPickerPage : ContentPage
 
     private const string AroundMe = "🚩 Around me 🚩";
 
-    public Func<string, SearchLocation, Task> SearchLocationChanged { get; set; } = (_, _) => Task.CompletedTask;
+    public Func<SearchLocation, Task> SearchLocationChanged { get; set; } = (_) => Task.CompletedTask;
 
     public GeoLocPickerPage(GeoLocPickerViewModel vm, IGeolocationService geoService, ILogger<GeoLocPickerPage> logger)
     {
@@ -36,12 +36,12 @@ public partial class GeoLocPickerPage : ContentPage
         if (city == AroundMe)
         {
             geoloc = await _geoService.GetCurrentLocation();
-            await SearchLocationChanged(city, geoloc);
+            await SearchLocationChanged(geoloc);
         }
         else
         {
             geoloc = Cities.Data[city];
-            await SearchLocationChanged(city, geoloc);
+            await SearchLocationChanged(geoloc);
         }
 
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
