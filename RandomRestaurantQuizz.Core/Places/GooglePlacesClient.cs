@@ -40,7 +40,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         };
     }
 
-    private async Task<List<PlaceResult>> RestaurantsAround(SearchLocation searchLocation, CancellationToken cancellationToken)
+    private async Task<PlacesApiResponse> RestaurantsAround(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
         var request = CreateRequest(searchLocation);
 
@@ -53,48 +53,49 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews");
 
         var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-        try
-        {
-            httpResponse.EnsureSuccessStatusCode();
-        }
-        catch (HttpRequestException httpException)
+
+        if (!httpResponse.IsSuccessStatusCode)
         {
             var content = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-            _logger.LogError(httpException, "Error calling the Google Places API. Response content: {ResponseContent}", content);
-            return [];
+            _logger.LogError("Error {HttpCode} calling the Google Places API. Response content: {ResponseContent}", httpResponse.StatusCode, content);
+            return new();
         }
+
         var jsonContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
         var response = JsonSerializer.Deserialize<PlacesApiResponse?>(jsonContent, _jsonOptions);
 
         if (response is null)
         {
             _logger.LogError("Error deserializing json : {Json}", jsonContent);
-            return [];
+            return new();
         }
 
         if (response.Places?.Count == 0)
             _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
 
-        return response.Places ?? [];
+        return response;
     }
 
-    public async Task<List<PlaceResult>> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
+    public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
         // Get all possible restaurants
-        var restaurantsInCity = (await RestaurantsAround(searchLocation, cancellationToken)).ToList();
+        var restaurantsInCity = await RestaurantsAround(searchLocation, cancellationToken);
 
         // Remove restaurants with no photo to download or no rating
         var restaurants = restaurantsInCity.WithRatingAndPhotos();
 
-        var filteredCount = restaurantsInCity.Count - restaurants.Count;
+        var filteredCount = restaurantsInCity.Places.Count - restaurants.Places.Count;
         if (filteredCount > 0)
         {
             _logger.LogInformation("Deleted {NoRatingCount} restaurants as they don't have a single user rating or no photo", filteredCount);
         }
-        _logger.LogInformation("Downloading all photos for {RestauCount} restaurants", restaurants.Count);
+        _logger.LogInformation("Downloading all photos for {RestauCount} restaurants", restaurants.Places.Count);
 
         // Enrich with photos
-        var withPhotos = await _photoDownloader.GetPhotos(restaurants, cancellationToken);
+        var withPhotos = new PlacesApiResponse()
+        {
+            Places = await _photoDownloader.GetPhotos(restaurants.Places, cancellationToken)
+        };
         return withPhotos;
     }
 }

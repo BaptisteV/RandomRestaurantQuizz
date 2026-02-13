@@ -33,7 +33,7 @@ public class QuizzGame(IGooglePlacesClient restauClient, ILogger<QuizzGame> logg
 
         var restaurants = await _restauClient.GetRestaurants(_searchLocation, cancellationToken);
 
-        foreach (var restaurant in restaurants)
+        foreach (var restaurant in restaurants.Places)
         {
             _nextRestaurants.Enqueue(restaurant);
         }

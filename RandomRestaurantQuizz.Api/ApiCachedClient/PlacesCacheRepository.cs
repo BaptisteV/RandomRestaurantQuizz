@@ -1,7 +1,7 @@
 ﻿using DuckDB.NET.Data;
 using System.Text.Json;
 
-namespace RandomRestaurantQuizz.Api;
+namespace RandomRestaurantQuizz.Api.ApiCachedClient;
 
 public sealed class PlacesCacheRepository
 {
@@ -9,7 +9,7 @@ public sealed class PlacesCacheRepository
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     public PlacesCacheRepository(
-        SqliteDbPath dbPath)
+        AppDataDb dbPath)
     {
         _connectionString = dbPath.ConnectionString;
 
@@ -30,10 +30,10 @@ public sealed class PlacesCacheRepository
         cmd.ExecuteNonQuery();
     }
 
-    public List<PlaceResult>? TryGet(string cacheKey, TimeSpan maxAge)
+    public async Task<PlacesApiResponse?> TryGet(string cacheKey, TimeSpan maxAge)
     {
         using var con = new DuckDBConnection(_connectionString);
-        con.Open();
+        await con.OpenAsync();
 
         using var cmd = con.CreateCommand();
         cmd.CommandText =
@@ -45,8 +45,8 @@ public sealed class PlacesCacheRepository
 
         cmd.Parameters.Add(new DuckDBParameter { Value = cacheKey });
 
-        using var reader = cmd.ExecuteReader();
-        if (!reader.Read())
+        using var reader = await cmd.ExecuteReaderAsync();
+        if (!(await reader.ReadAsync()))
             return null;
 
         var createdAt = reader.GetDateTime(1);
@@ -54,13 +54,24 @@ public sealed class PlacesCacheRepository
             return null;
 
         var json = reader.GetString(0);
-        return JsonSerializer.Deserialize<List<PlaceResult>>(json, _jsonOptions);
+
+        PlacesApiResponse? response = null;
+        try
+        {
+            response = JsonSerializer.Deserialize<PlacesApiResponse>(json, _jsonOptions)!;
+        }
+        catch (JsonException)
+        {
+            await Clear();
+        }
+
+        return response;
     }
 
-    public void Store(string cacheKey, SearchLocation loc, List<PlaceResult> places)
+    public async Task Store(string cacheKey, SearchLocation loc, PlacesApiResponse response)
     {
         using var con = new DuckDBConnection(_connectionString);
-        con.Open();
+        await con.OpenAsync();
 
         using var cmd = con.CreateCommand();
         cmd.CommandText =
@@ -75,9 +86,22 @@ public sealed class PlacesCacheRepository
         cmd.Parameters.Add(new DuckDBParameter { Value = SearchLocation.SearchRadius });
         cmd.Parameters.Add(new DuckDBParameter
         {
-            Value = JsonSerializer.Serialize(places, _jsonOptions)
+            Value = JsonSerializer.Serialize(response, _jsonOptions)
         });
 
-        cmd.ExecuteNonQuery();
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    public async Task Clear()
+    {
+        using var con = new DuckDBConnection(_connectionString);
+        await con.OpenAsync();
+        using var cmd = con.CreateCommand();
+        cmd.CommandText =
+        """
+        DELETE FROM places_cache;
+        """;
+
+        await cmd.ExecuteNonQueryAsync();
     }
 }

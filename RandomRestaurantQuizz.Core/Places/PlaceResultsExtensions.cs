@@ -4,13 +4,16 @@ namespace RandomRestaurantQuizz.Core.Places;
 
 public static class PlaceResultsExtensions
 {
-    extension(IEnumerable<PlaceResult> source)
+    extension(PlacesApiResponse response)
     {
-        public List<PlaceResult> WithRatingAndPhotos()
+        public PlacesApiResponse WithRatingAndPhotos()
         {
-            return [..source.Where(r =>
-            r.UserRatingCount > 0 &&
-            r.Photos.Any(p => !string.IsNullOrWhiteSpace(p.Name)))];
+            return new PlacesApiResponse()
+            {
+                Places = [.. response.Places.Where(r =>
+                    r.UserRatingCount > 0
+                    && r.Photos.Any(p => !string.IsNullOrWhiteSpace(p.Name)))]
+            };
         }
     }
 }

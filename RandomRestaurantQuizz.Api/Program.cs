@@ -1,14 +1,34 @@
+using RandomRestaurantQuizz.Api.ApiCachedClient;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host
+    .UseDefaultServiceProvider(o =>
+    {
+        o.ValidateScopes = true;
+        o.ValidateOnBuild = true;
+    })
+    .ConfigureLogging(logging =>
+    {
+        logging.ClearProviders().AddDebug().SetMinimumLevel(LogLevel.Information);
+#if DEBUG
+        logging.SetMinimumLevel(LogLevel.Debug);
+        logging.AddSimpleConsole(options =>
+        {
+            options.IncludeScopes = false;
+            options.SingleLine = true;
+            options.TimestampFormat = "[HH:mm:ss:fff] ";
+        });
+#endif
+    });
+
 builder.Services.AddOpenApi();
 builder.Configuration.AddSecretsFromRessources();
 builder.Services.AddCoreServices();
-builder.Services.AddTransient((_) => new SqliteDbPath() { DbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
+builder.Services.AddTransient((_) => new AppDataDb() { DbFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
 builder.Services.AddSingleton<IPhotoDownloader, NoOpPhotoDownloader>();
-builder.Services.AddTransient<ICachedPlacesClient, DuckCachedPlacesClient>();
-builder.Services.AddTransient<PlacesCacheRepository>();
+builder.Services.AddScoped<ICachedPlacesClient, DuckCachedPlacesClient>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using RandomRestaurantQuizz.Api.ApiCachedClient;
 
 namespace RandomRestaurantQuizz.Api;
 
@@ -22,14 +23,14 @@ public static class RestaurantsEndpoints
     }
 
     public static async Task<Ok<PlacesApiResponse>> GetRestaurantsByCoordinates(
-            [FromServices] IGooglePlacesClient googlePlacesClient,
+            [FromServices] ICachedPlacesClient googlePlacesClient,
             [FromQuery(Name = "lat")] double lat,
             [FromQuery(Name = "lng")] double lng,
             [FromQuery(Name = "name")] string? name,
             CancellationToken cancellationToken)
     {
         var location = new SearchLocation() { Latitude = lat, Longitude = lng, Name = name ?? "" };
-        var places = await googlePlacesClient.GetRestaurants(location, cancellationToken);
-        return TypedResults.Ok(new PlacesApiResponse() { Places = places });
+        var places = await googlePlacesClient.GetRestaurantsWithCache(location, cancellationToken);
+        return TypedResults.Ok(places);
     }
 }

@@ -27,7 +27,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<GeoLocPickerViewModel>();
         builder.Services.AddSingleton<GeoLocPickerPage>();
         builder.Services.AddTransient<IGeolocationService, GeolocationService>();
-        builder.Services.AddTransient((_) => new SqliteDbPath() { DbPath = Path.Combine(FileSystem.AppDataDirectory, "scores.db") });
+        builder.Services.AddTransient((_) => new AppDataDb() { DbFile = Path.Combine(FileSystem.AppDataDirectory, "scores.db") });
 
         return builder.Build();
     }

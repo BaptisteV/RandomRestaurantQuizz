@@ -7,7 +7,7 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
 {
     private readonly SqliteConnection _connection;
 
-    public SqliteScoreRepository(SqliteDbPath sqliteDbPath)
+    public SqliteScoreRepository(AppDataDb sqliteDbPath)
     {
         _connection = new SqliteConnection(sqliteDbPath.ConnectionString);
     }

@@ -25,7 +25,7 @@ internal static class Program
             .ConfigureServices((context, services) =>
             {
                 services.AddCoreServices();
-                services.AddTransient((_) => new SqliteDbPath() { DbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
+                services.AddTransient((_) => new AppDataDb() { DbFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
                 services.AddSingleton<IRunner, QuizzConsoleRunner>();
             })
             .UseDefaultServiceProvider(o =>
