@@ -52,8 +52,15 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews");
 
         var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-        httpResponse.EnsureSuccessStatusCode();
-
+        try
+        {
+            httpResponse.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException httpException)
+        {
+            _logger.LogError(httpException, "Error calling the Google Places API");
+            return [];
+        }
         var jsonContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
         var response = JsonSerializer.Deserialize<PlacesApiResponse?>(jsonContent, _jsonOptions);
 

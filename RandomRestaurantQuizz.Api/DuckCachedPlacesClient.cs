@@ -36,8 +36,15 @@ public class DuckCachedPlacesClient : ICachedPlacesClient
 
         _logger.LogInformation("No cache for {CacheKey}", cacheKey);
         var restaurantsInCity = (await _placesClient.GetRestaurants(searchLocation, cancellationToken)).WithRatingAndPhotos().ToList();
-        _logger.LogInformation("Got {RestauCount} restaurants from API, storing in {CacheKey}", restaurantsInCity.Count, cacheKey);
-        _cache.Store(cacheKey, searchLocation, restaurantsInCity);
+        if (restaurantsInCity.Count == 0)
+        {
+            _logger.LogInformation("Got {RestauCount} restaurants from API", restaurantsInCity.Count);
+        }
+        else
+        {
+            _logger.LogInformation("Got {RestauCount} restaurants from API, storing in {CacheKey}", restaurantsInCity.Count, cacheKey);
+            _cache.Store(cacheKey, searchLocation, restaurantsInCity);
+        }
 
         return restaurantsInCity;
     }
