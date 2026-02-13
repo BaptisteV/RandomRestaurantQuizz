@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path="Dockerfile" />
+    <File Path="fly.toml" />
     <File Path="README.md" />
   </Folder>
   <Project Path="RandomRestaurantQuizz.Api/RandomRestaurantQuizz.Api.csproj" Id="d9307efc-830a-49f3-826e-9d1d42e245f4" />
