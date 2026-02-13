@@ -1,6 +1,5 @@
 ﻿using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places.Api;
-using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -25,9 +24,9 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         _apiKey = config.GooglePlacesApiKey;
     }
 
-    private static NearbySearchRequest CreateRequest(SearchLocation center)
+    private HttpRequestMessage CreateRequestMessage(SearchLocation center)
     {
-        return new NearbySearchRequest
+        var apiRequest = new NearbySearchRequest
         {
             LocationRestriction = new LocationRestriction
             {
@@ -37,25 +36,23 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
                     Radius = SearchLocation.SearchRadius,
                 }
             },
-            IncludedTypes = ["restaurant"]
+            IncludedTypes = ["restaurant"],
+            LanguageCode = "fr", // CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
         };
-    }
 
-    private async Task<PlacesApiResponse> RestaurantsAround(SearchLocation searchLocation, CancellationToken cancellationToken)
-    {
-        var request = CreateRequest(searchLocation);
-
-        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
         {
-            Content = JsonContent.Create(request),
+            Content = JsonContent.Create(apiRequest),
         };
 
         httpRequest.Headers.Add("X-Goog-Api-Key", _apiKey);
         httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews");
-        var a = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-        httpRequest.Headers.Add("X-Goog-Language", "fr");
-        var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
 
+        return httpRequest;
+    }
+
+    private async Task<PlacesApiResponse> ReadResponse(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
+    {
         if (!httpResponse.IsSuccessStatusCode)
         {
             var content = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
@@ -76,6 +73,15 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
             _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
 
         return response;
+    }
+
+    private async Task<PlacesApiResponse> RestaurantsAround(SearchLocation searchLocation, CancellationToken cancellationToken)
+    {
+        using var httpRequest = CreateRequestMessage(searchLocation);
+
+        var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
+
+        return await ReadResponse(httpResponse, cancellationToken);
     }
 
     public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
