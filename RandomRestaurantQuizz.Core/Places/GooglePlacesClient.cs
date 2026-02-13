@@ -58,7 +58,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         }
         catch (HttpRequestException httpException)
         {
-            var content = await httpResponse.Content.ReadAsStringAsync();
+            var content = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogError(httpException, "Error calling the Google Places API. Response content: {ResponseContent}", content);
             return [];
         }

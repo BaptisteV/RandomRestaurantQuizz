@@ -126,11 +126,11 @@ public partial class MainPage : ContentPage, IDisposable
         var xPercent = 100.0 * x / width;
 
         // Tap sides to change photo
-        if (xPercent <= 25)
+        if (xPercent < 50)
         {
             await _quizzGame.PreviousPhoto();
         }
-        else if (xPercent >= 75)
+        else if (xPercent >= 50)
         {
             await _quizzGame.NextPhoto();
         }
