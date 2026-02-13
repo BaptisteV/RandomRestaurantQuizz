@@ -18,6 +18,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
     public GooglePlacesClient(HttpClient httpClient, SecretsJson config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
     {
         _httpClient = httpClient;
+        _httpClient.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
         _photoDownloader = photoDownloader;
         _logger = logger;
         _apiKey = config.GooglePlacesApiKey;
@@ -72,7 +73,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         }
 
         if (response.Places?.Count == 0)
-            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}m", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
+            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
 
         return response.Places ?? [];
     }

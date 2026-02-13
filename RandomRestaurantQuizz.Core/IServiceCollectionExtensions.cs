@@ -11,11 +11,7 @@ public static class IServiceCollectionExtensions
     {
         public void AddCoreServices()
         {
-            services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>(a =>
-            {
-                a.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
-            });
-
+            services.AddHttpClient<IGooglePlacesClient, RestauQuizzClient>();
             services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
             services.AddTransient<IFileNamer, FileNamer>();
             services.AddTransient<PhotoFileManager>();
