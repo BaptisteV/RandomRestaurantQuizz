@@ -7,7 +7,6 @@
              Title="Pick a location">
 
     <VerticalStackLayout VerticalOptions="Center"
-                 Padding="16"
                  Spacing="4"
                  MaximumWidthRequest="720">
 

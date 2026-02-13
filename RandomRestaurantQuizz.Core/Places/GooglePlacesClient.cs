@@ -1,5 +1,6 @@
 ﻿using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.Places.Api;
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -51,7 +52,8 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
         httpRequest.Headers.Add("X-Goog-Api-Key", _apiKey);
         httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews");
-
+        var a = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        httpRequest.Headers.Add("X-Goog-Language", "fr");
         var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
 
         if (!httpResponse.IsSuccessStatusCode)

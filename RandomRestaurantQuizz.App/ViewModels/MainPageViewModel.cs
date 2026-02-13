@@ -103,3 +103,44 @@ public class RatingToColorConverter : IValueConverter
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotImplementedException();
 }
+
+public static class ViewExtensions
+{
+    public static Task<bool> AlphaTo(this VisualElement self, Color baseColor, Action<Color> callback, uint length)
+    {
+        Color transform(double t)
+        {
+            return baseColor.WithAlpha((float)t * 0.5f + 0.33f);
+        }
+
+        return ColorAnimation(self, nameof(AlphaTo), transform, callback, length, Easing.Linear);
+    }
+
+    public static void CancelAnimation(this VisualElement self)
+    {
+        self.AbortAnimation(nameof(AlphaTo));
+    }
+
+    private static Task<bool> ColorAnimation(VisualElement element, string name, Func<double, Color> transform, Action<Color> callback, uint length, Easing easing)
+    {
+        var taskCompletionSource = new TaskCompletionSource<bool>();
+
+        element.Animate<Color>(name, transform, callback, 16, length, easing, (v, c) => taskCompletionSource.SetResult(c));
+        return taskCompletionSource.Task;
+    }
+}
+/*
+public partial class AlphaAnimationBehavior : Behavior<VisualElement>
+{
+    public Color BaseColor { get; set; } = Colors.Gold;
+
+    protected override async void OnAttachedTo(VisualElement bindable)
+    {
+        base.OnAttachedTo(bindable);
+
+        await bindable.AlphaTo(
+            BaseColor,
+            c => bindable.Background = c,
+            500);
+    }
+}*/

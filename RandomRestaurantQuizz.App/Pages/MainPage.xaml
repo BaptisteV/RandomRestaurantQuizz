@@ -19,15 +19,14 @@
     </ContentPage.Resources>
 
     <Grid MaximumWidthRequest="720"
-          Padding="16">
+          Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="72"></RowDefinition>
+            <RowDefinition Height="72" ></RowDefinition>
             <RowDefinition Height="72"></RowDefinition>
         </Grid.RowDefinitions>
         <ScrollView  Grid.Row="0">
-            <VerticalStackLayout Padding="16"
-                                 Spacing="4">
+            <VerticalStackLayout Spacing="4">
                 <Grid>
                     <Label Text="{Binding Round.RestaurantName}"
                            HorizontalOptions="Start"
@@ -121,13 +120,19 @@
             <Border.GestureRecognizers>
                 <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
             </Border.GestureRecognizers>
-            <Grid HorizontalOptions="Center">
+            <!--<Grid HorizontalOptions="Center"
+                  Background="Transparent">
                 <controls:StarRating ZIndex="2"
                                      StarSize="44"
                                      HorizontalOptions="Fill"
                                      Rating="{Binding RatingInput}">
                 </controls:StarRating>
-            </Grid>
+            </Grid>-->
+            <controls:StarRating ZIndex="2"
+                                 StarSize="44"
+                                 HorizontalOptions="Fill"
+                                 Rating="{Binding RatingInput}">
+            </controls:StarRating>
         </Border>
 
         <Button Grid.Row="2"
@@ -138,7 +143,12 @@
                 HorizontalOptions="Fill"
                 IsEnabled="false"
                 FontSize="Medium"
-                BackgroundColor="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}" />
+                Background="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}">
+
+            <!--<Button.Behaviors>
+                <conv:AlphaAnimationBehavior BaseColor="Gold" />
+            </Button.Behaviors>-->
+        </Button>
     </Grid>
 
 </ContentPage>
