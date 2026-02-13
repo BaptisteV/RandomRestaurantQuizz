@@ -6,7 +6,7 @@ namespace RandomRestaurantQuizz.Api;
 public static class RestaurantsEndpoints
 {
     public static async Task<Results<Ok<PlacesApiResponse>, NotFound>> GetRestaurantsByCity(
-            [FromServices] ICachedPlacesClient googlePlacesClient,
+            [FromServices] ICachedPlacesClient cachedPlacesClient,
             [FromRoute(Name = "city")] string city,
             CancellationToken cancellationToken)
     {
@@ -18,18 +18,18 @@ public static class RestaurantsEndpoints
 
         var location = foundCities.Single();
 
-        return await GetRestaurantsByCoordinates(googlePlacesClient, location.Latitude, location.Longitude, location.Name, cancellationToken);
+        return await GetRestaurantsByCoordinates(cachedPlacesClient, location.Latitude, location.Longitude, location.Name, cancellationToken);
     }
 
     public static async Task<Ok<PlacesApiResponse>> GetRestaurantsByCoordinates(
-            [FromServices] ICachedPlacesClient googlePlacesClient,
+            [FromServices] ICachedPlacesClient cachedPlacesClient,
             [FromQuery(Name = "lat")] double lat,
             [FromQuery(Name = "lng")] double lng,
             [FromQuery(Name = "name")] string? name,
             CancellationToken cancellationToken)
     {
         var location = new SearchLocation() { Latitude = lat, Longitude = lng, Name = name ?? "" };
-        var places = await googlePlacesClient.GetRestaurantsWithCache(location, cancellationToken);
+        var places = await cachedPlacesClient.GetRestaurantsWithCache(location, cancellationToken);
         return TypedResults.Ok(places);
     }
 }

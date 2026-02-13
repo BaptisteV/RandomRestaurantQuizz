@@ -14,6 +14,8 @@
         <conv:BoolToMaxLinesConverter x:Key="BoolToMaxLinesConverter"
                                       CollapsedLines="1"
                                       ExpandedLines="0" />
+        <conv:RatingToColorConverter x:Key="RatingToColorConverter"
+                                     BaseColor="Gold" />
     </ContentPage.Resources>
 
     <Grid MaximumWidthRequest="720"
@@ -110,32 +112,33 @@
             </VerticalStackLayout>
         </ScrollView>
         <Border Grid.Row="1"
-             x:Name="StarsContainer"
-                    Stroke="Gold"
-                    StrokeThickness="2"
-                    Shadow="2,2,4,Gold"
-                    Opacity="0.8"
-                    StrokeShape="RoundRectangle 8"
-                    HorizontalOptions="Center">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
-                </Border.GestureRecognizers>
-                <Grid HorizontalOptions="Center">
-                    <controls:StarRating ZIndex="2"
-                                         StarSize="64"
-                                         HorizontalOptions="Fill"
-                                         Rating="{Binding RatingInput}">
-                    </controls:StarRating>
-                </Grid>
-            </Border>
+                x:Name="StarsContainer"
+                Stroke="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}"
+                StrokeThickness="2"
+                Opacity="0.8"
+                StrokeShape="RoundRectangle 8"
+                HorizontalOptions="Center">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
+            </Border.GestureRecognizers>
+            <Grid HorizontalOptions="Center">
+                <controls:StarRating ZIndex="2"
+                                     StarSize="44"
+                                     HorizontalOptions="Fill"
+                                     Rating="{Binding RatingInput}">
+                </controls:StarRating>
+            </Grid>
+        </Border>
 
-        <Button Grid.Row="2" x:Name="AnswerBtn"
+        <Button Grid.Row="2"
+                x:Name="AnswerBtn"
                 Text="{Binding RatingInputText}"
                 SemanticProperties.Hint="Answer"
                 Clicked="AnswerBtn_Clicked"
                 HorizontalOptions="Fill"
                 IsEnabled="false"
-                FontSize="Medium" />
+                FontSize="Medium"
+                BackgroundColor="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}" />
     </Grid>
 
 </ContentPage>
