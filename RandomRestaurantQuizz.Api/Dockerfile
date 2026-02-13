@@ -11,9 +11,11 @@ EXPOSE 8081
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
+
 WORKDIR /src
-COPY ["RandomRestaurantQuizz.Api/RandomRestaurantQuizz.Api.csproj", "RandomRestaurantQuizz.Api/"]
+COPY ["RandomRestaurantQuizz.Api/RandomRestaurantQuizz.Api.csproj", "RandomRestaurantQuizz.Api/RandomRestaurantQuizz.Api.csproj"]
 RUN dotnet restore "./RandomRestaurantQuizz.Api/RandomRestaurantQuizz.Api.csproj"
+
 COPY . .
 WORKDIR "/src/RandomRestaurantQuizz.Api"
 RUN dotnet build "./RandomRestaurantQuizz.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
