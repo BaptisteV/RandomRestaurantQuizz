@@ -24,28 +24,12 @@ public partial class MainPage : ContentPage, IDisposable
 
         InitializeComponent();
 
-        _geoPage.SearchLocationChanged = async (e) =>
-        {
-            await MainThread.InvokeOnMainThreadAsync(async () => { await OnSearchLocationChanged(e); });
-        };
+        _geoPage.SearchLocationChanged = OnSearchLocationChanged;
 
-        _quizzGame.RestaurantChanged = async (e) =>
-        {
-            await MainThread.InvokeOnMainThreadAsync(async () => { await OnRestaurantChanged(e); });
-        };
-        _quizzGame.RoundFinished = async (e) =>
-        {
-            await MainThread.InvokeOnMainThreadAsync(async () => { await OnRoundFinished(e); });
-        };
-        _quizzGame.ScoreChanged = async (e) =>
-        {
-            await MainThread.InvokeOnMainThreadAsync(async () => { await OnScoreChanged(e); });
-        };
-        _quizzGame.PhotoChanged = async (e) =>
-        {
-            await MainThread.InvokeOnMainThreadAsync(async () => { await OnPhotoChanged(e); });
-        };
-
+        _quizzGame.RestaurantChanged = OnRestaurantChanged;
+        _quizzGame.RoundFinished = OnRoundFinished;
+        _quizzGame.ScoreChanged = OnScoreChanged;
+        _quizzGame.PhotoChanged = OnPhotoChanged;
 
         _ = Task.Run(async () => Navigation.PushAsync(_geoPage, true));
     }

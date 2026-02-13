@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using RandomRestaurantQuizz.Api.ApiCachedClient;
 
 namespace RandomRestaurantQuizz.Api;
 
