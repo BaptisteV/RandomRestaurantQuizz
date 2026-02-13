@@ -31,7 +31,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
             {
                 Circle = new Circle
                 {
-                    Center = center,
+                    Center = new Center() { Latitude = center.Latitude, Longitude = center.Longitude },
                     Radius = SearchLocation.SearchRadius,
                 }
             },
@@ -58,7 +58,8 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         }
         catch (HttpRequestException httpException)
         {
-            _logger.LogError(httpException, "Error calling the Google Places API");
+            var content = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogError(httpException, "Error calling the Google Places API. Response content: {ResponseContent}", content);
             return [];
         }
         var jsonContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
