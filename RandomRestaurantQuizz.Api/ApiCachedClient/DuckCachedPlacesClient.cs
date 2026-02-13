@@ -38,6 +38,8 @@ public class DuckCachedPlacesClient : ICachedPlacesClient
 
         _logger.LogInformation("{LocationName} not found in cache with {CacheKey}", searchLocation.Name, cacheKey);
 
-        return await _googlePlacesClient.GetRestaurants(searchLocation, cancellationToken);
+        var result = await _googlePlacesClient.GetRestaurants(searchLocation, cancellationToken);
+        await _cache.Store(cacheKey, searchLocation, result);
+        return result;
     }
 }

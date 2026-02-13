@@ -1,8 +1,9 @@
-﻿using System.Text.Json;
+﻿using RandomRestaurantQuizz.Core.Places.Api;
+using System.Text.Json;
 
-namespace RandomRestaurantQuizz.Api.ApiCachedClient;
+namespace RandomRestaurantQuizz.Core.Places;
 
-public class RestauQuizzClient : ICachedPlacesClient
+public class RestauQuizzClient : IGooglePlacesClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<RestauQuizzClient> _logger;
@@ -14,7 +15,7 @@ public class RestauQuizzClient : ICachedPlacesClient
         _logger = logger;
         _httpClient.BaseAddress = new Uri("https://restauquizz.fly.dev/");
     }
-    public async Task<PlacesApiResponse> GetRestaurantsWithCache(SearchLocation searchLocation, CancellationToken cancellationToken)
+    public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
         var getRestaurants = new Uri($"/restaurants/{searchLocation.Name}", UriKind.Relative);
 
