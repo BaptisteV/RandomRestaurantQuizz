@@ -85,6 +85,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         _logger.LogInformation("Downloading all photos for {RestauCount} restaurants", restaurants.Count);
 
         // Enrich with photos
-        return await _photoDownloader.GetPhotos(restaurants, cancellationToken);
+        var withPhotos = await _photoDownloader.GetPhotos(restaurants, cancellationToken);
+        return withPhotos;
     }
 }

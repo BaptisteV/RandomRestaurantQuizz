@@ -26,6 +26,7 @@ public class GooglePlacesStaticClient(HttpClient _, IPhotoDownloader photoDownlo
         }
         logger.LogInformation("Downloading all photos for {RestauCount} restaurants", restaurants.Count);
 
-        return await photoDownloader.GetPhotos(restaurants, cancellationToken);
+        var withPhotos = await photoDownloader.GetPhotos(restaurants, cancellationToken);
+        return withPhotos;
     }
 }

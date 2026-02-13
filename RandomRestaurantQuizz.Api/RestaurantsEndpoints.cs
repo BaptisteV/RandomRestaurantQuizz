@@ -6,7 +6,7 @@ namespace RandomRestaurantQuizz.Api;
 public static class RestaurantsEndpoints
 {
     public static async Task<Results<Ok<PlacesApiResponse>, NotFound>> GetRestaurantsByCity(
-            [FromServices] IGooglePlacesClient googlePlacesClient,
+            [FromServices] ICachedPlacesClient googlePlacesClient,
             [FromRoute(Name = "city")] string city,
             CancellationToken cancellationToken)
     {
