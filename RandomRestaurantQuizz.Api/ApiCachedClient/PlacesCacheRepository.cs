@@ -13,6 +13,7 @@ public sealed class PlacesCacheRepository
     {
         _connectionString = dbPath.ConnectionString;
 
+        // Clear();
         using var con = new DuckDBConnection(_connectionString);
         con.Open();
         using var cmd = con.CreateCommand();
@@ -24,7 +25,7 @@ public sealed class PlacesCacheRepository
             longitude DOUBLE,
             radius INTEGER,
             response_json JSON,
-            created_at TIMESTAMP
+            created_at TEXT
         );
         """;
         cmd.ExecuteNonQuery();
@@ -49,23 +50,14 @@ public sealed class PlacesCacheRepository
         if (!(await reader.ReadAsync()))
             return null;
 
-        var createdAt = reader.GetDateTime(1);
+        var c = reader.GetString(1);
+        var createdAt = DateTime.Parse(c);
         if (DateTime.UtcNow - createdAt > maxAge)
             return null;
 
         var json = reader.GetString(0);
 
-        PlacesApiResponse? response = null;
-        try
-        {
-            response = JsonSerializer.Deserialize<PlacesApiResponse>(json, _jsonOptions)!;
-        }
-        catch (JsonException)
-        {
-            await Clear();
-        }
-
-        return response;
+        return JsonSerializer.Deserialize<PlacesApiResponse>(json, _jsonOptions);
     }
 
     public async Task Store(string cacheKey, SearchLocation loc, PlacesApiResponse response)
@@ -76,8 +68,8 @@ public sealed class PlacesCacheRepository
         using var cmd = con.CreateCommand();
         cmd.CommandText =
         """
-        INSERT OR REPLACE INTO places_cache
-        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        INSERT INTO places_cache 
+        VALUES (?, ?, ?, ?, ?, ?);
         """;
 
         cmd.Parameters.Add(new DuckDBParameter { Value = cacheKey });
@@ -88,20 +80,34 @@ public sealed class PlacesCacheRepository
         {
             Value = JsonSerializer.Serialize(response, _jsonOptions)
         });
+        cmd.Parameters.Add(new DuckDBParameter() { Value = DateTime.Now, DbType = System.Data.DbType.DateTime });
 
         await cmd.ExecuteNonQueryAsync();
     }
 
-    public async Task Clear()
+    public async Task ClearAsync()
     {
         using var con = new DuckDBConnection(_connectionString);
         await con.OpenAsync();
         using var cmd = con.CreateCommand();
         cmd.CommandText =
         """
-        DELETE FROM places_cache;
+        DROP TABLE places_cache;
         """;
 
         await cmd.ExecuteNonQueryAsync();
+    }
+
+    public void Clear()
+    {
+        using var con = new DuckDBConnection(_connectionString);
+        con.Open();
+        using var cmd = con.CreateCommand();
+        cmd.CommandText =
+        """
+        DROP TABLE places_cache;
+        """;
+
+        cmd.ExecuteNonQuery();
     }
 }
