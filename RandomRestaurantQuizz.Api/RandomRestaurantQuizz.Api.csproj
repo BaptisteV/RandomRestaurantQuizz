@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <!--<DockerfileRunArguments>network host</DockerfileRunArguments>-->
     <UserSecretsId>856d145c-f9aa-4c97-aae3-e50da4686a68</UserSecretsId>
   </PropertyGroup>
 

@@ -1,20 +1,25 @@
-﻿using RandomRestaurantQuizz.Core.Places.Api;
+﻿using RandomRestaurantQuizz.Core.Photos;
+using RandomRestaurantQuizz.Core.Places.Api;
 using System.Text.Json;
 
 namespace RandomRestaurantQuizz.Core.Places;
 
-public class RestauQuizzClient : IGooglePlacesClient
+public class RestauQuizzClient : IInternalPlacesClient
 {
     private readonly HttpClient _httpClient;
+    private readonly IPhotoDownloader _photoDownloader;
     private readonly ILogger<RestauQuizzClient> _logger;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    public RestauQuizzClient(HttpClient client, ILogger<RestauQuizzClient> logger)
+    public RestauQuizzClient(HttpClient client, IPhotoDownloader photoDownloader, ILogger<RestauQuizzClient> logger)
     {
         _httpClient = client;
+        _photoDownloader = photoDownloader;
         _logger = logger;
         _httpClient.BaseAddress = new Uri("https://restauquizz.fly.dev/");
+        //_httpClient.BaseAddress = new Uri("https://localhost:7075/");
     }
+
     public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
         var getRestaurants = new Uri($"/restaurants/{searchLocation.Name}", UriKind.Relative);
@@ -36,9 +41,14 @@ public class RestauQuizzClient : IGooglePlacesClient
             return new();
         }
 
-        if (response.Places?.Count == 0)
+        if (response.Places.Count == 0)
             _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
 
-        return response;
+        // Enrich with photos
+        var withPhotos = new PlacesApiResponse()
+        {
+            Places = await _photoDownloader.GetPhotos(response.Places!, cancellationToken)
+        };
+        return withPhotos;
     }
 }

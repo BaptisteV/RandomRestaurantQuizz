@@ -11,7 +11,8 @@ public static class IServiceCollectionExtensions
     {
         public void AddCoreServices()
         {
-            services.AddHttpClient<IGooglePlacesClient, RestauQuizzClient>();
+            services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>();
+            services.AddSingleton<IInternalPlacesClient, RestauQuizzClient>();
             services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
             services.AddTransient<IFileNamer, FileNamer>();
             services.AddTransient<PhotoFileManager>();
