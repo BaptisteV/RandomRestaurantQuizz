@@ -69,7 +69,10 @@ public partial class MainPage : ContentPage, IDisposable
             await Task.Delay(4000, _cts.Token);
             await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
         }
-        catch (TaskCanceledException) { }
+        catch (TaskCanceledException)
+        {
+            // Do nothing
+        }
     }
 
     private Task OnPhotoChanged(PhotoChangedEvent photoChangedEvent)
@@ -165,8 +168,5 @@ public partial class MainPage : ContentPage, IDisposable
         var horizontalRatio = (float)((x - 8.0) / width); // From 0.0 to 1.0
         _vm.RatingInput = Math.Clamp(Math.Round(horizontalRatio * 5.0, 2), 0.0, 5.0);
         _vm.RatingInputText = $"{_vm.RatingInput:F2}";
-        //var color = Colors.Gold.WithAlpha(horizontalRatio * 0.5f + 0.33f);
-        //AnswerBtn.BackgroundColor = color;
-        //StarsContainer.Stroke = color;
     }
 }

@@ -51,7 +51,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         return httpRequest;
     }
 
-    private async Task<PlacesApiResponse> ReadResponse(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
+    private async Task<PlacesApiResponse> ReadResponse(HttpResponseMessage httpResponse, SearchLocation searchLocation, CancellationToken cancellationToken)
     {
         if (!httpResponse.IsSuccessStatusCode)
         {
@@ -81,7 +81,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
         var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
 
-        return await ReadResponse(httpResponse, cancellationToken);
+        return await ReadResponse(httpResponse, searchLocation, cancellationToken);
     }
 
     public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)

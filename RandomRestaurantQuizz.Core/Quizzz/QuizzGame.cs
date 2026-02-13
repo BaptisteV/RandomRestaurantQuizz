@@ -65,7 +65,7 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
     {
         if (_nextRestaurants.Count == 0)
         {
-            await _scoreSaver.SaveScore(new Score { Value = _player.TotalScore(), Timestamp = DateTime.Now });
+            await _scoreSaver.SaveScore(new Score { Value = _player.TotalScore(), Timestamp = DateTime.Now, LocationName = _searchLocation.Name });
 
             var pbs = (await _scoreSaver.ReadScores())
                 .SortBest()

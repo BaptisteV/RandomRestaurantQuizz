@@ -11,7 +11,7 @@ public class GooglePlacesStaticClient(HttpClient _, IPhotoDownloader photoDownlo
     public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
     {
         // Read "fake" JSON to avoid hitting Search API to debug
-        var response = JsonSerializer.Deserialize<PlacesApiResponse>(TestData.JsonDij, _jsonOptions);
+        var response = JsonSerializer.Deserialize<PlacesApiResponse>(TestData.JsonDij, _jsonOptions)!;
 
         // Remove restaurants with no photo to download or no rating
         var restaurants = response.WithRatingAndPhotos();

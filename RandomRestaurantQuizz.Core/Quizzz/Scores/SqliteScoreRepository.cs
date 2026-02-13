@@ -22,7 +22,7 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
     {
         await _connection.OpenAsync();
 
-        await DropTable();
+        // await DropTable();
 
         var command = _connection.CreateCommand();
         command.CommandText =
@@ -30,7 +30,8 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
         CREATE TABLE IF NOT EXISTS Score (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             ScoreValue DOUBLE PRECISION NOT NULL,
-            Ts TEXT NOT NULL
+            Ts TEXT NOT NULL,
+            LocationName TEXT NOT NULL
         );
         """;
 
@@ -57,7 +58,7 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
         var command = _connection.CreateCommand();
         command.CommandText =
         """
-        SELECT Id, ScoreValue, Ts
+        SELECT Id, ScoreValue, Ts, LocationName
         FROM Score
         ORDER BY ScoreValue DESC;
         """;
@@ -70,6 +71,7 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
                 Id = reader.GetInt32(0),
                 Value = reader.GetDouble(1),
                 Timestamp = DateTime.ParseExact(reader.GetString(2), "O", CultureInfo.InvariantCulture),
+                LocationName = reader.GetString(3),
             });
         }
 
@@ -83,12 +85,13 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
         var command = _connection.CreateCommand();
         command.CommandText =
         """
-        INSERT INTO Score (ScoreValue, Ts)
-        VALUES ($scoreValue, $ts);
+        INSERT INTO Score (ScoreValue, Ts, LocationName)
+        VALUES ($scoreValue, $ts, $locationName);
         """;
 
         command.Parameters.AddWithValue("$scoreValue", score.Value);
         command.Parameters.AddWithValue("$ts", score.Timestamp.ToString("O", CultureInfo.InvariantCulture));
+        command.Parameters.AddWithValue("$locationName", score.LocationName);
 
         await command.ExecuteNonQueryAsync();
     }

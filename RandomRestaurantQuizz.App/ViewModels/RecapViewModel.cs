@@ -10,6 +10,9 @@ public partial class VmScore : ObservableObject
 
     [ObservableProperty]
     public partial double Value { get; set; }
+
+    [ObservableProperty]
+    public partial string LocationName { get; set; }
 }
 
 public partial class RecapViewModel : ObservableObject
@@ -21,6 +24,7 @@ public partial class RecapViewModel : ObservableObject
         {
             Timestamp = s.Timestamp.ToString("G"),
             Value = s.Value,
+            LocationName = s.LocationName,
         });
         Scores = new(vmScores);
         ScoreText = $"Score: {TotalScore:F2}";

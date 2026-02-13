@@ -7,14 +7,13 @@
              Title="Pick a location">
 
     <VerticalStackLayout VerticalOptions="Center"
-                 Spacing="4"
-                 MaximumWidthRequest="720">
+                         MaximumWidthRequest="720">
 
         <CollectionView ItemsSource="{Binding Locations}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
                     <Button Text="{Binding .}"
-                            Margin="0,2"
+                            Margin="0,4"
                             IsEnabled="true"
                             Clicked="Btn_Clicked" />
                 </DataTemplate>
