@@ -28,21 +28,29 @@ public class DuckCachedPlacesClient : ICachedPlacesClient
         var cacheKey = CreateCacheKey(searchLocation);
 
         var cached = _cache.TryGet(cacheKey, TimeSpan.FromDays(7))?.WithRatingAndPhotos();
+
         if (cached is not null)
         {
-            _logger.LogInformation("Loaded {RestauCount} restaurants from cache {CacheKey}", cached.Count, cacheKey);
+            _logger.LogInformation("{LocationName} found in cache {CacheKey} with {RestauCount} restaurants", searchLocation.Name, cacheKey, cached.Count);
             return cached;
         }
 
-        _logger.LogInformation("No cache for {CacheKey}", cacheKey);
+        _logger.LogInformation("{LocationName} not found in cache with {CacheKey}", searchLocation.Name, cacheKey);
+
+        var restaurantsInCity = await GetRestaurantsFromPlacesApi(searchLocation, cacheKey, cancellationToken);
+        return restaurantsInCity;
+    }
+
+    private async Task<List<PlaceResult>> GetRestaurantsFromPlacesApi(SearchLocation searchLocation, string cacheKey, CancellationToken cancellationToken)
+    {
         var restaurantsInCity = (await _placesClient.GetRestaurants(searchLocation, cancellationToken)).WithRatingAndPhotos().ToList();
         if (restaurantsInCity.Count == 0)
         {
-            _logger.LogInformation("Got {RestauCount} restaurants from API", restaurantsInCity.Count);
+            _logger.LogInformation("{LocationName} Got {RestauCount} restaurants from API", searchLocation.Name, restaurantsInCity.Count);
         }
         else
         {
-            _logger.LogInformation("Got {RestauCount} restaurants from API, storing in {CacheKey}", restaurantsInCity.Count, cacheKey);
+            _logger.LogInformation("{LocationName} Got {RestauCount} restaurants from API, storing in {CacheKey}", searchLocation.Name, restaurantsInCity.Count, cacheKey);
             _cache.Store(cacheKey, searchLocation, restaurantsInCity);
         }
 
