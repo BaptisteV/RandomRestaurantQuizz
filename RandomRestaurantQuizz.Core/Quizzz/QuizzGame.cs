@@ -15,7 +15,7 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
     private int photoIndex = 0;
     private int _roundNumber = 1;
     private int _roundCount = 0;
-    private SearchLocation _searchLocation;
+    private SearchParams _searchParams;
     private byte[] Image => _currentPlace.Photos[photoIndex].DownloadedImage;
 
     public Func<ScoreChangedEvent, Task> ScoreChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(ScoreChanged)} handler");
@@ -23,15 +23,15 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
     public Func<RoundsFinishedEvent, Task> RoundFinished { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RoundFinished)} handler");
     public Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RestaurantChanged)} handler");
 
-    public async Task InitRound(SearchLocation searchLocation, CancellationToken cancellationToken)
+    public async Task InitRound(SearchParams searchParams, CancellationToken cancellationToken)
     {
-        _searchLocation = searchLocation;
+        _searchParams = searchParams;
         await _scoreSaver.Init();
 
         _player = new Player();
         _nextRestaurants.Clear();
 
-        var restaurants = await _restauClient.GetRestaurants(_searchLocation, cancellationToken);
+        var restaurants = await _restauClient.GetRestaurants(_searchParams, cancellationToken);
 
         foreach (var restaurant in restaurants.Places)
         {
@@ -40,7 +40,7 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
 
         if (_nextRestaurants.Count == 0)
         {
-            _logger.LogError("No restaurants found for location {LocationName}", _searchLocation.Name);
+            _logger.LogError("No restaurants found for location {LocationName}", _searchParams.Location.Name);
             return;
         }
 
@@ -53,7 +53,7 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
         var photoEvent = new PhotoChangedEvent(_currentPlace.Photos[0].DownloadedImage!);
         var round = new Round(
             _currentPlace.DisplayName.Text,
-            _searchLocation.Name,
+            _searchParams.Location.Name,
             _currentPlace.UserRatingCount,
             _roundCount,
             _roundNumber);
@@ -65,7 +65,7 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
     {
         if (_nextRestaurants.Count == 0)
         {
-            await _scoreSaver.SaveScore(new Score { Value = _player.TotalScore(), Timestamp = DateTime.Now, LocationName = _searchLocation.Name });
+            await _scoreSaver.SaveScore(new Score { Value = _player.TotalScore(), Timestamp = DateTime.Now, LocationName = _searchParams.Location.Name });
 
             var pbs = (await _scoreSaver.ReadScores())
                 .SortBest()
@@ -87,7 +87,7 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
         var scoreEvent = new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating);
         var photoEvent = new PhotoChangedEvent(Image);
         var round = new Round(_currentPlace.DisplayName.Text,
-            _searchLocation.Name,
+            _searchParams.Location.Name,
             _currentPlace.UserRatingCount,
             _roundCount,
             ++_roundNumber);

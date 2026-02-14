@@ -22,7 +22,7 @@
           Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="72" ></RowDefinition>
+            <RowDefinition Height="72"></RowDefinition>
             <RowDefinition Height="72"></RowDefinition>
         </Grid.RowDefinitions>
         <ScrollView  Grid.Row="0">
@@ -120,14 +120,6 @@
             <Border.GestureRecognizers>
                 <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
             </Border.GestureRecognizers>
-            <!--<Grid HorizontalOptions="Center"
-                  Background="Transparent">
-                <controls:StarRating ZIndex="2"
-                                     StarSize="44"
-                                     HorizontalOptions="Fill"
-                                     Rating="{Binding RatingInput}">
-                </controls:StarRating>
-            </Grid>-->
             <controls:StarRating ZIndex="2"
                                  StarSize="44"
                                  HorizontalOptions="Fill"
@@ -144,10 +136,6 @@
                 IsEnabled="false"
                 FontSize="Medium"
                 Background="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}">
-
-            <!--<Button.Behaviors>
-                <conv:AlphaAnimationBehavior BaseColor="Gold" />
-            </Button.Behaviors>-->
         </Button>
     </Grid>
 

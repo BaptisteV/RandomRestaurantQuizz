@@ -32,7 +32,7 @@ public class QuizzConsoleRunner : IRunner
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         var searchLocation = Locations.Cities.Single(l => l.Name == CityName);
-        await _quizzGame.InitRound(searchLocation, cancellationToken);
+        await _quizzGame.InitRound(new SearchParams() { Language = "fr", Location = searchLocation }, cancellationToken);
 
         while (true)
         {

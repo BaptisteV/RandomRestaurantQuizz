@@ -7,3 +7,9 @@ public readonly struct SearchLocation
     public required string Name { get; init; }
     public static double SearchRadius { get; } = 1_000.0;
 }
+
+public readonly struct SearchParams
+{
+    public required string Language { get; init; }
+    public required SearchLocation Location { get; init; }
+}

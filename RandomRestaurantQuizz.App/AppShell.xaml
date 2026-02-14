@@ -4,7 +4,7 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:local="clr-namespace:RandomRestaurantQuizz.App"
        Padding="8"
-       Title="RandomRestaurantQuizz.App">
+       Title="RestauQuizz">
     
     <ShellContent Title="Quizz"
                   ContentTemplate="{DataTemplate local:MainPage}"

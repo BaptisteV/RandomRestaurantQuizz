@@ -113,12 +113,19 @@ public partial class MainPage : ContentPage, IDisposable
     private async Task InitWithSpinner()
     {
         await Navigation.PushModalAsync(new SpinnerModal(), true);
-        await _quizzGame.InitRound(new SearchLocation()
+        var searchLocation = new SearchLocation()
         {
             Latitude = _vm.SearchLocation.Latitude,
             Longitude = _vm.SearchLocation.Longitude,
             Name = _vm.SearchLocation.Name,
+        };
+
+        await _quizzGame.InitRound(new SearchParams()
+        {
+            Language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName,
+            Location = searchLocation,
         }, CancellationToken.None);
+
         await Navigation.PopModalAsync(true);
     }
 

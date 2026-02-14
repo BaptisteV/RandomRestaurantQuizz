@@ -24,7 +24,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         _apiKey = config.GooglePlacesApiKey;
     }
 
-    private HttpRequestMessage CreateRequestMessage(SearchLocation center)
+    private HttpRequestMessage CreateRequestMessage(SearchParams searchParams)
     {
         var apiRequest = new NearbySearchRequest
         {
@@ -32,12 +32,12 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
             {
                 Circle = new Circle
                 {
-                    Center = new Center() { Latitude = center.Latitude, Longitude = center.Longitude },
+                    Center = new Center() { Latitude = searchParams.Location.Latitude, Longitude = searchParams.Location.Longitude },
                     Radius = SearchLocation.SearchRadius,
                 }
             },
             IncludedTypes = ["restaurant"],
-            LanguageCode = "fr", // CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
+            LanguageCode = searchParams.Language,
         };
 
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
@@ -75,19 +75,19 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         return response;
     }
 
-    private async Task<PlacesApiResponse> RestaurantsAround(SearchLocation searchLocation, CancellationToken cancellationToken)
+    private async Task<PlacesApiResponse> RestaurantsAround(SearchParams searchParams, CancellationToken cancellationToken)
     {
-        using var httpRequest = CreateRequestMessage(searchLocation);
+        using var httpRequest = CreateRequestMessage(searchParams);
 
         var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
 
-        return await ReadResponse(httpResponse, searchLocation, cancellationToken);
+        return await ReadResponse(httpResponse, searchParams.Location, cancellationToken);
     }
 
-    public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
+    public async Task<PlacesApiResponse> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
     {
         // Get all possible restaurants
-        var restaurantsInCity = await RestaurantsAround(searchLocation, cancellationToken);
+        var restaurantsInCity = await RestaurantsAround(searchParams, cancellationToken);
 
         // Remove restaurants with no photo to download or no rating
         var restaurants = restaurantsInCity.WithRatingAndPhotos();

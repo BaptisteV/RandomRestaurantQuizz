@@ -1,4 +1,5 @@
 ﻿using DuckDB.NET.Data;
+using System.Globalization;
 using System.Text.Json;
 
 namespace RandomRestaurantQuizz.Api.ApiCachedClient;
@@ -47,11 +48,11 @@ public sealed class PlacesCacheRepository
         cmd.Parameters.Add(new DuckDBParameter { Value = cacheKey });
 
         using var reader = await cmd.ExecuteReaderAsync();
-        if (!(await reader.ReadAsync()))
+        if (!await reader.ReadAsync())
             return null;
 
         var c = reader.GetString(1);
-        var createdAt = DateTime.Parse(c);
+        var createdAt = DateTime.ParseExact(c, "O", CultureInfo.InvariantCulture);
         if (DateTime.UtcNow - createdAt > maxAge)
             return null;
 
@@ -80,7 +81,7 @@ public sealed class PlacesCacheRepository
         {
             Value = JsonSerializer.Serialize(response, _jsonOptions)
         });
-        cmd.Parameters.Add(new DuckDBParameter() { Value = DateTime.Now, DbType = System.Data.DbType.DateTime });
+        cmd.Parameters.Add(new DuckDBParameter() { Value = DateTime.Now.ToString("O") });
 
         await cmd.ExecuteNonQueryAsync();
     }

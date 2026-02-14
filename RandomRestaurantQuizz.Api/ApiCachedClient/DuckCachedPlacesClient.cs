@@ -15,31 +15,31 @@ public class DuckCachedPlacesClient : ICachedPlacesClient
         _cache = new(dbPath);
     }
 
-    private static string CreateCacheKey(SearchLocation loc)
+    private static string CreateCacheKey(SearchParams searchParams)
     {
         // Round to reduce cache fragmentation (≈ 11m precision)
-        var lat = Math.Round(loc.Latitude, 4);
-        var lng = Math.Round(loc.Longitude, 4);
+        var lat = Math.Round(searchParams.Location.Latitude, 4);
+        var lng = Math.Round(searchParams.Location.Longitude, 4);
 
-        return $"restaurants:v1:{lat}:{lng}:{SearchLocation.SearchRadius}";
+        return $"restaurants:v1:{searchParams.Language}:{lat}:{lng}:{SearchLocation.SearchRadius}";
     }
 
-    public async Task<PlacesApiResponse> GetRestaurantsWithCache(SearchLocation searchLocation, CancellationToken cancellationToken)
+    public async Task<PlacesApiResponse> GetRestaurantsWithCache(SearchParams searchParams, CancellationToken cancellationToken)
     {
-        var cacheKey = CreateCacheKey(searchLocation);
+        var cacheKey = CreateCacheKey(searchParams);
 
         var cached = (await _cache.TryGet(cacheKey, CACHE_DURATION))?.WithRatingAndPhotos();
 
         if (cached is not null)
         {
-            _logger.LogInformation("{LocationName} found in cache {CacheKey} with {RestauCount} restaurants", searchLocation.Name, cacheKey, cached.Places.Count);
+            _logger.LogInformation("{LocationName} found in cache {CacheKey} with {RestauCount} restaurants", searchParams.Location.Name, cacheKey, cached.Places.Count);
             return cached;
         }
 
-        _logger.LogInformation("{LocationName} not found in cache with {CacheKey}", searchLocation.Name, cacheKey);
+        _logger.LogInformation("{LocationName} not found in cache with {CacheKey}", searchParams.Location.Name, cacheKey);
 
-        var result = await _googlePlacesClient.GetRestaurants(searchLocation, cancellationToken);
-        await _cache.Store(cacheKey, searchLocation, result);
+        var result = await _googlePlacesClient.GetRestaurants(searchParams, cancellationToken);
+        await _cache.Store(cacheKey, searchParams.Location, result);
         return result;
     }
 }

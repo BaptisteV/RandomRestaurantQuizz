@@ -16,8 +16,13 @@ public partial class TestSearchAndPhotosRunner(IGooglePlacesClient restauClient,
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         var searchLocation = Locations.Cities.Single(l => l.Name == CityName);
+        var restaurants = (await _restauClient.GetRestaurants(new SearchParams()
+        {
+            Language = "fr",
+            Location = searchLocation,
+        }, cancellationToken)).Places;
 
-        foreach (var restaurant in (await _restauClient.GetRestaurants(searchLocation, cancellationToken)).Places)
+        foreach (var restaurant in restaurants)
         {
             LogRestaurant(restaurant.DisplayName.Text, restaurant.Rating, restaurant.UserRatingCount, restaurant.FormattedAddress, restaurant.Photos.Count);
             await _photoManager.SaveTempJpgs(restaurant);

@@ -23,14 +23,14 @@
                             <Grid>
                                 <Label Text="{Binding LocationName}"
                                        FontSize="18"
-                                       HorizontalOptions="Start"/>
+                                       HorizontalOptions="Start" />
                                 <Label Text="{Binding Timestamp}"
-                                       FontSize="18" 
-                                       HorizontalOptions="Center"/>
+                                       FontSize="18"
+                                       HorizontalOptions="Center" />
                                 <Label Text="{Binding Value, StringFormat='{0:F2}'}"
                                        FontSize="18"
-                                       FontAttributes="Bold" 
-                                       HorizontalOptions="End"/>
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="End" />
                             </Grid>
                             <BoxView HeightRequest="1"
                                      Color="Gold"

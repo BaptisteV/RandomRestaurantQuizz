@@ -8,7 +8,7 @@ public class GooglePlacesStaticClient(HttpClient _, IPhotoDownloader photoDownlo
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
+    public async Task<PlacesApiResponse> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
     {
         // Read "fake" JSON to avoid hitting Search API to debug
         var response = JsonSerializer.Deserialize<PlacesApiResponse>(TestData.JsonDij, _jsonOptions)!;

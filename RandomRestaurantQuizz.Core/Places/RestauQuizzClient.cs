@@ -17,12 +17,11 @@ public class RestauQuizzClient : IInternalPlacesClient
         _photoDownloader = photoDownloader;
         _logger = logger;
         _httpClient.BaseAddress = new Uri("https://restauquizz.fly.dev/");
-        //_httpClient.BaseAddress = new Uri("https://localhost:7075/");
     }
 
-    public async Task<PlacesApiResponse> GetRestaurants(SearchLocation searchLocation, CancellationToken cancellationToken)
+    public async Task<PlacesApiResponse> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
     {
-        var getRestaurants = new Uri($"/restaurants/{searchLocation.Name}", UriKind.Relative);
+        var getRestaurants = new Uri($"/restaurants/{searchParams.Location.Name}?lang={searchParams.Language}", UriKind.Relative);
 
         var httpResponse = await _httpClient.GetAsync(getRestaurants, cancellationToken);
         if (!httpResponse.IsSuccessStatusCode)
@@ -42,7 +41,7 @@ public class RestauQuizzClient : IInternalPlacesClient
         }
 
         if (response.Places.Count == 0)
-            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
+            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchParams.Location.Latitude, searchParams.Location.Longitude, searchParams.Location.Name);
 
         // Enrich with photos
         var withPhotos = new PlacesApiResponse()

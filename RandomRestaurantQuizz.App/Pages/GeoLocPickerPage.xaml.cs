@@ -39,16 +39,16 @@ public partial class GeoLocPickerPage : ContentPage
         var city = btn.Text;
         _logger.LogInformation("Picked {City}", city);
 
-        SearchLocation geoloc;
+        SearchLocation search;
         if (city == AroundMe)
         {
-            geoloc = await _geoService.GetCurrentLocation();
-            await SearchLocationChanged(geoloc);
+            search = await _geoService.GetCurrentLocation();
+            await SearchLocationChanged(search);
         }
         else
         {
-            geoloc = Locations.Cities.Single(l => l.Name == city);
-            await SearchLocationChanged(geoloc);
+            search = Locations.Cities.Single(l => l.Name == city);
+            await SearchLocationChanged(search);
         }
 
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
