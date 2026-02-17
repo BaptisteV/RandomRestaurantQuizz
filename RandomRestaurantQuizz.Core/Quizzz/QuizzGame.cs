@@ -25,15 +25,22 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
 
     public async Task InitRound(SearchParams searchParams, CancellationToken cancellationToken)
     {
-        _searchParams = searchParams;
         await _scoreSaver.Init();
 
         _player = new Player();
         _nextRestaurants.Clear();
 
-        var restaurants = await _restauClient.GetRestaurants(_searchParams, cancellationToken);
+        var restaurants = await _restauClient.GetRestaurants(searchParams, cancellationToken);
+        if (restaurants is null || restaurants.ApiResponse.Places.Count == 0)
+        {
+            _logger.LogError("No restaurants found for location {LocationName}", searchParams.Location.Name);
+            return;
+        }
 
-        foreach (var restaurant in restaurants.Places)
+        var actualSearchParams = restaurants.Searched;
+        _searchParams = actualSearchParams;
+
+        foreach (var restaurant in restaurants.ApiResponse.Places)
         {
             _nextRestaurants.Enqueue(restaurant);
         }
@@ -69,7 +76,6 @@ public class QuizzGame(IInternalPlacesClient restauClient, ILogger<QuizzGame> lo
 
             var pbs = (await _scoreSaver.ReadScores())
                 .SortBest()
-                //.Take(20)
                 .ToList();
 
             await RoundFinished(new RoundsFinishedEvent(_player.TotalScore(), pbs));

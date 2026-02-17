@@ -2,16 +2,19 @@
 
 public class GeolocationService : IGeolocationService
 {
+    private readonly GeolocationRequest _request = new(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+
     public async Task<SearchLocation> GetCurrentLocation()
     {
-        var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(2));
+        var location = await Geolocation.Default.GetLocationAsync(_request) ?? throw new InvalidProgramException("Cannot locate user");
 
-        var location = await Geolocation.Default.GetLocationAsync(request);
-        return location is null ? default : new SearchLocation
+        var roundedLat = Math.Round(location.Latitude, 4);
+        var roundedLng = Math.Round(location.Longitude, 4);
+        return new SearchLocation
         {
-            Latitude = location.Latitude,
-            Longitude = location.Longitude,
-            Name = $"({location.Latitude},{location.Longitude})",
+            Latitude = roundedLat,
+            Longitude = roundedLng,
+            Name = $"({roundedLat},{roundedLng})",
         };
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace RandomRestaurantQuizz.Core.Places.Api;
+﻿namespace RandomRestaurantQuizz.Core.Places.Api;
 
 public sealed class AuthorAttribution
 {

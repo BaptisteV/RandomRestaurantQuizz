@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace RandomRestaurantQuizz.Core.Places;
+﻿namespace RandomRestaurantQuizz.Core.Places;
 
 public class SecretsJson
 {

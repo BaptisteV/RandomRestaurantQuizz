@@ -31,7 +31,11 @@ public partial class MainPage : ContentPage, IDisposable
         _quizzGame.ScoreChanged = OnScoreChanged;
         _quizzGame.PhotoChanged = OnPhotoChanged;
 
-        _ = Task.Run(async () => Navigation.PushAsync(_geoPage, true));
+        _ = Task.Run(async () =>
+        {
+            // Show GeoLocPickerPage on start
+            await Navigation.PushAsync(_geoPage, false);
+        });
     }
 
     private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
@@ -103,16 +107,17 @@ public partial class MainPage : ContentPage, IDisposable
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
+        await Navigation.PushModalAsync(new SpinnerModal(), true);
         _cts.TryReset();
         await _soundEffects.Init();
         await InitWithSpinner();
 
         AnswerBtn.IsEnabled = true;
+        await Navigation.PopModalAsync(true);
     }
 
     private async Task InitWithSpinner()
     {
-        await Navigation.PushModalAsync(new SpinnerModal(), true);
         var searchLocation = new SearchLocation()
         {
             Latitude = _vm.SearchLocation.Latitude,
@@ -125,8 +130,6 @@ public partial class MainPage : ContentPage, IDisposable
             Language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName,
             Location = searchLocation,
         }, CancellationToken.None);
-
-        await Navigation.PopModalAsync(true);
     }
 
     private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)

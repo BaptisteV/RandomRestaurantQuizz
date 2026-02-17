@@ -9,7 +9,7 @@ public interface IGooglePlacesClient
 
 public interface IInternalPlacesClient
 {
-    Task<PlacesApiResponse> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken);
+    Task<GetRestaurantsResponse?> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken);
 }
 
 public interface ICachedPlacesClient

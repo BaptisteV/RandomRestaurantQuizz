@@ -19,16 +19,85 @@ public class RestauQuizzClient : IInternalPlacesClient
         _httpClient.BaseAddress = new Uri("https://restauquizz.fly.dev/");
     }
 
-    public async Task<PlacesApiResponse> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
+    private static bool IsCity(SearchLocation searchLocation)
     {
-        var getRestaurants = new Uri($"/restaurants/{searchParams.Location.Name}?lang={searchParams.Language}", UriKind.Relative);
+        return Locations.Cities
+            .Where(l => string.Equals(l.Name, searchLocation.Name, StringComparison.OrdinalIgnoreCase))
+            .ToList().Count == 1;
+    }
+
+    private SearchLocation? CityForLocation(SearchLocation searchLocation)
+    {
+        if (IsCity(searchLocation))
+            return searchLocation;
+
+        // If not a city, we try to find match with an existing city to
+        // Prevents Google Places API call but reduces accuracy
+        var nearCities = Locations.Cities
+            .Select(city => new
+            {
+                City = city,
+                Distance = GetHaversineDistance(searchLocation, city)
+            })
+            .Where(x => x.Distance <= SearchLocation.CityMatchRadius)
+            .OrderBy(x => x.Distance)
+            .ToList();
+
+        // Match found
+        if (nearCities.Count > 0)
+        {
+            var nearCity = nearCities[0];
+            _logger.LogInformation("Found a nearby known city: changing search location to {City}, Distance {Distance:F2}m", nearCity.City.Name, nearCity.Distance);
+            return nearCity.City;
+        }
+
+        _logger.LogInformation("No known city found near {City}", searchLocation.Name);
+        return null;
+    }
+
+    private Uri GetRestaurantsApiUri(SearchParams searchParams)
+    {
+        static Uri GetCityUri(SearchParams sp)
+        {
+            return new Uri($"/restaurants/{sp.Location.Name}?lang={sp.Language}", UriKind.Relative);
+        }
+
+        static Uri GetGeoLocUri(SearchParams sp)
+        {
+            return new Uri($"/restaurants?lang={sp.Language}&lat={sp.Location.Latitude}&lng={sp.Location.Longitude}", UriKind.Relative);
+        }
+
+        var normalizedSearchLocation = CityForLocation(searchParams.Location);
+        if (normalizedSearchLocation is not null)
+            return GetCityUri(new SearchParams()
+            {
+                Language = searchParams.Language,
+                Location = normalizedSearchLocation.Value
+            });
+
+        return GetGeoLocUri(searchParams);
+    }
+
+    public async Task<GetRestaurantsResponse?> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
+    {
+        var nearCity = CityForLocation(searchParams.Location);
+        if (nearCity is not null)
+        {
+            searchParams = new SearchParams()
+            {
+                Language = searchParams.Language,
+                Location = nearCity.Value,
+            };
+        }
+
+        var getRestaurants = GetRestaurantsApiUri(searchParams);
 
         var httpResponse = await _httpClient.GetAsync(getRestaurants, cancellationToken);
         if (!httpResponse.IsSuccessStatusCode)
         {
             var content = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogError("Error {HttpCode} calling the Google Places API. Response content: {ResponseContent}", httpResponse.StatusCode, content);
-            return new();
+            return null;
         }
 
         var jsonContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
@@ -37,7 +106,7 @@ public class RestauQuizzClient : IInternalPlacesClient
         if (response is null)
         {
             _logger.LogError("Error deserializing json : {Json}", jsonContent);
-            return new();
+            return null;
         }
 
         if (response.Places.Count == 0)
@@ -48,6 +117,29 @@ public class RestauQuizzClient : IInternalPlacesClient
         {
             Places = await _photoDownloader.GetPhotos(response.Places!, cancellationToken)
         };
-        return withPhotos;
+
+        return new GetRestaurantsResponse()
+        {
+            ApiResponse = withPhotos,
+            Searched = searchParams,
+        };
+    }
+
+    private static double GetHaversineDistance(SearchLocation from, SearchLocation to)
+    {
+        const double EarthRadiusMeters = 6_371_000.0;
+
+        var lat1 = double.DegreesToRadians(from.Latitude);
+        var lat2 = double.DegreesToRadians(to.Latitude);
+        var deltaLat = double.DegreesToRadians(to.Latitude - from.Latitude);
+        var deltaLon = double.DegreesToRadians(to.Longitude - from.Longitude);
+
+        var a = Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2)
+              + Math.Cos(lat1) * Math.Cos(lat2)
+              * Math.Sin(deltaLon / 2) * Math.Sin(deltaLon / 2);
+
+        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+        return EarthRadiusMeters * c;
     }
 }
