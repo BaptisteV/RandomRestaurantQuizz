@@ -1,10 +1,9 @@
 ﻿using RandomRestaurantQuizz.Core.Photos;
-using RandomRestaurantQuizz.Core.Places.Api;
-using System.Text.Json;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
 
 namespace RandomRestaurantQuizz.Core.Places;
 
-public class RestauQuizzClient : IInternalPlacesClient
+public class RestauQuizzClient : IQuizzApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly IPhotoDownloader _photoDownloader;
@@ -78,7 +77,7 @@ public class RestauQuizzClient : IInternalPlacesClient
         return GetGeoLocUri(searchParams);
     }
 
-    public async Task<GetRestaurantsResponse?> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
+    public async Task<QuizzApiResult?> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
     {
         var nearCity = CityForLocation(searchParams.Location);
         if (nearCity is not null)
@@ -118,7 +117,7 @@ public class RestauQuizzClient : IInternalPlacesClient
             Places = await _photoDownloader.GetPhotos(response.Places!, cancellationToken)
         };
 
-        return new GetRestaurantsResponse()
+        return new QuizzApiResult()
         {
             ApiResponse = withPhotos,
             Searched = searchParams,

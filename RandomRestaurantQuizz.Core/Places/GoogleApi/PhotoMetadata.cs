@@ -1,4 +1,4 @@
-﻿namespace RandomRestaurantQuizz.Core.Places.Api;
+﻿namespace RandomRestaurantQuizz.Core.Places.GoogleApi;
 
 public sealed class PhotoMetadata
 {

@@ -1,9 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Photos;
-using RandomRestaurantQuizz.Core.Places.Api;
-using System.Net.Http.Json;
-using System.Text.Json;
-
-namespace RandomRestaurantQuizz.Core.Places;
+﻿namespace RandomRestaurantQuizz.Api.ApiCachedClient;
 
 public sealed class GooglePlacesClient : IGooglePlacesClient
 {
@@ -12,7 +7,6 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly IPhotoDownloader _photoDownloader;
-
     private readonly ILogger<GooglePlacesClient> _logger;
 
     public GooglePlacesClient(HttpClient httpClient, SecretsJson config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)

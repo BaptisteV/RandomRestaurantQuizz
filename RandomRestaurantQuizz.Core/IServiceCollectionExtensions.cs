@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RandomRestaurantQuizz.Core.Photos;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using RandomRestaurantQuizz.Core.SoundEffects;
 using System.Reflection;
 
@@ -11,8 +12,7 @@ public static class IServiceCollectionExtensions
     {
         public void AddCoreServices()
         {
-            services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>();
-            services.AddSingleton<IInternalPlacesClient, RestauQuizzClient>();
+            services.AddSingleton<IQuizzApiClient, RestauQuizzClient>();
             services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
             services.AddTransient<IFileNamer, FileNamer>();
             services.AddTransient<PhotoFileManager>();

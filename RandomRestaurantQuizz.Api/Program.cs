@@ -1,4 +1,3 @@
-using RandomRestaurantQuizz.Api.ApiCachedClient;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +27,7 @@ builder.Configuration.AddSecretsFromRessources();
 builder.Services.AddCoreServices();
 builder.Services.AddTransient((_) => new AppDataDb() { DbFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
 builder.Services.AddSingleton<IPhotoDownloader, NoOpPhotoDownloader>();
+builder.Services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>();
 builder.Services.AddScoped<ICachedPlacesClient, DuckCachedPlacesClient>();
 
 var app = builder.Build();

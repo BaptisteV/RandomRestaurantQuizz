@@ -1,4 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Places.Api;
+﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Core.Photos;

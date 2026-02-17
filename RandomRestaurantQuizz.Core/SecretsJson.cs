@@ -1,4 +1,4 @@
-﻿namespace RandomRestaurantQuizz.Core.Places;
+﻿namespace RandomRestaurantQuizz.Core;
 
 public class SecretsJson
 {

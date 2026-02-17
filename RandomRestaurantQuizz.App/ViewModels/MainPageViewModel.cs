@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using RandomRestaurantQuizz.Core.Places.Api;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 

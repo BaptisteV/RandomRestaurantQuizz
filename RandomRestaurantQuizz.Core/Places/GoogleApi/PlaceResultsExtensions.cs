@@ -1,6 +1,6 @@
-﻿using RandomRestaurantQuizz.Core.Places.Api;
+﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
 
-namespace RandomRestaurantQuizz.Core.Places;
+namespace RandomRestaurantQuizz.Core.Places.GoogleApi;
 
 public static class PlaceResultsExtensions
 {

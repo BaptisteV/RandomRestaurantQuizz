@@ -1,6 +1,5 @@
 ﻿using DuckDB.NET.Data;
 using System.Globalization;
-using System.Text.Json;
 
 namespace RandomRestaurantQuizz.Api.ApiCachedClient;
 
