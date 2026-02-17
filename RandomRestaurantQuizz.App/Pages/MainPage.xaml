@@ -41,12 +41,12 @@
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
                     </Grid.GestureRecognizers>
-                    <Border BackgroundColor="#80000000"
+                    <Border BackgroundColor="#40000000"
                             Padding="4,0"
                             ZIndex="2"
-                            Stroke="{StaticResource Secondary}"
+                            Stroke="#40FFFFFF"
                             Opacity="0.8"
-                            StrokeShape="RoundRectangle 8"
+                            StrokeShape="RoundRectangle 4"
                             StrokeThickness="2"
                             HorizontalOptions="End"
                             VerticalOptions="Start">
@@ -62,12 +62,19 @@
                             </FlexLayout>
                         </AbsoluteLayout>
                     </Border>
-                    <Image ZIndex="1"
-                           HeightRequest="240"
-                           Source="{Binding ImageSource}"
-                           Aspect="AspectFit"
-                           SemanticProperties.Description="Restaurant photo">
-                    </Image>
+                    <Border Stroke="#40FFFFFF"
+                            StrokeThickness="1"
+                            Padding="4"
+                            Margin="0,2"
+                            StrokeShape="RoundRectangle 4">
+
+                        <Image ZIndex="1"
+                               HeightRequest="240"
+                               Source="{Binding ImageSource}"
+                               Aspect="AspectFit"
+                               SemanticProperties.Description="Restaurant photo">
+                        </Image>
+                    </Border>
                 </Grid>
 
                 <CollectionView ItemsSource="{Binding Reviews}"
@@ -75,12 +82,11 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="vm:VmReview">
                             <StackLayout>
-                                <Border Stroke="DarkGrey"
+                                <Border Stroke="#40FFFFFF"
                                         StrokeThickness="1"
-                                        Padding="2"
+                                        Padding="4"
                                         Margin="0,2"
                                         StrokeShape="RoundRectangle 4">
-
                                     <VerticalStackLayout>
                                         <VerticalStackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=BindingContext.ToggleReviewCommand}"
@@ -90,7 +96,7 @@
                                             <Label Text="{Binding AuthorName}"
                                                    FontAttributes="Bold"
                                                    VerticalTextAlignment="End"
-                                                   FontSize="14" />
+                                                   FontSize="10" />
 
                                             <Label Text="{Binding RelativePublishTimeDescription}"
                                                    VerticalTextAlignment="End"
@@ -99,11 +105,44 @@
 
                                         <Label Text="{Binding Text}"
                                                MaxLines="{Binding IsExpanded, Converter={StaticResource BoolToMaxLinesConverter}}"
-                                               FontSize="12">
-                                        </Label>
+                                               FontSize="14" />
                                     </VerticalStackLayout>
                                 </Border>
                             </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <CollectionView ItemsSource="{Binding Reviews}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:VmReview">
+                            <VerticalStackLayout>
+                                <VerticalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=BindingContext.ToggleReviewCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </VerticalStackLayout.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding AuthorName}"
+                                           FontAttributes="Bold"
+                                           VerticalTextAlignment="End"
+                                           FontSize="12" />
+
+                                    <Label Text="{Binding RelativePublishTimeDescription}"
+                                           VerticalTextAlignment="End"
+                                           FontSize="11" />
+                                </HorizontalStackLayout>
+
+                                <Label Text="{Binding Text}"
+                                       MaxLines="{Binding IsExpanded, Converter={StaticResource BoolToMaxLinesConverter}}"
+                                       FontSize="14" />
+
+                                <BoxView HeightRequest="1"
+                                         Color="Gold"
+                                         Opacity="0.5" 
+                                         Margin="0,4"/>
+                                
+                            </VerticalStackLayout>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>

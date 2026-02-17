@@ -35,7 +35,7 @@
                             <BoxView HeightRequest="1"
                                      Color="Gold"
                                      Opacity="0.5"
-                                     Margin="0,0,0,8" />
+                                     Margin="0,4" />
                         </VerticalStackLayout>
                     </DataTemplate>
 
