@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RandomRestaurantQuizz.App.GeoLocPickerPage"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
+             xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              x:DataType="vm:GeoLocPickerViewModel"
-             Title="Pick a location">
+             Title="{x:Static res:AppText.GeoLocTitle}">
 
     <VerticalStackLayout VerticalOptions="Center"
                          MaximumWidthRequest="720">

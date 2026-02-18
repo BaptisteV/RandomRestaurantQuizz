@@ -1,5 +1,5 @@
-﻿using RandomRestaurantQuizz.App.Services;
-
+﻿using RandomRestaurantQuizz.App.Resources.Strings;
+using RandomRestaurantQuizz.App.Services;
 namespace RandomRestaurantQuizz.App;
 
 public partial class GeoLocPickerPage : ContentPage
@@ -8,7 +8,7 @@ public partial class GeoLocPickerPage : ContentPage
     private readonly IGeolocationService _geoService;
     private readonly ILogger<GeoLocPickerPage> _logger;
 
-    private const string AroundMe = "📌 Around me 📌";
+    private static readonly string AroundMe = $"📌 {AppText.AroundMe} 📌";
 
     public Func<SearchLocation, Task> SearchLocationChanged { get; set; } = (_) => Task.CompletedTask;
 

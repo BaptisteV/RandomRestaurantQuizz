@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RandomRestaurantQuizz.App.RecapModal"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
+             xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              x:DataType="vm:RecapViewModel"
              Title="Score recap">
     <ScrollView>
@@ -43,7 +44,7 @@
             </CollectionView>
 
             <Button x:Name="CloseBtn"
-                    Text="Close"
+                    Text="{x:Static res:AppText.ScoreClose}"
                     Clicked="CloseBtn_Clicked" />
         </VerticalStackLayout>
     </ScrollView>

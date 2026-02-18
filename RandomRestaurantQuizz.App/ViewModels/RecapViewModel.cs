@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using RandomRestaurantQuizz.App.Resources.Strings;
 using System.Collections.ObjectModel;
-
 namespace RandomRestaurantQuizz.App.ViewModels;
 
 public partial class VmScore : ObservableObject
@@ -27,7 +27,7 @@ public partial class RecapViewModel : ObservableObject
             LocationName = s.LocationName,
         });
         Scores = new(vmScores);
-        ScoreText = $"Score: {TotalScore:F2}";
+        ScoreText = $"{AppText.ScoreHeader}{TotalScore:F2}";
     }
 
     [ObservableProperty]
