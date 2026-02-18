@@ -5,7 +5,8 @@
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              x:DataType="vm:RecapViewModel"
-             Title="Score recap">
+             Title="Score recap"
+             Padding="16">
     <ScrollView>
         <VerticalStackLayout Spacing="25"
                              HorizontalOptions="Fill"

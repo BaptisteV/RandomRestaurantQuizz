@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using RandomRestaurantQuizz.App.Resources.Strings;
 using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -28,7 +29,11 @@ public partial class MainPageViewModel : ObservableObject
     public ICommand ToggleReviewCommand => new Command<VmReview>(review =>
     {
         if (review == null) return;
-        review.IsExpanded = !review.IsExpanded;
+        foreach (var r in Reviews)
+        {
+            r.IsExpanded = (r == review) && !r.IsExpanded;
+        }
+        review.Text = review.IsExpanded ? review.FullText : review.TruncatedText;
     });
 }
 
@@ -57,19 +62,40 @@ public partial class VmReview : ObservableObject
     [ObservableProperty]
     public partial double Rating { get; set; }
     [ObservableProperty]
+    public partial string FullText { get; set; }
+    [ObservableProperty]
+    public partial string TruncatedText { get; set; }
+    [ObservableProperty]
     public partial string Text { get; set; }
     [ObservableProperty]
     public partial string RelativePublishTimeDescription { get; set; }
     [ObservableProperty]
     public partial bool IsExpanded { get; set; } = false;
 
+    public static int ReviewLabelLength { get; set; } = 180;
+
+    private static string AddReadMoreIfNeeded(string text)
+    {
+        var noBreak = text.Replace('\n', ' ');
+        if (noBreak.Length > ReviewLabelLength)
+        {
+            var chars = noBreak.Substring(0, ReviewLabelLength - AppText.More.Length) + AppText.More;
+
+            return chars;
+        }
+        return text;
+    }
+
     public static VmReview FromCoreReview(Review review)
     {
+        var truncatedText = AddReadMoreIfNeeded(review.Text.Text);
         return new VmReview
         {
             AuthorName = review.AuthorAttribution.DisplayName,
             Rating = review.Rating,
-            Text = review.Text.Text,
+            FullText = review.Text.Text,
+            Text = truncatedText,
+            TruncatedText = truncatedText,
             RelativePublishTimeDescription = review.RelativePublishTimeDescription,
         };
     }
@@ -102,4 +128,27 @@ public class RatingToColorConverter : IValueConverter
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotImplementedException();
+}
+
+public class TextToTruncatedTextConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var text = (string)value!;
+        return AddReadMoreIfNeeded(text);
+    }
+
+    private static object AddReadMoreIfNeeded(string text)
+    {
+        const int maxLineLength = 52;
+        const string readMore = "...Read more";
+        if (text.Length > maxLineLength)
+        {
+            return text.Substring(0, maxLineLength - readMore.Length) + readMore;
+        }
+        return text;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
 }

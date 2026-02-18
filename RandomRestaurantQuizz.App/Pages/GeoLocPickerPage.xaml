@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
              xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              x:DataType="vm:GeoLocPickerViewModel"
+             Padding="16"
              Title="{x:Static res:AppText.GeoLocTitle}">
 
     <VerticalStackLayout VerticalOptions="Center"

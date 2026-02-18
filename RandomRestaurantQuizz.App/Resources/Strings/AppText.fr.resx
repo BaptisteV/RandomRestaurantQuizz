@@ -126,6 +126,9 @@
   <data name="GeoLocTitle" xml:space="preserve">
     <value>Choisis une localisation</value>
   </data>
+  <data name="More" xml:space="preserve">
+    <value>...</value>
+  </data>
   <data name="ScoreClose" xml:space="preserve">
     <value>Fermer</value>
   </data>

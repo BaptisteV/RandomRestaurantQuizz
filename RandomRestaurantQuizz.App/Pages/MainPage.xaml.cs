@@ -1,4 +1,5 @@
-﻿using RandomRestaurantQuizz.Core.SoundEffects;
+﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
+using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
 
@@ -16,13 +17,10 @@ public partial class MainPage : ContentPage, IDisposable
     public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, MainPageViewModel vm, GeoLocPickerPage geoPage)
     {
         _vm = vm;
-        BindingContext = _vm;
         _quizzGame = quizz;
         _logger = logger;
         _soundEffects = soundEffects;
         _geoPage = geoPage;
-
-        InitializeComponent();
 
         _geoPage.SearchLocationChanged = OnSearchLocationChanged;
 
@@ -31,11 +29,28 @@ public partial class MainPage : ContentPage, IDisposable
         _quizzGame.ScoreChanged = OnScoreChanged;
         _quizzGame.PhotoChanged = OnPhotoChanged;
 
+        BindingContext = _vm;
+        InitializeComponent();
+
         _ = Task.Run(async () =>
         {
             // Show GeoLocPickerPage on start
             await Navigation.PushAsync(_geoPage, false);
         });
+
+    }
+
+    private async void ContentPage_Loaded(object sender, EventArgs e)
+    {
+        await Navigation.PushModalAsync(new SpinnerModal(), false);
+
+        _cts.TryReset();
+        await _soundEffects.Init();
+        await InitWithSpinner();
+
+        AnswerBtn.IsEnabled = true;
+
+        await Navigation.PopModalAsync(true);
     }
 
     private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
@@ -105,17 +120,6 @@ public partial class MainPage : ContentPage, IDisposable
         };
     }
 
-    private async void ContentPage_Loaded(object sender, EventArgs e)
-    {
-        await Navigation.PushModalAsync(new SpinnerModal(), true);
-        _cts.TryReset();
-        await _soundEffects.Init();
-        await InitWithSpinner();
-
-        AnswerBtn.IsEnabled = true;
-        await Navigation.PopModalAsync(true);
-    }
-
     private async Task InitWithSpinner()
     {
         var searchLocation = new SearchLocation()
@@ -178,5 +182,14 @@ public partial class MainPage : ContentPage, IDisposable
         var horizontalRatio = (float)((x - 8.0) / width); // From 0.0 to 1.0
         _vm.RatingInput = Math.Clamp(Math.Round(horizontalRatio * 5.0, 2), 0.0, 5.0);
         _vm.RatingInputText = $"{_vm.RatingInput:F2}";
+    }
+
+    private void ReviewsContainer_SizeChanged(object sender, EventArgs e)
+    {
+        VmReview.ReviewLabelLength = (int)(ReviewsContainer.Width / 8.2);
+        foreach (var review in _vm.Reviews)
+        {
+            review.Text = review.IsExpanded ? review.FullText : review.TruncatedText;
+        }
     }
 }

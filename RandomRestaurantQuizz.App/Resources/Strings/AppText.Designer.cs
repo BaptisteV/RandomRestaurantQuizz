@@ -88,6 +88,15 @@ namespace RandomRestaurantQuizz.App.Resources.Strings {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à ....
+        /// </summary>
+        internal static string More {
+            get {
+                return ResourceManager.GetString("More", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Close.
         /// </summary>
         internal static string ScoreClose {

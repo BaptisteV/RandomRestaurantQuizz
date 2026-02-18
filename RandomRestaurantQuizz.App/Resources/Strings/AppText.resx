@@ -129,6 +129,10 @@
     <value>Pick a location</value>
     <comment>GeoLoc title</comment>
   </data>
+  <data name="More" xml:space="preserve">
+    <value>...</value>
+    <comment>more</comment>
+  </data>
   <data name="ScoreClose" xml:space="preserve">
     <value>Close</value>
     <comment>RecapModel close button</comment>
