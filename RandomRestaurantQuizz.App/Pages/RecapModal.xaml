@@ -35,8 +35,7 @@
                                        HorizontalOptions="End" />
                             </Grid>
                             <BoxView HeightRequest="1"
-                                     Color="Gold"
-                                     Opacity="0.5"
+                                     Color="{StaticResource SoftGold}"
                                      Margin="0,4" />
                         </VerticalStackLayout>
                     </DataTemplate>

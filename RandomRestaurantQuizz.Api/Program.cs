@@ -26,7 +26,7 @@ builder.Services.AddOpenApi();
 builder.Configuration.AddSecretsFromRessources();
 builder.Services.AddCoreServices();
 builder.Services.AddTransient((_) => new AppDataDb() { DbFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
-builder.Services.AddSingleton<IPhotoDownloader, NoOpPhotoDownloader>();
+builder.Services.AddTransient<IPhotoDownloader, NoOpPhotoDownloader>();
 builder.Services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>();
 builder.Services.AddScoped<ICachedPlacesClient, DuckDbCachedPlacesClient>();
 
