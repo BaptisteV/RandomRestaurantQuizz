@@ -1,6 +1,6 @@
 ﻿namespace RandomRestaurantQuizz.Api.ApiCachedClient;
 
-public class DuckCachedPlacesClient(IGooglePlacesClient googlePlacesClient, AppDataDb dbPath, ILogger<DuckCachedPlacesClient> logger) : ICachedPlacesClient
+public sealed class DuckCachedPlacesClient(IGooglePlacesClient googlePlacesClient, AppDataDb dbPath, ILogger<DuckCachedPlacesClient> logger) : ICachedPlacesClient, IDisposable
 {
     private readonly IGooglePlacesClient _googlePlacesClient = googlePlacesClient;
     private readonly ILogger<DuckCachedPlacesClient> _logger = logger;
@@ -34,5 +34,10 @@ public class DuckCachedPlacesClient(IGooglePlacesClient googlePlacesClient, AppD
         var result = await _googlePlacesClient.GetRestaurants(searchParams, cancellationToken);
         await _cache.Store(cacheKey, searchParams.Location, result);
         return result;
+    }
+
+    public void Dispose()
+    {
+        _cache?.Dispose();
     }
 }

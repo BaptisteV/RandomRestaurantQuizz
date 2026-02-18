@@ -10,12 +10,4 @@
                   ContentTemplate="{DataTemplate local:MainPage}"
                   Route="MainPage" />
 
-    <ShellContent Title="Pick a location"
-                  Route="GeoLocPickerPage"
-                  ContentTemplate="{DataTemplate local:GeoLocPickerPage}" />
-    
-    <ShellContent Title="Loading..."
-                  Route="SpinnerModal"
-                  ContentTemplate="{DataTemplate local:SpinnerModal}" />
-
 </Shell>

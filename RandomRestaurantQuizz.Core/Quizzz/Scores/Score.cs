@@ -2,7 +2,6 @@
 
 public class Score
 {
-    public int Id { get; set; }
     public required double Value { get; init; }
     public required DateTime Timestamp { get; init; }
     public required string LocationName { get; init; }

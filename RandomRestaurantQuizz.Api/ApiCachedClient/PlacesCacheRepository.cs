@@ -3,20 +3,18 @@ using System.Globalization;
 
 namespace RandomRestaurantQuizz.Api.ApiCachedClient;
 
-public sealed class PlacesCacheRepository
+public sealed class PlacesCacheRepository : IDisposable
 {
-    private readonly string _connectionString;
+    private readonly DuckDBConnection _connection;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     public PlacesCacheRepository(
         AppDataDb dbPath)
     {
-        _connectionString = dbPath.ConnectionString;
-
         // Clear();
-        using var con = new DuckDBConnection(_connectionString);
-        con.Open();
-        using var cmd = con.CreateCommand();
+        _connection = new DuckDBConnection(dbPath.ConnectionString);
+        _connection.Open();
+        using var cmd = _connection.CreateCommand();
         cmd.CommandText =
         """
         CREATE TABLE IF NOT EXISTS places_cache (
@@ -33,10 +31,7 @@ public sealed class PlacesCacheRepository
 
     public async Task<PlacesApiResponse?> TryGet(string cacheKey, TimeSpan maxAge)
     {
-        using var con = new DuckDBConnection(_connectionString);
-        await con.OpenAsync();
-
-        using var cmd = con.CreateCommand();
+        using var cmd = _connection.CreateCommand();
         cmd.CommandText =
         """
         SELECT response_json, created_at
@@ -62,10 +57,7 @@ public sealed class PlacesCacheRepository
 
     public async Task Store(string cacheKey, SearchLocation loc, PlacesApiResponse response)
     {
-        using var con = new DuckDBConnection(_connectionString);
-        await con.OpenAsync();
-
-        using var cmd = con.CreateCommand();
+        using var cmd = _connection.CreateCommand();
         cmd.CommandText =
         """
         INSERT INTO places_cache 
@@ -87,9 +79,7 @@ public sealed class PlacesCacheRepository
 
     public async Task ClearAsync()
     {
-        using var con = new DuckDBConnection(_connectionString);
-        await con.OpenAsync();
-        using var cmd = con.CreateCommand();
+        using var cmd = _connection.CreateCommand();
         cmd.CommandText =
         """
         DROP TABLE places_cache;
@@ -100,14 +90,17 @@ public sealed class PlacesCacheRepository
 
     public void Clear()
     {
-        using var con = new DuckDBConnection(_connectionString);
-        con.Open();
-        using var cmd = con.CreateCommand();
+        using var cmd = _connection.CreateCommand();
         cmd.CommandText =
         """
         DROP TABLE places_cache;
         """;
 
         cmd.ExecuteNonQuery();
+    }
+
+    public void Dispose()
+    {
+        _connection?.Dispose();
     }
 }

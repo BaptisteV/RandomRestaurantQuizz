@@ -1,22 +1,31 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using DuckDB.NET.Data;
+using System.Data;
 using System.Globalization;
 
 namespace RandomRestaurantQuizz.Core.Quizzz.Scores;
 
-public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
+// /!\ Not supported on Android (yet)
+// https://duckdb.org/docs/stable/dev/building/android
+public sealed class DuckDbScoreRepository : IScoreRepository, IDisposable
 {
-    private readonly SqliteConnection _connection;
+    private readonly DuckDBConnection _connection;
 
-    public SqliteScoreRepository(AppDataDb sqliteDbPath)
+    public DuckDbScoreRepository(AppDataDb dbPath)
     {
-        _connection = new SqliteConnection(sqliteDbPath.ConnectionString);
+        _connection = new DuckDBConnection(dbPath.ConnectionString);
+    }
+
+    public void Dispose()
+    {
+        _connection?.Dispose();
     }
 
     public async Task Init()
     {
-        await _connection.OpenAsync();
+        if (!_connection.State.HasFlag(ConnectionState.Open))
+            await _connection.OpenAsync();
 
-        //await DropTable();
+        // await DropTable();
 
         var command = _connection.CreateCommand();
         command.CommandText =
@@ -46,8 +55,6 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
     {
         var scores = new List<Score>();
 
-        await _connection.OpenAsync();
-
         var command = _connection.CreateCommand();
         command.CommandText =
         """
@@ -72,8 +79,6 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
 
     public async Task SaveScore(Score score)
     {
-        await _connection.OpenAsync();
-
         var command = _connection.CreateCommand();
         command.CommandText =
         """
@@ -81,15 +86,21 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
         VALUES ($scoreValue, $ts, $locationName);
         """;
 
-        command.Parameters.AddWithValue("$scoreValue", score.Value);
-        command.Parameters.AddWithValue("$ts", score.Timestamp.ToString("O", CultureInfo.InvariantCulture));
-        command.Parameters.AddWithValue("$locationName", score.LocationName);
+        var scoreValueParam = command.CreateParameter();
+        scoreValueParam.ParameterName = "scoreValue";
+        scoreValueParam.Value = score.Value;
+        command.Parameters.Add(scoreValueParam);
+
+        var tsParam = command.CreateParameter();
+        tsParam.ParameterName = "ts";
+        tsParam.Value = score.Timestamp.ToString("O", CultureInfo.InvariantCulture);
+        command.Parameters.Add(tsParam);
+
+        var locationParam = command.CreateParameter();
+        locationParam.ParameterName = "locationName";
+        locationParam.Value = score.LocationName;
+        command.Parameters.Add(locationParam);
 
         await command.ExecuteNonQueryAsync();
-    }
-
-    public void Dispose()
-    {
-        _connection?.Dispose();
     }
 }
