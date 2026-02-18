@@ -1,7 +1,7 @@
 ﻿using DuckDB.NET.Data;
 using System.Globalization;
 
-namespace RandomRestaurantQuizz.Api.ApiCachedClient;
+namespace RandomRestaurantQuizz.Api.CachedClient;
 
 public sealed class PlacesCacheRepository : IDisposable
 {

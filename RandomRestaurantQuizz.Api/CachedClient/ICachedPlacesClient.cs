@@ -1,4 +1,4 @@
-﻿namespace RandomRestaurantQuizz.Api.ApiCachedClient;
+﻿namespace RandomRestaurantQuizz.Api.CachedClient;
 
 public interface ICachedPlacesClient
 {

@@ -1,9 +1,9 @@
-﻿namespace RandomRestaurantQuizz.Api.ApiCachedClient;
+﻿namespace RandomRestaurantQuizz.Api.CachedClient;
 
-public sealed class DuckCachedPlacesClient(IGooglePlacesClient googlePlacesClient, AppDataDb dbPath, ILogger<DuckCachedPlacesClient> logger) : ICachedPlacesClient, IDisposable
+public sealed class DuckDbCachedPlacesClient(IGooglePlacesClient googlePlacesClient, AppDataDb dbPath, ILogger<DuckDbCachedPlacesClient> logger) : ICachedPlacesClient, IDisposable
 {
     private readonly IGooglePlacesClient _googlePlacesClient = googlePlacesClient;
-    private readonly ILogger<DuckCachedPlacesClient> _logger = logger;
+    private readonly ILogger<DuckDbCachedPlacesClient> _logger = logger;
     private readonly PlacesCacheRepository _cache = new(dbPath);
 
     private static readonly TimeSpan CACHE_DURATION = TimeSpan.FromDays(15);

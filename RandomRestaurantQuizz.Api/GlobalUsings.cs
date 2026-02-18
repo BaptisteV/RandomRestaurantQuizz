@@ -1,5 +1,5 @@
 ﻿global using RandomRestaurantQuizz.Api;
-global using RandomRestaurantQuizz.Api.ApiCachedClient;
+global using RandomRestaurantQuizz.Api.CachedClient;
 global using RandomRestaurantQuizz.Core;
 global using RandomRestaurantQuizz.Core.Data;
 global using RandomRestaurantQuizz.Core.Photos;
