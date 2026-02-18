@@ -8,7 +8,6 @@
              xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              x:DataType="vm:MainPageViewModel"
              Loaded="ContentPage_Loaded"
-             Unloaded="ContentPage_Unloaded"
              Padding="16"
              Title="{Binding SearchLocation.Name}">
 

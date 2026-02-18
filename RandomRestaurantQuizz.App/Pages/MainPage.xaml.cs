@@ -1,4 +1,5 @@
-﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
+﻿using RandomRestaurantQuizz.App.Services;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
@@ -12,15 +13,17 @@ public partial class MainPage : ContentPage, IDisposable
     private readonly ISoundEffect _soundEffects;
     private readonly IQuizzGame _quizzGame;
     private readonly GeoLocPickerPage _geoPage;
+    private readonly IGeolocationService _geoService;
     private readonly CancellationTokenSource _cts = new();
 
-    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, MainPageViewModel vm, GeoLocPickerPage geoPage)
+    public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, MainPageViewModel vm, GeoLocPickerPage geoPage, IGeolocationService geoService)
     {
         _vm = vm;
         _quizzGame = quizz;
         _logger = logger;
         _soundEffects = soundEffects;
         _geoPage = geoPage;
+        _geoService = geoService;
 
         _geoPage.SearchLocationChanged = OnSearchLocationChanged;
 
@@ -129,11 +132,14 @@ public partial class MainPage : ContentPage, IDisposable
             Name = _vm.SearchLocation.Name,
         };
 
+        var userLocation = await _geoService.GetCurrentLocation();
         await _quizzGame.InitRound(new SearchParams()
         {
             Language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName,
             Location = searchLocation,
-        }, CancellationToken.None);
+        },
+        userLocation,
+        _cts.Token);
     }
 
     private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
@@ -156,11 +162,6 @@ public partial class MainPage : ContentPage, IDisposable
     private async void AnswerBtn_Clicked(object sender, EventArgs e)
     {
         await _quizzGame.Answer(_vm.RatingInput);
-    }
-
-    private void ContentPage_Unloaded(object sender, EventArgs e)
-    {
-        _cts.Cancel();
     }
 
     public void Dispose()

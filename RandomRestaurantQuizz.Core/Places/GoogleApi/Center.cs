@@ -2,6 +2,9 @@
 
 public sealed class Center
 {
-    public required double Latitude { get; init; }
-    public required double Longitude { get; init; }
+    [JsonPropertyName("latitude")]
+    public double Latitude { get; set; }
+
+    [JsonPropertyName("longitude")]
+    public double Longitude { get; set; }
 }

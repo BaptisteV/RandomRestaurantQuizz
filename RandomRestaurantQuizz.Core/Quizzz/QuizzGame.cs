@@ -23,7 +23,7 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
     public Func<RoundsFinishedEvent, Task> RoundFinished { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RoundFinished)} handler");
     public Func<RestaurantChangedEvent, Task> RestaurantChanged { get; set; } = (_) => throw new NotImplementedException($"Missing {nameof(RestaurantChanged)} handler");
 
-    public async Task InitRound(SearchParams searchParams, CancellationToken cancellationToken)
+    public async Task InitRound(SearchParams searchParams, SearchLocation userLocation, CancellationToken cancellationToken)
     {
         await _scoreSaver.Init();
 
@@ -40,9 +40,26 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
         var actualSearchParams = restaurants.Searched;
         _searchParams = actualSearchParams;
 
-        foreach (var restaurant in restaurants.ApiResponse.Places)
+        var nearRestaurants = restaurants.ApiResponse.Places
+            .Select(r => new
+            {
+                Place = r,
+                Distance = SearchLocation.GetHaversineDistance(
+                    userLocation,
+                    new SearchLocation()
+                    {
+                        Latitude = r.Location.Latitude,
+                        Longitude = r.Location.Longitude,
+                        Name = "",
+                    }),
+            })
+            .OrderByDescending(x => x.Distance)
+            .ToList();
+
+        foreach (var r in nearRestaurants)
         {
-            _nextRestaurants.Enqueue(restaurant);
+            _logger.LogInformation("{RestauName} is {Distance}m away from user", r.Place.DisplayName.Text, r.Distance);
+            _nextRestaurants.Enqueue(r.Place);
         }
 
         if (_nextRestaurants.Count == 0)

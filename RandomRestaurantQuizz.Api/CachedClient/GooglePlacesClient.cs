@@ -40,7 +40,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         };
 
         httpRequest.Headers.Add("X-Goog-Api-Key", _apiKey);
-        httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews");
+        httpRequest.Headers.Add("X-Goog-FieldMask", "places.displayName,places.rating,places.userRatingCount,places.photos,places.formattedAddress,places.reviews,places.location");
 
         return httpRequest;
     }
