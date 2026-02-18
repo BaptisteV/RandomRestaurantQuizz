@@ -12,7 +12,7 @@ public static class IServiceCollectionExtensions
     {
         public void AddCoreServices()
         {
-            services.AddSingleton<IQuizzApiClient, RestauQuizzClient>();
+            services.AddSingleton<IQuizzApiClient, QuizzApiClient>();
             services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
             services.AddTransient<IFileNamer, FileNamer>();
             services.AddTransient<PhotoFileManager>();

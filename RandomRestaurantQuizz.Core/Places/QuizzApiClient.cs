@@ -3,14 +3,14 @@ using RandomRestaurantQuizz.Core.Places.GoogleApi;
 
 namespace RandomRestaurantQuizz.Core.Places;
 
-public class RestauQuizzClient : IQuizzApiClient
+public class QuizzApiClient : IQuizzApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly IPhotoDownloader _photoDownloader;
-    private readonly ILogger<RestauQuizzClient> _logger;
+    private readonly ILogger<QuizzApiClient> _logger;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    public RestauQuizzClient(HttpClient client, IPhotoDownloader photoDownloader, ILogger<RestauQuizzClient> logger)
+    public QuizzApiClient(HttpClient client, IPhotoDownloader photoDownloader, ILogger<QuizzApiClient> logger)
     {
         _httpClient = client;
         _photoDownloader = photoDownloader;

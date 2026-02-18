@@ -53,12 +53,12 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
                         Name = "",
                     }),
             })
-            .OrderByDescending(x => x.Distance)
+            .OrderBy(x => x.Distance)
             .ToList();
 
         foreach (var r in nearRestaurants)
         {
-            _logger.LogInformation("{RestauName} is {Distance}m away from user", r.Place.DisplayName.Text, r.Distance);
+            _logger.LogInformation("{RestauName} is {Distance:F2}m away from user", r.Place.DisplayName.Text, r.Distance);
             _nextRestaurants.Enqueue(r.Place);
         }
 
