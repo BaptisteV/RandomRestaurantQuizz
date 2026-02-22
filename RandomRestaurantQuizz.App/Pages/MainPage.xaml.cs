@@ -1,5 +1,4 @@
-﻿using RandomRestaurantQuizz.App.Services;
-using RandomRestaurantQuizz.Core.SoundEffects;
+﻿using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
 

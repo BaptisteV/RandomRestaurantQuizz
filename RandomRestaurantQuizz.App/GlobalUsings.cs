@@ -1,4 +1,5 @@
 ﻿global using Microsoft.Extensions.Logging;
+global using RandomRestaurantQuizz.App.Services;
 global using RandomRestaurantQuizz.App.ViewModels;
 global using RandomRestaurantQuizz.Core;
 global using RandomRestaurantQuizz.Core.Data;

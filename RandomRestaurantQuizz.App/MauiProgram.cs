@@ -1,6 +1,4 @@
-﻿using RandomRestaurantQuizz.App.Services;
-
-namespace RandomRestaurantQuizz.App;
+﻿namespace RandomRestaurantQuizz.App;
 
 public static class MauiProgram
 {
