@@ -1,4 +1,5 @@
 ﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
+using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Core.Places;
 
@@ -86,16 +87,39 @@ public class QuizzApiClient : IQuizzApiClient
             };
         }
 
-        var getRestaurants = GetRestaurantsApiUri(searchParams);
+        var sw = Stopwatch.StartNew();
 
-        var httpResponse = await _httpClient.GetAsync(getRestaurants, cancellationToken);
+        var getRestaurants = GetRestaurantsApiUri(searchParams);
+        var httpResponse = await RequestApi(getRestaurants, cancellationToken);
+
+        var response = await ReadApiResponse(searchParams, httpResponse, cancellationToken);
+        if (response is null)
+            return null;
+
+        var elapsed = sw.Elapsed;
+        _logger.LogInformation("Got restaurants from {GetBaseAddress}{GetUri} in {ApiElapsed}", _httpClient.BaseAddress, getRestaurants.ToString().Substring(1), elapsed);
+
+        return new QuizzApiResult()
+        {
+            ApiResponse = response,
+            Searched = searchParams,
+        };
+    }
+
+    private async Task<HttpResponseMessage> RequestApi(Uri uri, CancellationToken cancellationToken)
+    {
+        var httpResponse = await _httpClient.GetAsync(uri, cancellationToken);
         if (!httpResponse.IsSuccessStatusCode)
         {
             var content = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogError("Error {HttpCode} calling the Google Places API. Response content: {ResponseContent}", httpResponse.StatusCode, content);
-            return null;
         }
 
+        return httpResponse;
+    }
+
+    private async Task<PlacesApiResponse?> ReadApiResponse(SearchParams searchParams, HttpResponseMessage httpResponse, CancellationToken cancellationToken)
+    {
         var jsonContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
         var response = JsonSerializer.Deserialize<PlacesApiResponse?>(jsonContent, _jsonOptions);
 
@@ -106,12 +130,11 @@ public class QuizzApiClient : IQuizzApiClient
         }
 
         if (response.Places.Count == 0)
-            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchParams.Location.Latitude, searchParams.Location.Longitude, searchParams.Location.Name);
-
-        return new QuizzApiResult()
         {
-            ApiResponse = response,
-            Searched = searchParams,
-        };
+            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchParams.Location.Latitude, searchParams.Location.Longitude, searchParams.Location.Name);
+            return null;
+        }
+
+        return response;
     }
 }

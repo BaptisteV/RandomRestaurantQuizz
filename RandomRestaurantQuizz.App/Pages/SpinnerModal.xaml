@@ -6,12 +6,11 @@
              xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              Title="{x:Static res:AppText.SpinnerTitle}">
     <Grid x:Name="LoadingOverlay"
-          BackgroundColor="#80000000"
           HorizontalOptions="Fill"
           VerticalOptions="Fill">
 
-        <BoxView BackgroundColor="Transparent"
-                 HorizontalOptions="Fill"
+        <BoxView HorizontalOptions="Fill"
+                 BackgroundColor="Transparent"
                  VerticalOptions="Fill" />
 
         <Border WidthRequest="120"
@@ -25,8 +24,7 @@
             </Border.StrokeShape>
 
             <Border.Shadow>
-                <Shadow Brush="#40000000"
-                        Offset="0,4"
+                <Shadow Offset="0,4"
                         Radius="10" />
             </Border.Shadow>
 
