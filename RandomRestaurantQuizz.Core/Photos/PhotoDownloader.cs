@@ -27,16 +27,6 @@ public class PhotoDownloader : IPhotoDownloader
         return url;
     }
 
-    private async Task<byte[]> GetImage(Photo photo, CancellationToken cancellationToken)
-    {
-        var url = GetPhotoUrl(photo.Name!);
-        _logger.LogDebug("Downloading: {DownloadUrl}", url);
-        using var response = await _httpClient.GetAsync(url, cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        return await response.Content.ReadAsByteArrayAsync(cancellationToken);
-    }
-
     private bool PhotoInCache(PlaceResult place, int photoIndex)
     {
         var filename = _fileNamer.GetFilename(place, photoIndex);
@@ -47,10 +37,8 @@ public class PhotoDownloader : IPhotoDownloader
             Directory.CreateDirectory(rootDir);
         }
 
-        if (!File.Exists(filename))
-            return false;
-
-        if (new FileInfo(filename).Length == 0)
+        var info = new FileInfo(filename);
+        if (!info.Exists || info.Length == 0)
             return false;
 
         _logger.LogDebug("Photo {PhotoIndex} already exists for {PlaceName}, skipping download.", photoIndex, place.DisplayName.Text);
@@ -67,8 +55,17 @@ public class PhotoDownloader : IPhotoDownloader
 
         async Task<byte[]> ReadFromApi(string filename, Photo photo, CancellationToken cancellationToken)
         {
-            var image = await GetImage(photo, cancellationToken);
-            _ = Task.Run(async () => await File.WriteAllBytesAsync(filename, image, cancellationToken), cancellationToken);
+            using var response = await _httpClient.GetAsync(GetPhotoUrl(photo.Name!), HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var contentLength = response.Content.Headers.ContentLength!.Value;
+            using var ms = new MemoryStream((int)contentLength);
+
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            await stream.CopyToAsync(ms, cancellationToken);
+
+            var image = ms.ToArray();
+            await File.WriteAllBytesAsync(filename, image, cancellationToken); // no fire-and-forget (see point 2)
             return image;
         }
 
@@ -81,6 +78,7 @@ public class PhotoDownloader : IPhotoDownloader
             return await ReadFromDisk(filename, cancellationToken);
         }
     }
+
     private async Task GetSingleRestaurantPhotos(PlaceResult place, CancellationToken cancellationToken)
     {
         try
