@@ -12,4 +12,18 @@ public static class Locations
         { new SearchLocation { Name = "Paris", Latitude = 48.8566, Longitude = 2.3522 }},
         { new SearchLocation { Name = "Bordeaux", Latitude = 44.8378, Longitude = -0.5792 }},
     }.ToImmutableList();
+
+    extension(IImmutableList<SearchLocation> cities)
+    {
+        public List<SearchLocationWithDistance> OrderByDistance(SearchLocation searchLocation)
+        {
+            return [.. cities
+                .Select(city => new SearchLocationWithDistance
+                {
+                    Location = city,
+                    Distance = SearchLocation.GetHaversineDistance(searchLocation, city)
+                })
+                .OrderBy(x => x.Distance)];
+        }
+    }
 }

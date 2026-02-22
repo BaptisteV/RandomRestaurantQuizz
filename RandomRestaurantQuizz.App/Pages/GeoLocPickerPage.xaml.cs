@@ -6,6 +6,8 @@ public partial class GeoLocPickerPage : ContentPage
 {
     private readonly GeoLocPickerViewModel _vm;
     private readonly IGeolocationService _geoService;
+    private SearchLocation _userGeoloc;
+
     private readonly ILogger<GeoLocPickerPage> _logger;
 
     private static readonly string AroundMe = $"📌 {AppText.AroundMe} 📌";
@@ -20,13 +22,12 @@ public partial class GeoLocPickerPage : ContentPage
 
         BindingContext = _vm;
         InitializeComponent();
-        CreateLocationButtons();
     }
 
     private void CreateLocationButtons()
     {
         _vm.Locations.Add(AroundMe);
-        var cities = Locations.Cities.Select(c => c.Name).Order();
+        var cities = Locations.Cities.OrderByDistance(_userGeoloc).Select(c => c.Location.Name);
         foreach (var city in cities)
         {
             _vm.Locations.Add(city);
@@ -52,5 +53,11 @@ public partial class GeoLocPickerPage : ContentPage
         }
 
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
+    }
+
+    private async void ContentPage_Loaded(object sender, EventArgs e)
+    {
+        _userGeoloc = await _geoService.GetCurrentLocation();
+        CreateLocationButtons();
     }
 }

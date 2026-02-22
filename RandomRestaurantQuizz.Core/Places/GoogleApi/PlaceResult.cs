@@ -23,3 +23,9 @@ public sealed class PlaceResult
     [JsonPropertyName("reviews")]
     public List<Review> Reviews { get; set; } = [];
 }
+
+public class PlaceResultWithDistance
+{
+    public required double Distance { get; init; }
+    public required PlaceResult Place { get; init; }
+}

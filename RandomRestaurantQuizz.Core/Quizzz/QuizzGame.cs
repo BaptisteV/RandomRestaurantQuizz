@@ -42,22 +42,7 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
         var actualSearchParams = restaurants.Searched;
         _searchParams = actualSearchParams;
 
-        var nearRestaurants = restaurants.ApiResponse.Places
-            .Select(r => new
-            {
-                Place = r,
-                Distance = SearchLocation.GetHaversineDistance(
-                    userLocation,
-                    new SearchLocation()
-                    {
-                        Latitude = r.Location.Latitude,
-                        Longitude = r.Location.Longitude,
-                        Name = "",
-                    }),
-            })
-            .OrderBy(x => x.Distance)
-            .ToList();
-
+        var nearRestaurants = restaurants.ApiResponse.Places.OrderByDistance(userLocation);
         foreach (var r in nearRestaurants)
         {
             _logger.LogInformation("{RestauName} is {Distance:F2}m away from user", r.Place.DisplayName.Text, r.Distance);

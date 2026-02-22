@@ -31,21 +31,15 @@ public class QuizzApiClient : IQuizzApiClient
         // If not a city, we try to find match with an existing city to
         // Prevents Google Places API call but reduces accuracy
         var nearCities = Locations.Cities
-            .Select(city => new
-            {
-                City = city,
-                Distance = SearchLocation.GetHaversineDistance(searchLocation, city)
-            })
-            .Where(x => x.Distance <= SearchLocation.CityMatchRadius)
-            .OrderBy(x => x.Distance)
-            .ToList();
+            .OrderByDistance(searchLocation)
+            .Where(x => x.Distance <= SearchLocation.CityMatchRadius).ToList();
 
         // Match found
         if (nearCities.Count > 0)
         {
             var nearCity = nearCities[0];
-            _logger.LogInformation("Found a nearby known city: changing search location to {City}, Distance {Distance:F2}m", nearCity.City.Name, nearCity.Distance);
-            return nearCity.City;
+            _logger.LogInformation("Found a nearby known city: changing search location to {City}, Distance {Distance:F2}m", nearCity.Location.Name, nearCity.Distance);
+            return nearCity.Location;
         }
 
         _logger.LogInformation("No known city found near {City}", searchLocation.Name);
@@ -97,7 +91,7 @@ public class QuizzApiClient : IQuizzApiClient
             return null;
 
         var elapsed = sw.Elapsed;
-        _logger.LogInformation("Got restaurants from {GetBaseAddress}{GetUri} in {ApiElapsed}", _httpClient.BaseAddress, getRestaurants.ToString().Substring(1), elapsed);
+        _logger.LogInformation("Got restaurants from {GetBaseAddress}{GetUri} in {ApiElapsed}", _httpClient.BaseAddress, getRestaurants.ToString()[1..], elapsed);
 
         return new QuizzApiResult()
         {

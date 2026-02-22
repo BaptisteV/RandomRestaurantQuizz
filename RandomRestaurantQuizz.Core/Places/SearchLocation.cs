@@ -27,6 +27,12 @@ public readonly struct SearchLocation
     }
 }
 
+public readonly struct SearchLocationWithDistance
+{
+    public required double Distance { get; init; }
+    public required SearchLocation Location { get; init; }
+}
+
 public readonly struct SearchParams
 {
     public required string Language { get; init; }
