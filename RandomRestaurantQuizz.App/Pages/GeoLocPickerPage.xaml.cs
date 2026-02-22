@@ -6,6 +6,7 @@ public partial class GeoLocPickerPage : ContentPage
     private readonly GeoLocPickerViewModel _vm;
     private readonly IGeolocationService _geoService;
     private SearchLocation _userGeoloc;
+    private bool firstLoad = true;
 
     private readonly ILogger<GeoLocPickerPage> _logger;
 
@@ -56,7 +57,11 @@ public partial class GeoLocPickerPage : ContentPage
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
-        _userGeoloc = await _geoService.GetCurrentLocation();
-        CreateLocationButtons();
+        if (firstLoad)
+        {
+            _userGeoloc = await _geoService.GetCurrentLocation();
+            CreateLocationButtons();
+        }
+        firstLoad = false;
     }
 }
