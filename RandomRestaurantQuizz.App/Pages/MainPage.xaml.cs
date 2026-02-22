@@ -1,5 +1,4 @@
 ﻿using RandomRestaurantQuizz.App.Services;
-using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
@@ -75,7 +74,7 @@ public partial class MainPage : ContentPage, IDisposable
     {
         _vm.Score = scoreChangedEvent.TotalScore;
         _vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
-        await Task.WhenAll(AnimateScoreDiff(scoreChangedEvent.RoundScore), _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, CancellationToken.None));
+        await Task.WhenAll(AnimateScoreDiff(scoreChangedEvent.RoundScore), _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, _cts.Token));
     }
 
     private async Task AnimateScoreDiff(double roundScore)
@@ -161,7 +160,7 @@ public partial class MainPage : ContentPage, IDisposable
 
     private async void AnswerBtn_Clicked(object sender, EventArgs e)
     {
-        await _quizzGame.Answer(_vm.RatingInput);
+        await _quizzGame.Answer(_vm.RatingInput, _cts.Token);
     }
 
     public void Dispose()

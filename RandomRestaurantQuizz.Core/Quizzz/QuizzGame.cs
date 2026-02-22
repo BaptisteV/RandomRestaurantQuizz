@@ -1,14 +1,16 @@
-﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
+﻿using RandomRestaurantQuizz.Core.Photos;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, IScoreRepository scoreSaver) : IQuizzGame
+public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, IScoreRepository scoreSaver, IPhotoDownloader photoDownloader) : IQuizzGame
 {
     private readonly ILogger<QuizzGame> _logger = logger;
 
     private readonly IQuizzApiClient _restauClient = restauClient;
     private readonly Queue<PlaceResult> _nextRestaurants = [];
     private readonly IScoreRepository _scoreSaver = scoreSaver;
+    private readonly IPhotoDownloader _photoDownloader = photoDownloader;
 
     private Player _player = new();
     private PlaceResult _currentPlace = new();
@@ -72,9 +74,9 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
         _roundCount = _nextRestaurants.Count;
 
         _currentPlace = _nextRestaurants.Dequeue();
-
+        await _photoDownloader.LazyGetPhotos(_currentPlace, cancellationToken);
         var scoreEvent = new ScoreChangedEvent(0, 0, 0);
-        var photoEvent = new PhotoChangedEvent(_currentPlace.Photos[0].DownloadedImage!);
+        var photoEvent = new PhotoChangedEvent(_currentPlace.Photos[0].DownloadedImage);
         var round = new Round(
             _currentPlace.DisplayName.Text,
             _searchParams.Location.Name,
@@ -85,7 +87,7 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
         await RestaurantChanged(new RestaurantChangedEvent(round, _currentPlace.Reviews, scoreEvent, photoEvent));
     }
 
-    public async Task Answer(double guessedRating)
+    public async Task Answer(double guessedRating, CancellationToken cancellationToken)
     {
         if (_nextRestaurants.Count == 0)
         {
@@ -100,7 +102,7 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
         }
 
         _currentPlace = _nextRestaurants.Dequeue();
-
+        await _photoDownloader.LazyGetPhotos(_currentPlace, cancellationToken);
         var guess = new Guess(_currentPlace, guessedRating);
         _player.AddGuess(guess);
 
@@ -114,14 +116,15 @@ public class QuizzGame(IQuizzApiClient restauClient, ILogger<QuizzGame> logger, 
             _currentPlace.UserRatingCount,
             _roundCount,
             ++_roundNumber);
-        await RestaurantChanged(new RestaurantChangedEvent(
+
+        await Task.WhenAll(
+            ScoreChanged(new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating)),
+            PhotoChanged(new PhotoChangedEvent(Image)),
+            RestaurantChanged(new RestaurantChangedEvent(
             round,
             _currentPlace.Reviews,
             scoreEvent,
-            photoEvent));
-
-        await PhotoChanged(new PhotoChangedEvent(Image));
-        await ScoreChanged(new ScoreChangedEvent(_player.TotalScore(), guess.RoundScore(), _currentPlace.Rating));
+            photoEvent)));
     }
 
     public async Task NextPhoto()

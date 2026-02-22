@@ -37,7 +37,7 @@ public class QuizzConsoleRunner : IRunner
         while (true)
         {
             var answerValue = DoubleReader.ReadDouble("Guessed rating ? : ");
-            await _quizzGame.Answer(answerValue);
+            await _quizzGame.Answer(answerValue, cancellationToken);
         }
     }
 #pragma warning restore S2190 // Add a way to break out this method's recursion

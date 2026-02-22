@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RandomRestaurantQuizz.Core.Photos;
-using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using RandomRestaurantQuizz.Core.SoundEffects;
 using System.Reflection;
 
@@ -15,7 +14,6 @@ public static class IServiceCollectionExtensions
             services.AddHttpClient<IQuizzApiClient, QuizzApiClient>();
             services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
             services.AddTransient<IFileNamer, FileNamer>();
-            services.AddTransient<PhotoFileManager>();
 
             services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
             services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
@@ -48,6 +46,7 @@ public static class IServiceCollectionExtensions
 
     extension(IConfigurationBuilder configBuilder)
     {
+
         public void AddSecretsFromRessources()
         {
             using var stream = ReadSecretsJson();
@@ -62,5 +61,4 @@ public static class IServiceCollectionExtensions
             ((IConfigurationBuilder)configManager).AddSecretsFromRessources();
         }
     }
-
 }

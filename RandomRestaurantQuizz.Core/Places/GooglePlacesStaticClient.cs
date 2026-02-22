@@ -1,5 +1,4 @@
-﻿using RandomRestaurantQuizz.Core.Photos;
-using RandomRestaurantQuizz.Core.Places.GoogleApi;
+﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
 
 namespace RandomRestaurantQuizz.Core.Places;
 
@@ -7,7 +6,6 @@ public class GooglePlacesStaticClient(
 #pragma warning disable CS9113 // Parameter is unread.
     HttpClient _,
 #pragma warning restore CS9113 // Parameter is unread.
-    IPhotoDownloader photoDownloader,
     ILogger<GooglePlacesStaticClient> logger) : IQuizzApiClient
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
@@ -27,13 +25,9 @@ public class GooglePlacesStaticClient(
         }
         logger.LogInformation("Downloading all photos for {RestauCount} restaurants", restaurants.Places.Count);
 
-        // Enrich with photos
         return new QuizzApiResult()
         {
-            ApiResponse = new PlacesApiResponse()
-            {
-                Places = await photoDownloader.GetPhotos(restaurants.Places, cancellationToken)
-            },
+            ApiResponse = restaurants,
             Searched = searchParams,
         };
     }

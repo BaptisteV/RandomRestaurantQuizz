@@ -2,8 +2,8 @@
 
 public class NoOpPhotoDownloader : IPhotoDownloader
 {
-    public Task<List<PlaceResult>> GetPhotos(List<PlaceResult> placeResults, CancellationToken cancellationToken)
+    public Task<PlaceResult> LazyGetPhotos(PlaceResult placeResult, CancellationToken cancellationToken)
     {
-        return Task.FromResult(placeResults);
+        return Task.FromResult(placeResult);
     }
 }

@@ -5,14 +5,20 @@ namespace RandomRestaurantQuizz.Core.Photos;
 
 public class FileNamer : IFileNamer
 {
-    private const string FOLDER = "RandomRestaurantQuizz";
+    private const string FOLDER = "Local/RandomRestaurantQuizz";
+
+    public FileNamer(ILogger<FileNamer> logger)
+    {
+        var root = Path.GetFullPath(Root());
+        logger.LogInformation("Root folder for caching: {Root}", root);
+    }
 
     public string Root()
     {
         return Path.Combine(FileSystem.CacheDirectory, FOLDER);
     }
 
-    public static string SanitizeFileName(string fileName, char replacement = '_')
+    private static string SanitizeFileName(string fileName, char replacement = '_')
     {
         var defaultFileName = $"{Guid.NewGuid()}.jpg";
         if (string.IsNullOrWhiteSpace(fileName))
@@ -32,8 +38,8 @@ public class FileNamer : IFileNamer
 
     public string GetFilename(PlaceResult place, int index)
     {
-        var root = Path.Combine(Path.GetTempPath(), FOLDER);
         var file = SanitizeFileName($"{place.DisplayName.Text}-{index.ToString().PadLeft(2, '0')}.jpg");
+        var root = Root();
         return Path.Combine(root, file);
     }
 }

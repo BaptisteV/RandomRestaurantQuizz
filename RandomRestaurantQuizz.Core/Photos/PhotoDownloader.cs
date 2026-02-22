@@ -48,53 +48,60 @@ public class PhotoDownloader : IPhotoDownloader
         }
 
         if (!File.Exists(filename))
-            return true;
+            return false;
 
         if (new FileInfo(filename).Length == 0)
-            return true;
+            return false;
 
         _logger.LogDebug("Photo {PhotoIndex} already exists for {PlaceName}, skipping download.", photoIndex, place.DisplayName.Text);
-        return false;
+        return true;
     }
 
-    public async Task<List<PlaceResult>> GetPhotos(List<PlaceResult> placeResults, CancellationToken cancellationToken)
+    private async Task<byte[]> GetSinglePhoto(PlaceResult place, int p, string filename, CancellationToken cancellationToken)
     {
-        var sw = Stopwatch.StartNew();
-        var downloadTasks = placeResults.Select((place, i) => DownloadRestaurantPhotosTask(place, cancellationToken));
+        async Task<byte[]> ReadFromDisk(string filename, CancellationToken cancellationToken)
+        {
+            var image = await File.ReadAllBytesAsync(filename, cancellationToken);
+            return image;
+        }
 
-        await Task.WhenAll(downloadTasks);
+        async Task<byte[]> ReadFromApi(string filename, Photo photo, CancellationToken cancellationToken)
+        {
+            var image = await GetImage(photo, cancellationToken);
+            _ = Task.Run(async () => await File.WriteAllBytesAsync(filename, image, cancellationToken), cancellationToken);
+            return image;
+        }
 
-        var elapsed = sw.Elapsed;
-        _logger.LogInformation("Got all photos in {DlElapsed}", elapsed);
-
-        return placeResults;
+        if (!PhotoInCache(place, p))
+        {
+            return await ReadFromApi(filename, place.Photos[p], cancellationToken);
+        }
+        else
+        {
+            return await ReadFromDisk(filename, cancellationToken);
+        }
     }
-
-    private async Task<bool> DownloadRestaurantPhotosTask(PlaceResult place, CancellationToken cancellationToken)
+    private async Task GetSingleRestaurantPhotos(PlaceResult place, CancellationToken cancellationToken)
     {
         try
         {
             if (place.Photos.Count == 0)
             {
                 _logger.LogWarning("No photo for {PlaceName}", place.DisplayName.Text);
-                return false;
+                return;
             }
 
             for (var p = 0; p < place.Photos.Count; p++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (PhotoInCache(place, p))
-                {
-                    var image = await GetImage(place.Photos[p], cancellationToken);
-                    await File.WriteAllBytesAsync(_fileNamer.GetFilename(place, p), image, cancellationToken);
-                    place.Photos[p].DownloadedImage = image;
-                }
-                else
-                {
-                    var image = await File.ReadAllBytesAsync(_fileNamer.GetFilename(place, p), cancellationToken);
-                    place.Photos[p].DownloadedImage = image;
-                }
+                // The first image gets downloaded early
+                if (place.Photos[p].DownloadedImage.Length > 0)
+                    continue;
+
+                var filename = _fileNamer.GetFilename(place, p);
+                var data = await GetSinglePhoto(place, p, filename, cancellationToken);
+                place.Photos[p].DownloadedImage = data;
             }
         }
         catch (HttpRequestException reqException)
@@ -108,6 +115,37 @@ public class PhotoDownloader : IPhotoDownloader
             throw;
         }
 
-        return true;
+    }
+
+    public async Task<PlaceResult> GetFirstPhoto(PlaceResult placeResult, CancellationToken cancellationToken)
+    {
+        var sw = Stopwatch.StartNew();
+        var data = await GetSinglePhoto(placeResult, 0, _fileNamer.GetFilename(placeResult, 0), cancellationToken);
+        placeResult.Photos[0].DownloadedImage = data;
+
+        var elapsed = sw.Elapsed;
+        _logger.LogInformation("First restaurant photo fetched in {DlElapsed}", elapsed);
+
+        return placeResult;
+    }
+
+    public async Task<PlaceResult> LazyGetPhotos(PlaceResult placeResult, CancellationToken cancellationToken)
+    {
+        var sw = Stopwatch.StartNew();
+        var data = await GetSinglePhoto(placeResult, 0, _fileNamer.GetFilename(placeResult, 0), cancellationToken);
+        placeResult.Photos[0].DownloadedImage = data;
+
+        var elapsed = sw.Elapsed;
+        _logger.LogInformation("First restaurant photo fetched in {DlElapsed}", elapsed);
+
+        _ = Task.Run(async () =>
+        {
+            var swAll = Stopwatch.StartNew();
+            await GetSingleRestaurantPhotos(placeResult, cancellationToken);
+            var elapsedAll = swAll.Elapsed;
+            _logger.LogInformation("All restaurant's photos fetched in {DlElapsed}", elapsedAll);
+        }, cancellationToken);
+
+        return placeResult;
     }
 }
