@@ -1,4 +1,5 @@
-﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
+﻿using RandomRestaurantQuizz.Core.Config;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Core.Photos;
@@ -10,9 +11,10 @@ public class PhotoDownloader : IPhotoDownloader
     private readonly IFileNamer _fileNamer;
     private readonly ILogger<PhotoDownloader> _logger;
 
-    public PhotoDownloader(HttpClient httpClient, SecretsJson config, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
+    public PhotoDownloader(HttpClient httpClient, SecretsJson config, ApiUrls apiUrls, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
     {
         _httpClient = httpClient;
+        _httpClient.BaseAddress = new Uri(apiUrls.QuizzApi);
         _apiKey = config.GooglePlacesApiKey;
         _logger = logger;
         _fileNamer = fileNamer;
@@ -23,7 +25,7 @@ public class PhotoDownloader : IPhotoDownloader
         var segments = photoName.Split('/');
         var placeId = segments[1];
         var photoReference = segments[3];
-        var url = $"https://places.googleapis.com/v1/places/{placeId}/photos/{photoReference}/media?key={_apiKey}&maxWidthPx={maxWidth}";
+        var url = $"/{placeId}/photos/{photoReference}/media?key={_apiKey}&maxWidthPx={maxWidth}";
         return url;
     }
 
@@ -65,7 +67,7 @@ public class PhotoDownloader : IPhotoDownloader
             await stream.CopyToAsync(ms, cancellationToken);
 
             var image = ms.ToArray();
-            await File.WriteAllBytesAsync(filename, image, cancellationToken); // no fire-and-forget (see point 2)
+            await File.WriteAllBytesAsync(filename, image, cancellationToken);
             return image;
         }
 
@@ -113,18 +115,6 @@ public class PhotoDownloader : IPhotoDownloader
             throw;
         }
 
-    }
-
-    public async Task<PlaceResult> GetFirstPhoto(PlaceResult placeResult, CancellationToken cancellationToken)
-    {
-        var sw = Stopwatch.StartNew();
-        var data = await GetSinglePhoto(placeResult, 0, _fileNamer.GetFilename(placeResult, 0), cancellationToken);
-        placeResult.Photos[0].DownloadedImage = data;
-
-        var elapsed = sw.Elapsed;
-        _logger.LogInformation("First restaurant photo fetched in {DlElapsed}", elapsed);
-
-        return placeResult;
     }
 
     public async Task<PlaceResult> LazyGetPhotos(PlaceResult placeResult, CancellationToken cancellationToken)

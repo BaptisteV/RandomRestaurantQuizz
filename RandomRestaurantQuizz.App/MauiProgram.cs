@@ -18,7 +18,8 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #endif
-        builder.Configuration.AddSecretsFromRessources();
+        builder.Configuration.AddSecrets();
+        builder.Configuration.AddAppsettings();
         builder.Services.AddCoreServices();
 
         builder.Services.AddSingleton<MainPageViewModel>();

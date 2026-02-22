@@ -1,4 +1,6 @@
-﻿namespace RandomRestaurantQuizz.Api.CachedClient;
+﻿using RandomRestaurantQuizz.Core.Config;
+
+namespace RandomRestaurantQuizz.Api.CachedClient;
 
 public sealed class GooglePlacesClient : IGooglePlacesClient
 {
@@ -9,10 +11,10 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
     private readonly IPhotoDownloader _photoDownloader;
     private readonly ILogger<GooglePlacesClient> _logger;
 
-    public GooglePlacesClient(HttpClient httpClient, SecretsJson config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
+    public GooglePlacesClient(HttpClient httpClient, ApiUrls apiUrls, SecretsJson config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
     {
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri("https://places.googleapis.com/v1/places:searchNearby");
+        _httpClient.BaseAddress = new Uri(apiUrls.GooglePlacesApi);
         _photoDownloader = photoDownloader;
         _logger = logger;
         _apiKey = config.GooglePlacesApiKey;

@@ -26,4 +26,14 @@
     <AdditionalFiles Remove="C:\Users\Bapt\AppData\Roaming\SonarLint for Visual Studio\.global\csharp\SonarLint.xml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="appsettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

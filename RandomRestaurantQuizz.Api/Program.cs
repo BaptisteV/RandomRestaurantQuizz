@@ -23,7 +23,8 @@ builder.Host
     });
 
 builder.Services.AddOpenApi();
-builder.Configuration.AddSecretsFromRessources();
+builder.Configuration.AddSecrets();
+builder.Configuration.AddAppsettings();
 builder.Services.AddCoreServices();
 builder.Services.AddTransient((_) => new AppDataDb() { DbFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
 builder.Services.AddTransient<IPhotoDownloader, NoOpPhotoDownloader>();

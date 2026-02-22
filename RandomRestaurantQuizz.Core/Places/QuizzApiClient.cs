@@ -1,4 +1,5 @@
-﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
+﻿using RandomRestaurantQuizz.Core.Config;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Core.Places;
@@ -9,11 +10,11 @@ public class QuizzApiClient : IQuizzApiClient
     private readonly ILogger<QuizzApiClient> _logger;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    public QuizzApiClient(HttpClient client, ILogger<QuizzApiClient> logger)
+    public QuizzApiClient(HttpClient client, ApiUrls apiUrls, ILogger<QuizzApiClient> logger)
     {
         _httpClient = client;
         _logger = logger;
-        _httpClient.BaseAddress = new Uri("https://restauquizz.fly.dev/");
+        _httpClient.BaseAddress = new Uri(apiUrls.QuizzApi);
     }
 
     private static bool IsCity(SearchLocation searchLocation)
