@@ -6,5 +6,7 @@ namespace RandomRestaurantQuizz.App.ViewModels;
 public partial class GeoLocPickerViewModel : ObservableObject
 {
     [ObservableProperty]
-    public partial ObservableCollection<string> Locations { get; set; } = [];
+    public partial bool Enabled { get; set; } = false;
+    [ObservableProperty]
+    public partial ObservableCollection<string> GeoLocations { get; set; } = [];
 }

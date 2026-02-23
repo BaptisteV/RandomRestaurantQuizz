@@ -19,19 +19,20 @@ public partial class GeoLocPickerPage : ContentPage
         _vm = vm;
         _geoService = geoService;
         _logger = logger;
-
+        _vm.GeoLocations = new(Locations.Cities.Select(c => "").Append(""));
         BindingContext = _vm;
         InitializeComponent();
     }
 
-    private void CreateLocationButtons()
+    private void SetLocationButtons()
     {
-        _vm.Locations.Add(AroundMe);
-        var cities = Locations.Cities.OrderByDistance(_userGeoloc).Select(c => c.Location.Name);
-        foreach (var city in cities)
+        var cities = Locations.Cities.OrderByDistance(_userGeoloc).Select(c => c.Location.Name).ToArray();
+        _vm.GeoLocations[0] = AroundMe;
+        for (var i = 0; i < cities.Length; i++)
         {
-            _vm.Locations.Add(city);
+            _vm.GeoLocations[i + 1] = cities[i];
         }
+        _vm.Enabled = true;
     }
 
     private async void Btn_Clicked(object? sender, EventArgs e)
@@ -60,7 +61,7 @@ public partial class GeoLocPickerPage : ContentPage
         if (firstLoad)
         {
             _userGeoloc = await _geoService.GetCurrentLocation();
-            CreateLocationButtons();
+            SetLocationButtons();
         }
         firstLoad = false;
     }

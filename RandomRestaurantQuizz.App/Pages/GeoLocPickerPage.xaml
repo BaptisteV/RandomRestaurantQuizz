@@ -10,14 +10,14 @@
              Title="{x:Static res:AppText.GeoLocTitle}">
 
     <VerticalStackLayout VerticalOptions="Center"
-                         MaximumWidthRequest="720">
+                         MaximumWidthRequest="720"
+                         IsEnabled="{Binding Enabled}">
 
-        <CollectionView ItemsSource="{Binding Locations}">
+        <CollectionView ItemsSource="{Binding GeoLocations}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
                     <Button Text="{Binding .}"
                             Margin="0,4"
-                            IsEnabled="true"
                             Clicked="Btn_Clicked" />
                 </DataTemplate>
             </CollectionView.ItemTemplate>
