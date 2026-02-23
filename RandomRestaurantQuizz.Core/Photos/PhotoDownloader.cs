@@ -14,7 +14,7 @@ public class PhotoDownloader : IPhotoDownloader
     public PhotoDownloader(HttpClient httpClient, SecretsJson config, ApiUrls apiUrls, IFileNamer fileNamer, ILogger<PhotoDownloader> logger)
     {
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(apiUrls.QuizzApi);
+        _httpClient.BaseAddress = new Uri(apiUrls.GooglePhotosApi);
         _apiKey = config.GooglePlacesApiKey;
         _logger = logger;
         _fileNamer = fileNamer;
@@ -25,7 +25,7 @@ public class PhotoDownloader : IPhotoDownloader
         var segments = photoName.Split('/');
         var placeId = segments[1];
         var photoReference = segments[3];
-        var url = $"/{placeId}/photos/{photoReference}/media?key={_apiKey}&maxWidthPx={maxWidth}";
+        var url = $"{_httpClient.BaseAddress}{placeId}/photos/{photoReference}/media?key={_apiKey}&maxWidthPx={maxWidth}";
         return url;
     }
 

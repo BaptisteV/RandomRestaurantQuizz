@@ -25,7 +25,6 @@ public static class PlaceResultsExtensions
                     Place = place,
                     Distance = SearchLocation.GetHaversineDistance(searchLocation, new SearchLocation(){ Latitude = place.Location.Latitude, Longitude = place.Location.Longitude, Name = "" })
                 })
-                .Where(x => x.Distance <= SearchLocation.CityMatchRadius)
                 .OrderBy(x => x.Distance)];
         }
     }
