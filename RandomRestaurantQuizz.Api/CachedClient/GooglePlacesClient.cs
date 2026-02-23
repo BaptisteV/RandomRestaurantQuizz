@@ -1,4 +1,5 @@
 ﻿using RandomRestaurantQuizz.Core.Config;
+using System.Diagnostics;
 
 namespace RandomRestaurantQuizz.Api.CachedClient;
 
@@ -82,6 +83,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
 
     public async Task<PlacesApiResponse> GetRestaurants(SearchParams searchParams, CancellationToken cancellationToken)
     {
+        var sw = Stopwatch.StartNew();
         // Get all possible restaurants
         var restaurantsInCity = await RestaurantsAround(searchParams, cancellationToken);
 
@@ -93,7 +95,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         {
             _logger.LogInformation("Deleted {NoRatingCount} restaurants as they don't have a single user rating or no photo", filteredCount);
         }
-        _logger.LogInformation("Downloading all photos for {RestauCount} restaurants", restaurants.Places.Count);
+        _logger.LogInformation("Got {RestauCount} restaurants in {RestauElapsed}", restaurants.Places.Count, sw.Elapsed);
 
         return restaurants;
     }
