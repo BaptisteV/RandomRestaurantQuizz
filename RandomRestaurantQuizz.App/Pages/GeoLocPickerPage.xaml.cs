@@ -44,8 +44,7 @@ public partial class GeoLocPickerPage : ContentPage
         SearchLocation search;
         if (city == AroundMe)
         {
-            search = await _geoService.GetCurrentLocation();
-            await SearchLocationChanged(search);
+            await SearchLocationChanged(_userGeoloc);
         }
         else
         {

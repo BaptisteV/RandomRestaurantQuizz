@@ -2,7 +2,7 @@
 
 public class GeolocationService : IGeolocationService
 {
-    private readonly GeolocationRequest _request = new(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+    private readonly GeolocationRequest _request = new(GeolocationAccuracy.Default);
 
     public async Task<SearchLocation> GetCurrentLocation()
     {
