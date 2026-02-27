@@ -2,5 +2,5 @@
 
 public interface IGeolocationService
 {
-    Task<SearchLocation> GetCurrentLocation();
+    Task<Geoloc> GetCurrentLocation();
 }

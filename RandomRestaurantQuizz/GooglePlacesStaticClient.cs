@@ -1,6 +1,9 @@
-﻿using RandomRestaurantQuizz.Core.Places.GoogleApi;
+﻿using Microsoft.Extensions.Logging;
+using RandomRestaurantQuizz.Core.Places;
+using RandomRestaurantQuizz.Core.Places.GoogleApi;
+using System.Text.Json;
 
-namespace RandomRestaurantQuizz.Core.Places;
+namespace RandomRestaurantQuizz.Console;
 
 public class GooglePlacesStaticClient(
 #pragma warning disable CS9113 // Parameter is unread.

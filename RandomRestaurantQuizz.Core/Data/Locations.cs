@@ -16,15 +16,20 @@ public static class Locations
 
     extension(IImmutableList<SearchLocation> cities)
     {
-        public IEnumerable<SearchLocationWithDistance> OrderByDistance(SearchLocation searchLocation)
+        public IEnumerable<SearchLocationWithDistance> OrderByDistance(Geoloc geoloc)
         {
             return cities
                 .Select(city => new SearchLocationWithDistance
                 {
                     Location = city,
-                    Distance = Geoloc.GetHaversineDistance(searchLocation.Geoloc, city.Geoloc)
+                    Distance = Geoloc.GetHaversineDistance(geoloc, city.Geoloc)
                 })
                 .OrderBy(x => x.Distance);
+        }
+
+        public IEnumerable<SearchLocationWithDistance> OrderByDistance(SearchLocation searchLocation)
+        {
+            return cities.OrderByDistance(searchLocation.Geoloc);
         }
     }
 

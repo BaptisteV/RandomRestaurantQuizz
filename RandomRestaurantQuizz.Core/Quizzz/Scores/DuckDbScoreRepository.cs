@@ -25,8 +25,6 @@ public sealed class DuckDbScoreRepository : IScoreRepository, IDisposable
         if (!_connection.State.HasFlag(ConnectionState.Open))
             await _connection.OpenAsync();
 
-        // await DropTable();
-
         var command = _connection.CreateCommand();
         command.CommandText =
         """

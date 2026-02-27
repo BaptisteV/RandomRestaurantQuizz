@@ -3,18 +3,26 @@ using RandomRestaurantQuizz.Core.Places.GoogleApi;
 
 namespace RandomRestaurantQuizz.Core.Quizzz;
 
-public class RoundManager(IScoreRepository _scoreSaver, IPhotoDownloader _photoDownloader, IQuizzApiClient _restauClient, ILogger<RoundManager> _logger)
+public class RoundManager(
+    IScoreRepository _scoreSaver,
+    IPhotoDownloader _photoDownloader,
+    IQuizzApiClient _restauClient,
+    ILogger<RoundManager> _logger)
 {
     private int PhotoIndex = 0;
     private int RoundNumber = 0;
     private int RoundCount = 0;
     private PlaceResult CurrentPlace = new();
     private SearchParams SearchParams;
-    private readonly Player _player = new();
+    private Player _player = new();
     private readonly Queue<PlaceResult> _nextRestaurants = [];
 
-    public async Task Init(SearchParams searchParams, SearchLocation userLocation, CancellationToken cancellationToken)
+    public async Task Init(SearchParams searchParams, Geoloc userLocation, CancellationToken cancellationToken)
     {
+        _player = new Player();
+        PhotoIndex = 0;
+        RoundNumber = 0;
+
         await _scoreSaver.Init();
 
         var restaurants = await _restauClient.GetRestaurants(searchParams, cancellationToken);
@@ -39,18 +47,15 @@ public class RoundManager(IScoreRepository _scoreSaver, IPhotoDownloader _photoD
             _logger.LogError("No restaurants found for location {LocationName}", SearchParams.Location.Name);
             return;
         }
+
         RoundCount = _nextRestaurants.Count;
     }
 
-    public async Task NextRestaurant(CancellationToken cancellationToken)
+    public async Task<RestaurantChangedEvent> NextRestaurant(CancellationToken cancellationToken)
     {
         PhotoIndex = 0;
         RoundNumber++;
         CurrentPlace = await _photoDownloader.LazyGetPhotos(_nextRestaurants.Dequeue(), cancellationToken);
-    }
-
-    public RestaurantChangedEvent RestaurantChanged()
-    {
         var photoEvent = new PhotoChangedEvent(CurrentPlace.Photos[0].DownloadedImage);
         var round = new Round(
             CurrentPlace.DisplayName.Text,
@@ -97,5 +102,5 @@ public class RoundManager(IScoreRepository _scoreSaver, IPhotoDownloader _photoD
         return new PhotoChangedEvent(CurrentPlace.Photos[PhotoIndex].DownloadedImage);
     }
 
-    public bool RoundFinished() => _nextRestaurants.Count == 0;
+    public bool Finished() => _nextRestaurants.Count == 0;
 }

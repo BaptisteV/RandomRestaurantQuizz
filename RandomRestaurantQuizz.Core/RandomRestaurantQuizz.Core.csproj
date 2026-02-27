@@ -20,6 +20,10 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0-preview.1.26104.118" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.1.26107.1" />
     <PackageReference Include="DuckDB.NET.Data.Full" Version="1.4.4" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.20.0.135146">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

@@ -9,14 +9,12 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
     private readonly string _apiKey;
     private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    private readonly IPhotoDownloader _photoDownloader;
     private readonly ILogger<GooglePlacesClient> _logger;
 
-    public GooglePlacesClient(HttpClient httpClient, ApiUrls apiUrls, SecretsJson config, IPhotoDownloader photoDownloader, ILogger<GooglePlacesClient> logger)
+    public GooglePlacesClient(HttpClient httpClient, ApiUrls apiUrls, SecretsJson config, ILogger<GooglePlacesClient> logger)
     {
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri(apiUrls.GooglePlacesApi);
-        _photoDownloader = photoDownloader;
         _logger = logger;
         _apiKey = config.GooglePlacesApiKey;
     }

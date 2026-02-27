@@ -18,6 +18,7 @@
         <conv:RatingToColorConverter x:Key="RatingToColorConverter"
                                      BaseColor="Gold" />
         <conv:TextToTruncatedTextConverter x:Key="TextToTruncatedTextConverter" />
+        <conv:ScoreDiffToColorConverter x:Key="ScoreDiffToColorConverter" />
     </ContentPage.Resources>
 
     <Grid MaximumWidthRequest="720"
@@ -61,7 +62,7 @@
 
                                 <Label x:Name="ScoreDiffLabel"
                                        Text="{Binding ScoreDiff}"
-                                       Opacity="1.0"
+                                       TextColor="{Binding ScoreDiff, Converter={StaticResource ScoreDiffToColorConverter}}"
                                        FontSize="Medium" />
                             </FlexLayout>
                         </AbsoluteLayout>
@@ -74,7 +75,7 @@
                                ZIndex="1"
                                HeightRequest="240"
                                Source="{Binding ImageSource}"
-                               Aspect="AspectFit"
+                               Aspect="AspectFill"
                                SemanticProperties.Description="Restaurant photo">
                         </Image>
                     </Border>

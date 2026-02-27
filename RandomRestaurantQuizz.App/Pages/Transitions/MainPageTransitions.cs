@@ -1,33 +1,24 @@
 ﻿namespace RandomRestaurantQuizz.App.Pages.Transitions;
 
-public class MainPageTransitions
+public class MainPageTransitions(
+    Image restaurantImage,
+    Label restaurantNameLabel,
+    CollectionView reviewsContainer,
+    Button answerButton) : ITransitions
 {
-    private readonly Image restaurantImage;
-    private readonly Label restaurantNameLabel;
-    private readonly CollectionView reviewsContainer;
-    private readonly Button anserButton;
-
-    public MainPageTransitions(
-        Image restaurantImage,
-        Label restaurantNameLabel,
-        CollectionView reviewsContainer,
-        Button anserButton)
-    {
-        this.restaurantImage = restaurantImage;
-        this.restaurantNameLabel = restaurantNameLabel;
-        this.reviewsContainer = reviewsContainer;
-        this.anserButton = anserButton;
-    }
-
+    private readonly Image _restaurantImage = restaurantImage;
+    private readonly Label _restaurantNameLabel = restaurantNameLabel;
+    private readonly CollectionView _reviewsContainer = reviewsContainer;
+    private readonly Button _answerButton = answerButton;
 
     public void AnimateRestaurantEnd()
     {
-        anserButton.IsEnabled = false;
+        _answerButton.IsEnabled = false;
         _ = Task.Run(async () =>
         {
-            var fadeImage = restaurantImage.FadeToAsync(0, 250);
-            var fadeName = restaurantNameLabel.FadeToAsync(0, 250);
-            var fades = reviewsContainer
+            var fadeImage = _restaurantImage.FadeToAsync(0, 250);
+            var fadeName = _restaurantNameLabel.FadeToAsync(0, 250);
+            var fades = _reviewsContainer
                 .GetVisualTreeDescendants()
                 .Where(e => e.GetType() == typeof(Label))
                 .Select(l => ((Label)l).FadeToAsync(0, 250))
@@ -38,20 +29,20 @@ public class MainPageTransitions
 
     public void AnimateRestaurantStart()
     {
-        anserButton.IsEnabled = true;
+        _answerButton.IsEnabled = true;
         _ = Task.Run(async () =>
         {
             // Cancel animations
-            restaurantImage.CancelAnimations();
-            restaurantNameLabel.CancelAnimations();
-            var labels = reviewsContainer
+            _restaurantImage.CancelAnimations();
+            _restaurantNameLabel.CancelAnimations();
+            var labels = _reviewsContainer
                 .GetVisualTreeDescendants()
                 .OfType<Label>().ToList();
             labels.ForEach(l => l.CancelAnimations());
 
             // Quickly animate back to 1.0
-            var fadeImage = restaurantImage.FadeToAsync(1.0, 50);
-            var fadeName = restaurantNameLabel.FadeToAsync(1.0, 50);
+            var fadeImage = _restaurantImage.FadeToAsync(1.0, 50);
+            var fadeName = _restaurantNameLabel.FadeToAsync(1.0, 50);
             var fades = labels
                 .Select(l => l.FadeToAsync(1.0, 50))
                 .Concat([fadeImage, fadeName]);

@@ -16,8 +16,6 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
     {
         await _connection.OpenAsync();
 
-        //await DropTable();
-
         var command = _connection.CreateCommand();
         command.CommandText =
         """

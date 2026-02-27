@@ -16,8 +16,6 @@ public class QuizzConsoleRunner : IRunner
     {
         _quizzGame = quizz;
         _logger = logger;
-        _quizzGame.PhotoChanged = LogEvent;
-        _quizzGame.ScoreChanged = LogEvent;
         _quizzGame.RoundFinished = LogEvent;
     }
 
@@ -32,7 +30,7 @@ public class QuizzConsoleRunner : IRunner
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         var searchLocation = Locations.Cities.Find(CityName);
-        await _quizzGame.InitRound(new SearchParams() { Language = "fr", Location = searchLocation }, searchLocation, cancellationToken);
+        await _quizzGame.InitRound(new SearchParams() { Language = "fr", Location = searchLocation }, searchLocation.Geoloc, cancellationToken);
 
         while (true)
         {

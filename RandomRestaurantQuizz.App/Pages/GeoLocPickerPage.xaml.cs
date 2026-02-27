@@ -5,19 +5,23 @@ public partial class GeoLocPickerPage : ContentPage
 {
     private readonly GeoLocPickerViewModel _vm;
     private readonly IGeolocationService _geoService;
-    private SearchLocation _userGeoloc;
+    private readonly VmUpdater _vmUpdater;
+    private Geoloc _userGeoloc = new();
     private bool firstLoad = true;
 
     private readonly ILogger<GeoLocPickerPage> _logger;
 
     private static readonly string AroundMe = $"📌 {AppText.AroundMe} 📌";
 
-    public Func<SearchLocation, Task> SearchLocationChanged { get; set; } = (_) => Task.CompletedTask;
-
-    public GeoLocPickerPage(GeoLocPickerViewModel vm, IGeolocationService geoService, ILogger<GeoLocPickerPage> logger)
+    public GeoLocPickerPage(
+        GeoLocPickerViewModel vm,
+        IGeolocationService geoService,
+        VmUpdater vmUpdater,
+        ILogger<GeoLocPickerPage> logger)
     {
         _vm = vm;
         _geoService = geoService;
+        _vmUpdater = vmUpdater;
         _logger = logger;
         _vm.GeoLocations = new(Locations.Cities.Select(c => "").Append(""));
         BindingContext = _vm;
@@ -41,15 +45,14 @@ public partial class GeoLocPickerPage : ContentPage
         var city = btn.Text;
         _logger.LogInformation("Picked {City}", city);
 
-        SearchLocation search;
         if (city == AroundMe)
         {
-            await SearchLocationChanged(_userGeoloc);
+            _vmUpdater.UpdateSearchLocation(new SearchLocation() { Geoloc = _userGeoloc });
         }
         else
         {
-            search = Locations.Cities.Find(city);
-            await SearchLocationChanged(search);
+            var search = Locations.Cities.Find(city);
+            _vmUpdater.UpdateSearchLocation(search);
         }
 
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");

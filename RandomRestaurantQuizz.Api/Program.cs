@@ -23,13 +23,16 @@ builder.Host
     });
 
 builder.Services.AddOpenApi();
+
 builder.Configuration.AddSecrets();
 builder.Configuration.AddAppsettings();
+
 builder.Services.AddCoreServices();
+
 builder.Services.AddTransient((_) => new AppDataDb() { DbFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "scores.db") });
-builder.Services.AddTransient<IPhotoDownloader, NoOpPhotoDownloader>();
+
 builder.Services.AddHttpClient<IGooglePlacesClient, GooglePlacesClient>();
-builder.Services.AddScoped<ICachedPlacesClient, DuckDbCachedPlacesClient>();
+builder.Services.AddSingleton<ICachedPlacesClient, DuckDbCachedPlacesClient>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

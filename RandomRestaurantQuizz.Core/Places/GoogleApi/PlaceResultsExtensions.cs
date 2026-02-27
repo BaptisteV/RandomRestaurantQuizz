@@ -17,13 +17,13 @@ public static class PlaceResultsExtensions
 
     extension(List<PlaceResult> placeResults)
     {
-        public List<PlaceResultWithDistance> OrderByDistance(SearchLocation searchLocation)
+        public List<PlaceResultWithDistance> OrderByDistance(Geoloc geoloc)
         {
             return [.. placeResults
                 .Select(place => new PlaceResultWithDistance
                 {
                     Place = place,
-                    Distance = Geoloc.GetHaversineDistance(searchLocation.Geoloc, place.Location)
+                    Distance = Geoloc.GetHaversineDistance(geoloc, place.Location)
                 })
                 .OrderBy(x => x.Distance)];
         }

@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RandomRestaurantQuizz.Core.Config;
-using RandomRestaurantQuizz.Core.Photos;
-using RandomRestaurantQuizz.Core.SoundEffects;
 using System.Reflection;
 
 namespace RandomRestaurantQuizz.Core;
@@ -23,16 +21,6 @@ public static class IServiceCollectionExtensions
     {
         public void AddCoreServices()
         {
-            services.AddHttpClient<IQuizzApiClient, QuizzApiClient>();
-            services.AddHttpClient<IPhotoDownloader, PhotoDownloader>();
-            services.AddTransient<IFileNamer, FileNamer>();
-
-            services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
-            services.AddSingleton<ISoundEffect, ResourceSoundEffect>();
-            services.AddSingleton<IScoreRepository, SqliteScoreRepository>();
-            services.AddSingleton<RoundManager>();
-            services.AddSingleton<IQuizzGame, QuizzGame>();
-
             services.AddSingleton(sp =>
             {
                 var apiKey = ReadConfig(sp, "GOOGLE_PLACES_API_KEY");

@@ -2,9 +2,51 @@
 using CommunityToolkit.Mvvm.Input;
 using RandomRestaurantQuizz.App.Resources.Strings;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 
 namespace RandomRestaurantQuizz.App.ViewModels;
+
+public class VmUpdater(MainPageViewModel vm)
+{
+    public void UpdateScore(ScoreChangedEvent scoreChangedEvent)
+    {
+        vm.Score = scoreChangedEvent.TotalScore;
+        vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
+    }
+
+    public void UpdatePhoto(PhotoChangedEvent photoChangedEvent)
+    {
+        vm.ImageSource = photoChangedEvent.Source;
+    }
+
+    public void UpdateSearchLocation(SearchLocation searchLocation)
+    {
+        vm.SearchLocation = new VmSearchLocation
+        {
+            Latitude = searchLocation.Geoloc.Latitude,
+            Longitude = searchLocation.Geoloc.Longitude,
+            Name = searchLocation.Name,
+        };
+    }
+
+    public void UpdateRating(double x, double width)
+    {
+        var horizontalRatio = (float)((x - 8.0) / width); // From 0.0 to 1.0
+        vm.RatingInput = Math.Clamp(Math.Round(horizontalRatio * 5.0, 2), 0.0, 5.0);
+        vm.RatingInputText = $"{vm.RatingInput:F2}";
+    }
+
+    public void UpdateRestaurant(RestaurantChangedEvent restaurant)
+    {
+        vm.Round.RestaurantName = restaurant.Round.RestaurantName;
+        vm.SearchLocation.Name = restaurant.Round.LocationName;
+        vm.Round.Progress = restaurant.Round.Progress;
+
+        UpdatePhoto(restaurant.PhotoChangedEvent);
+        vm.Reviews = [.. restaurant.Reviews.ConvertAll(VmReview.FromCoreReview)];
+    }
+}
 
 public partial class MainPageViewModel : ObservableObject
 {
@@ -151,4 +193,27 @@ public class TextToTruncatedTextConverter : IValueConverter
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
+}
+
+public partial class ScoreDiffToColorConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var val = (string)value!;
+        var matches = ScoreDiffRegex.Match(val);
+        if (matches.Success)
+        {
+            var d = double.Parse(matches.Groups[0].Value);
+            return d >= 50.0 ? Colors.Green : Colors.Red;
+        }
+        return Colors.White;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+
+    [GeneratedRegex(@"[+-]?\d+\.\d{2}")]
+    private static partial Regex ScoreDiffRegex { get; }
 }
