@@ -42,18 +42,15 @@ public class RoundManager(IScoreRepository _scoreSaver, IPhotoDownloader _photoD
         RoundCount = _nextRestaurants.Count;
     }
 
-    public async Task<PlaceResult> NextRestaurant(CancellationToken cancellationToken)
+    public async Task NextRestaurant(CancellationToken cancellationToken)
     {
         PhotoIndex = 0;
         RoundNumber++;
-        CurrentPlace = _nextRestaurants.Dequeue();
-        await _photoDownloader.LazyGetPhotos(CurrentPlace, cancellationToken);
-        return CurrentPlace;
+        CurrentPlace = await _photoDownloader.LazyGetPhotos(_nextRestaurants.Dequeue(), cancellationToken);
     }
 
     public RestaurantChangedEvent RestaurantChanged()
     {
-        var scoreEvent = new ScoreChangedEvent(0, 0, 0);
         var photoEvent = new PhotoChangedEvent(CurrentPlace.Photos[0].DownloadedImage);
         var round = new Round(
             CurrentPlace.DisplayName.Text,
@@ -62,7 +59,7 @@ public class RoundManager(IScoreRepository _scoreSaver, IPhotoDownloader _photoD
             RoundCount,
             RoundNumber);
 
-        return new RestaurantChangedEvent(round, CurrentPlace.Reviews, scoreEvent, photoEvent);
+        return new RestaurantChangedEvent(round, CurrentPlace.Reviews, photoEvent);
     }
 
     public async Task<RoundsFinishedEvent> RoundsFinished()
@@ -76,13 +73,17 @@ public class RoundManager(IScoreRepository _scoreSaver, IPhotoDownloader _photoD
         return new RoundsFinishedEvent(_player.TotalScore(), pbs);
     }
 
-    public void SaveAnswer(double guessedRating)
+    public ScoreChangedEvent SaveAnswer(double guessedRating)
     {
         var guess = new Guess(CurrentPlace, guessedRating);
         _player.AddGuess(guess);
 
+        var totalScore = _player.TotalScore();
+        var roundScore = guess.RoundScore();
         _logger.LogInformation("Answered {Guess} for {PlaceName}\tReal ranking {RealRank}", guessedRating, CurrentPlace.DisplayName.Text, CurrentPlace.Rating);
-        _logger.LogInformation("Round score: {RoundScore}, Total: {TotalScore}", guess.RoundScore(), _player.TotalScore());
+        _logger.LogInformation("Round score: {RoundScore}, Total: {TotalScore}", roundScore, totalScore);
+
+        return new ScoreChangedEvent(totalScore, roundScore, CurrentPlace.Rating);
     }
 
     public PhotoChangedEvent NextPhoto()

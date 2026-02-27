@@ -23,7 +23,7 @@ public static class PlaceResultsExtensions
                 .Select(place => new PlaceResultWithDistance
                 {
                     Place = place,
-                    Distance = SearchLocation.GetHaversineDistance(searchLocation, new SearchLocation(){ Latitude = place.Location.Latitude, Longitude = place.Location.Longitude, Name = "" })
+                    Distance = Geoloc.GetHaversineDistance(searchLocation.Geoloc, place.Location)
                 })
                 .OrderBy(x => x.Distance)];
         }

@@ -33,7 +33,8 @@ public class QuizzApiClient : IQuizzApiClient
         // Prevents Google Places API call but reduces accuracy
         var nearCities = Locations.Cities
             .OrderByDistance(searchLocation)
-            .Where(x => x.Distance <= SearchLocation.CityMatchRadius).ToList();
+            .Where(x => x.Distance <= SearchLocation.CityMatchRadius)
+            .ToList();
 
         // Match found
         if (nearCities.Count > 0)
@@ -56,7 +57,7 @@ public class QuizzApiClient : IQuizzApiClient
 
         static Uri GetGeoLocUri(SearchParams sp)
         {
-            return new Uri($"/restaurants?lang={sp.Language}&lat={sp.Location.Latitude}&lng={sp.Location.Longitude}", UriKind.Relative);
+            return new Uri($"/restaurants?lang={sp.Language}&lat={sp.Location.Geoloc.Latitude}&lng={sp.Location.Geoloc.Longitude}", UriKind.Relative);
         }
 
         var normalizedSearchLocation = CityForLocation(searchParams.Location);
@@ -126,7 +127,7 @@ public class QuizzApiClient : IQuizzApiClient
 
         if (response.Places.Count == 0)
         {
-            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchParams.Location.Latitude, searchParams.Location.Longitude, searchParams.Location.Name);
+            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchParams.Location.Geoloc.Latitude, searchParams.Location.Geoloc.Longitude, searchParams.Location.Name);
             return null;
         }
 

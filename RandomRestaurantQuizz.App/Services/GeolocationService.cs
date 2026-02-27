@@ -12,9 +12,11 @@ public class GeolocationService : IGeolocationService
         var roundedLng = Math.Round(location.Longitude, 4);
         return new SearchLocation
         {
-            Latitude = roundedLat,
-            Longitude = roundedLng,
-            Name = $"({roundedLat},{roundedLng})",
+            Geoloc = new Geoloc()
+            {
+                Latitude = roundedLat,
+                Longitude = roundedLng,
+            },
         };
     }
 }

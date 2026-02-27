@@ -5,21 +5,14 @@ namespace RandomRestaurantQuizz.Api;
 
 public static class RestaurantsEndpoints
 {
-    public static async Task<Results<Ok<PlacesApiResponse>, NotFound>> GetRestaurantsByCity(
+    public static async Task<Ok<PlacesApiResponse>> GetRestaurantsByCity(
             [FromServices] ICachedPlacesClient cachedPlacesClient,
             [FromRoute(Name = "city")] string city,
             [FromQuery(Name = "lang")] string lang,
             CancellationToken cancellationToken)
     {
-        var foundCities = Locations.Cities.Where(l => string.Equals(l.Name, city, StringComparison.OrdinalIgnoreCase)).ToList();
-        if (foundCities.Count == 0)
-        {
-            return TypedResults.NotFound();
-        }
-
-        var location = foundCities.Single();
-
-        return await GetRestaurantsByCoordinates(cachedPlacesClient, location.Latitude, location.Longitude, location.Name, lang, cancellationToken);
+        var location = Locations.Cities.Find(city);
+        return await GetRestaurantsByCoordinates(cachedPlacesClient, location.Geoloc.Latitude, location.Geoloc.Longitude, location.Name, lang, cancellationToken);
     }
 
     public static async Task<Ok<PlacesApiResponse>> GetRestaurantsByCoordinates(
@@ -35,9 +28,8 @@ public static class RestaurantsEndpoints
             Language = lang,
             Location = new SearchLocation()
             {
-                Latitude = lat,
-                Longitude = lng,
-                Name = name ?? ""
+                Geoloc = new Geoloc() { Latitude = lat, Longitude = lng },
+                Name = name ?? "",
             }
         };
         var places = await cachedPlacesClient.GetRestaurantsWithCache(location, cancellationToken);

@@ -15,7 +15,7 @@ public sealed class PlaceResult
     public string? FormattedAddress { get; set; }
 
     [JsonPropertyName("location")]
-    public Center Location { get; set; } = new();
+    public Geoloc Location { get; set; } = new();
 
     [JsonPropertyName("photos")]
     public List<Photo> Photos { get; set; } = [];

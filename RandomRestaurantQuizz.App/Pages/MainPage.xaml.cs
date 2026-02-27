@@ -31,7 +31,6 @@ public partial class MainPage : ContentPage, IDisposable
         _quizzGame.PhotoChanged = OnPhotoChanged;
 
         BindingContext = _vm;
-        InitializeComponent();
 
         _ = Task.Run(async () =>
         {
@@ -39,9 +38,10 @@ public partial class MainPage : ContentPage, IDisposable
             await Navigation.PushAsync(_geoPage, false);
         });
 
+        InitializeComponent();
     }
 
-    private async void ContentPage_Loaded(object sender, EventArgs e)
+    private async void ContentPage_Loaded(object? sender, EventArgs e)
     {
         await Navigation.PushModalAsync(new SpinnerModal(), false);
 
@@ -56,9 +56,6 @@ public partial class MainPage : ContentPage, IDisposable
 
     private Task OnRestaurantChanged(RestaurantChangedEvent startedEvent)
     {
-        _vm.Score = startedEvent.ScoreChangedEvent.TotalScore;
-        _vm.ScoreDiff = startedEvent.ScoreChangedEvent.ScoreDiff;
-
         _vm.Round.RestaurantName = startedEvent.Round.RestaurantName;
         _vm.SearchLocation.Name = startedEvent.Round.LocationName;
         _vm.Round.Progress = startedEvent.Round.Progress;
@@ -73,31 +70,20 @@ public partial class MainPage : ContentPage, IDisposable
     {
         _vm.Score = scoreChangedEvent.TotalScore;
         _vm.ScoreDiff = scoreChangedEvent.ScoreDiff;
-        await Task.WhenAll(AnimateScoreDiff(scoreChangedEvent.RoundScore), _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, _cts.Token));
+        ColorScoreDiff(scoreChangedEvent.RoundScore);
+        _ = Task.Run(() => _soundEffects.PlayAnswer(correctnessPercentage: scoreChangedEvent.RoundScore, _cts.Token));
     }
 
-    private async Task AnimateScoreDiff(double roundScore)
+    private void ColorScoreDiff(double roundScore)
     {
-        try
-        {
-            ScoreDiffLabel.CancelAnimations();
-
-            ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
-            ScoreDiffLabel.Opacity = 1.0;
-
-            await ScoreDiffLabel.FadeToAsync(100, 1000, Easing.CubicIn);
-            await Task.Delay(4000, _cts.Token);
-            await ScoreDiffLabel.FadeToAsync(0, 1000, Easing.CubicOut);
-        }
-        catch (TaskCanceledException)
-        {
-            // Do nothing
-        }
+        ScoreDiffLabel.TextColor = roundScore >= 50.0 ? Colors.Green : Colors.Red;
+        ScoreDiffLabel.Opacity = 1.0;
     }
 
     private Task OnPhotoChanged(PhotoChangedEvent photoChangedEvent)
     {
         _logger.LogDebug("Photo changed");
+        AnimateRestaurantStart();
         _vm.ImageSource = photoChangedEvent.Source;
         return Task.CompletedTask;
     }
@@ -115,8 +101,8 @@ public partial class MainPage : ContentPage, IDisposable
         _logger.LogInformation("New location picked: {SearchLocation}", searchLocation.Name);
         _vm.SearchLocation = new VmSearchLocation
         {
-            Latitude = searchLocation.Latitude,
-            Longitude = searchLocation.Longitude,
+            Latitude = searchLocation.Geoloc.Latitude,
+            Longitude = searchLocation.Geoloc.Longitude,
             Name = searchLocation.Name,
         };
     }
@@ -125,8 +111,11 @@ public partial class MainPage : ContentPage, IDisposable
     {
         var searchLocation = new SearchLocation()
         {
-            Latitude = _vm.SearchLocation.Latitude,
-            Longitude = _vm.SearchLocation.Longitude,
+            Geoloc = new Geoloc()
+            {
+                Latitude = _vm.SearchLocation.Latitude,
+                Longitude = _vm.SearchLocation.Longitude,
+            },
             Name = _vm.SearchLocation.Name,
         };
 
@@ -140,7 +129,7 @@ public partial class MainPage : ContentPage, IDisposable
         _cts.Token);
     }
 
-    private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
+    private async void TapGestureRecognizer_Tapped(object? sender, TappedEventArgs e)
     {
         var x = e.GetPosition(PhotoContainer)!.Value.X;
         var width = PhotoContainer.Width;
@@ -157,8 +146,46 @@ public partial class MainPage : ContentPage, IDisposable
         }
     }
 
-    private async void AnswerBtn_Clicked(object sender, EventArgs e)
+    private void AnimateRestaurantEnd()
     {
+        _ = Task.Run(async () =>
+        {
+            var fadeImage = RestaurantImage.FadeToAsync(0, 250);
+            var fadeName = RestaurantNameLabel.FadeToAsync(0, 250);
+            var fades = ReviewsContainer
+                .GetVisualTreeDescendants()
+                .Where(e => e.GetType() == typeof(Label))
+                .Select(l => ((Label)l).FadeToAsync(0, 250))
+                .Concat([fadeImage, fadeName]);
+            await Task.WhenAll(fades);
+        });
+        /*
+        foreach (var r in _vm.Reviews)
+        {
+            r.AuthorName = "";
+            r.RelativePublishTimeDescription = "";
+            r.FullText = "";
+            r.Text = "";
+            r.TruncatedText = "";
+            r.IsExpanded = false;
+        }*/
+    }
+
+    private void AnimateRestaurantStart()
+    {
+        _ = Task.Run(async () =>
+        {
+            RestaurantImage.CancelAnimations();
+            RestaurantNameLabel.CancelAnimations();
+            var fadeImage = RestaurantImage.FadeToAsync(1.0, 50);
+            var fadeName = RestaurantNameLabel.FadeToAsync(1.0, 50);
+            await Task.WhenAll(fadeImage, fadeName);
+        });
+    }
+
+    private async void AnswerBtn_Clicked(object? sender, EventArgs e)
+    {
+        AnimateRestaurantEnd();
         await _quizzGame.Answer(_vm.RatingInput, _cts.Token);
     }
 
@@ -173,7 +200,7 @@ public partial class MainPage : ContentPage, IDisposable
         _cts.Dispose();
     }
 
-    private void RatingPbInput_Tapped(object sender, TappedEventArgs e)
+    private void RatingPbInput_Tapped(object? sender, TappedEventArgs e)
     {
         var x = e.GetPosition(StarsContainer)!.Value.X;
         var width = StarsContainer.Width - 12 - 12;
@@ -183,7 +210,7 @@ public partial class MainPage : ContentPage, IDisposable
         _vm.RatingInputText = $"{_vm.RatingInput:F2}";
     }
 
-    private void ReviewsContainer_SizeChanged(object sender, EventArgs e)
+    private void ReviewsContainer_SizeChanged(object? sender, EventArgs e)
     {
         VmReview.ReviewLabelLength = (int)(ReviewsContainer.Width / 8.2);
         foreach (var review in _vm.Reviews)

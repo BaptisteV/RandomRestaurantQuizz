@@ -30,7 +30,8 @@
         <ScrollView  Grid.Row="0">
             <VerticalStackLayout Spacing="4">
                 <Grid>
-                    <Label Text="{Binding Round.RestaurantName}"
+                    <Label x:Name="RestaurantNameLabel"
+                           Text="{Binding Round.RestaurantName}"
                            HorizontalOptions="Start"
                            FontSize="Small" />
 
@@ -69,7 +70,8 @@
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 4">
 
-                        <Image ZIndex="1"
+                        <Image x:Name="RestaurantImage"
+                               ZIndex="1"
                                HeightRequest="240"
                                Source="{Binding ImageSource}"
                                Aspect="AspectFit"

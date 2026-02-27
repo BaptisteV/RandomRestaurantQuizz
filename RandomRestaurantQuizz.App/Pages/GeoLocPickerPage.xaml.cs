@@ -48,14 +48,14 @@ public partial class GeoLocPickerPage : ContentPage
         }
         else
         {
-            search = Locations.Cities.Single(l => l.Name == city);
+            search = Locations.Cities.Find(city);
             await SearchLocationChanged(search);
         }
 
         await Shell.Current.GoToAsync($"///{nameof(MainPage)}");
     }
 
-    private async void ContentPage_Loaded(object sender, EventArgs e)
+    private async void ContentPage_Loaded(object? sender, EventArgs e)
     {
         if (firstLoad)
         {

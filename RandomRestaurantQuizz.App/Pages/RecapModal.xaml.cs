@@ -8,7 +8,7 @@ public partial class RecapModal : ContentPage
         InitializeComponent();
     }
 
-    private async void CloseBtn_Clicked(object sender, EventArgs e)
+    private async void CloseBtn_Clicked(object? sender, EventArgs e)
     {
         await Navigation.PopModalAsync(true);
     }

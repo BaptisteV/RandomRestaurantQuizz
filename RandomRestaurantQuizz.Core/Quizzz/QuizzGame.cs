@@ -13,7 +13,7 @@ public class QuizzGame(RoundManager roundManager) : IQuizzGame
     {
         await _roundManager.Init(searchParams, userLocation, cancellationToken);
 
-        var currentPlace = await _roundManager.NextRestaurant(cancellationToken);
+        await _roundManager.NextRestaurant(cancellationToken);
 
         await RestaurantChanged(_roundManager.RestaurantChanged());
     }
@@ -26,13 +26,14 @@ public class QuizzGame(RoundManager roundManager) : IQuizzGame
             return;
         }
 
-        var currentPlace = await _roundManager.NextRestaurant(cancellationToken);
-        _roundManager.SaveAnswer(guessedRating);
+        var scoreEvent = _roundManager.SaveAnswer(guessedRating);
+        await ScoreChanged(scoreEvent);
+
+        await _roundManager.NextRestaurant(cancellationToken);
 
         var e = _roundManager.RestaurantChanged();
 
         await Task.WhenAll(
-            ScoreChanged(e.ScoreChangedEvent),
             PhotoChanged(e.PhotoChangedEvent),
             RestaurantChanged(e));
     }

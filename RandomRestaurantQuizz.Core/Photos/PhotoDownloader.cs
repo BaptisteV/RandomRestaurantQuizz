@@ -114,13 +114,13 @@ public class PhotoDownloader : IPhotoDownloader
             _logger.LogError(cancelledException, "Getting image canceled for: {PlaceName}", place.DisplayName.Text);
             throw;
         }
-
     }
 
     public async Task<PlaceResult> LazyGetPhotos(PlaceResult placeResult, CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
         var data = await GetSinglePhoto(placeResult, 0, _fileNamer.GetFilename(placeResult, 0), cancellationToken);
+        await Task.Delay(1000);
         placeResult.Photos[0].DownloadedImage = data;
 
         var elapsed = sw.Elapsed;

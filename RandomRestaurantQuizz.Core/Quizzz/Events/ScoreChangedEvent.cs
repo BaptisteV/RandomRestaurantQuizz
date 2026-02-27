@@ -6,7 +6,7 @@ public class ScoreChangedEvent
     {
         TotalScore = $"{totalScore:F2}";
         RoundScore = roundScore;
-        ScoreDiff = $" +{roundScore} ({locationRating:F2})";
+        ScoreDiff = $" +{roundScore:F2} ({locationRating:F2})";
     }
     public string TotalScore { get; }
     public double RoundScore { get; }

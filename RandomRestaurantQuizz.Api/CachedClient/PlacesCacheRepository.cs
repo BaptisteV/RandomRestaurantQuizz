@@ -11,7 +11,6 @@ public sealed class PlacesCacheRepository : IDisposable
     public PlacesCacheRepository(
         AppDataDb dbPath)
     {
-        // Clear();
         _connection = new DuckDBConnection(dbPath.ConnectionString);
         _connection.Open();
         using var cmd = _connection.CreateCommand();
@@ -65,8 +64,8 @@ public sealed class PlacesCacheRepository : IDisposable
         """;
 
         cmd.Parameters.Add(new DuckDBParameter { Value = cacheKey });
-        cmd.Parameters.Add(new DuckDBParameter { Value = loc.Latitude });
-        cmd.Parameters.Add(new DuckDBParameter { Value = loc.Longitude });
+        cmd.Parameters.Add(new DuckDBParameter { Value = loc.Geoloc.Latitude });
+        cmd.Parameters.Add(new DuckDBParameter { Value = loc.Geoloc.Longitude });
         cmd.Parameters.Add(new DuckDBParameter { Value = SearchLocation.SearchRadius });
         cmd.Parameters.Add(new DuckDBParameter
         {

@@ -10,11 +10,9 @@ public sealed class DuckDbCachedPlacesClient(IGooglePlacesClient googlePlacesCli
 
     private static string CreateCacheKey(SearchParams searchParams)
     {
-        // Round to reduce cache fragmentation (≈ 11m precision)
-        var lat = Math.Round(searchParams.Location.Latitude, 4);
-        var lng = Math.Round(searchParams.Location.Longitude, 4);
+        var cacheGeoloc = Geoloc.ReducePrecision(searchParams.Location.Geoloc);
 
-        return $"restaurants:v1:{searchParams.Language}:{lat}:{lng}:{SearchLocation.SearchRadius}";
+        return $"restaurants:v1:{searchParams.Language}:{cacheGeoloc.Latitude}:{cacheGeoloc.Longitude}:{SearchLocation.SearchRadius}";
     }
 
     public async Task<PlacesApiResponse> GetRestaurantsWithCache(SearchParams searchParams, CancellationToken cancellationToken)

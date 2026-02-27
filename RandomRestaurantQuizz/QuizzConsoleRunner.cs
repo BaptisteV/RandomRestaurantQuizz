@@ -31,7 +31,7 @@ public class QuizzConsoleRunner : IRunner
 #pragma warning disable S2190 // Add a way to break out this method's recursion
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        var searchLocation = Locations.Cities.Single(l => l.Name == CityName);
+        var searchLocation = Locations.Cities.Find(CityName);
         await _quizzGame.InitRound(new SearchParams() { Language = "fr", Location = searchLocation }, searchLocation, cancellationToken);
 
         while (true)

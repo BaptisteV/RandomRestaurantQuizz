@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using RandomRestaurantQuizz.App.Resources.Strings;
-using RandomRestaurantQuizz.Core.Places.GoogleApi;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -13,11 +13,11 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     public partial VmRound Round { get; set; } = new();
     [ObservableProperty]
-    public partial string Score { get; set; }
+    public partial string Score { get; set; } = $"{0.0:F2}";
     [ObservableProperty]
-    public partial string ScoreDiff { get; set; }
+    public partial string ScoreDiff { get; set; } = $" +{0.0:F2} ({0.0:F2})";
     [ObservableProperty]
-    public partial ImageSource ImageSource { get; set; }
+    public partial ImageSource? ImageSource { get; set; }
     [ObservableProperty]
     public partial double RatingInput { get; set; } = 2.5;
     [ObservableProperty]
@@ -26,7 +26,7 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     public partial ObservableCollection<VmReview> Reviews { get; set; } = new();
 
-    public ICommand ToggleReviewCommand => new Command<VmReview>(review =>
+    public ICommand ToggleReviewCommand => new RelayCommand<VmReview>(review =>
     {
         if (review == null) return;
         foreach (var r in Reviews)
@@ -74,12 +74,12 @@ public partial class VmReview : ObservableObject
 
     public static int ReviewLabelLength { get; set; } = 180;
 
-    private static string AddReadMoreIfNeeded(string text)
+    private static string TruncateSingleLine(string text)
     {
         var noBreak = text.Replace('\n', ' ');
         if (noBreak.Length > ReviewLabelLength)
         {
-            var chars = noBreak.Substring(0, ReviewLabelLength - AppText.More.Length) + AppText.More;
+            var chars = string.Concat(noBreak.AsSpan(0, ReviewLabelLength - AppText.More.Length), AppText.More);
 
             return chars;
         }
@@ -88,7 +88,7 @@ public partial class VmReview : ObservableObject
 
     public static VmReview FromCoreReview(Review review)
     {
-        var truncatedText = AddReadMoreIfNeeded(review.Text.Text);
+        var truncatedText = TruncateSingleLine(review.Text.Text);
         return new VmReview
         {
             AuthorName = review.AuthorAttribution.DisplayName,
@@ -138,13 +138,13 @@ public class TextToTruncatedTextConverter : IValueConverter
         return AddReadMoreIfNeeded(text);
     }
 
-    private static object AddReadMoreIfNeeded(string text)
+    private static string AddReadMoreIfNeeded(string text)
     {
         const int maxLineLength = 52;
         const string readMore = "...Read more";
         if (text.Length > maxLineLength)
         {
-            return text.Substring(0, maxLineLength - readMore.Length) + readMore;
+            return string.Concat(text.AsSpan(0, maxLineLength - readMore.Length), readMore);
         }
         return text;
     }

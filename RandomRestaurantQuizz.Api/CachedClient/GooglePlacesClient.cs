@@ -29,7 +29,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
             {
                 Circle = new Circle
                 {
-                    Center = new Center() { Latitude = searchParams.Location.Latitude, Longitude = searchParams.Location.Longitude },
+                    Center = searchParams.Location.Geoloc,
                     Radius = SearchLocation.SearchRadius,
                 }
             },
@@ -67,7 +67,7 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         }
 
         if (response.Places?.Count == 0)
-            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Name);
+            _logger.LogError("No restaurants found in the area centered at ({Lat},{Lng}) with radius {Radius}", searchLocation.Geoloc.Latitude, searchLocation.Geoloc.Longitude, searchLocation.Name);
 
         return response;
     }
