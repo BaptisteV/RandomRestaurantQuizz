@@ -1,4 +1,5 @@
-﻿using RandomRestaurantQuizz.App.Resources.Strings;
+﻿using RandomRestaurantQuizz.App.Pages.MainPage;
+using RandomRestaurantQuizz.App.Resources.Strings;
 namespace RandomRestaurantQuizz.App;
 
 public partial class GeoLocPickerPage : ContentPage
@@ -23,19 +24,23 @@ public partial class GeoLocPickerPage : ContentPage
         _geoService = geoService;
         _vmUpdater = vmUpdater;
         _logger = logger;
-        _vm.GeoLocations = new(Locations.Cities.Select(c => "").Append(""));
         BindingContext = _vm;
         InitializeComponent();
     }
 
     private void SetLocationButtons()
     {
-        var cities = Locations.Cities.OrderByDistance(_userGeoloc).Select(c => c.Location.Name).ToArray();
+        var cities = Locations.Cities
+            .OrderByDistance(_userGeoloc)
+            .Select(c => c.Location.Name)
+            .ToList();
+
         _vm.GeoLocations[0] = AroundMe;
-        for (var i = 0; i < cities.Length; i++)
+        for (var i = 0; i < cities.Count; i++)
         {
             _vm.GeoLocations[i + 1] = cities[i];
         }
+
         _vm.Enabled = true;
     }
 

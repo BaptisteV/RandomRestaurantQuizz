@@ -1,4 +1,4 @@
-﻿using RandomRestaurantQuizz.App.Pages.Transitions;
+﻿using RandomRestaurantQuizz.App.Pages.MainPage;
 using RandomRestaurantQuizz.Core.Photos;
 using RandomRestaurantQuizz.Core.SoundEffects;
 

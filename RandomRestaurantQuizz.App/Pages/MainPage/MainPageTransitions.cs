@@ -1,4 +1,4 @@
-﻿namespace RandomRestaurantQuizz.App.Pages.Transitions;
+﻿namespace RandomRestaurantQuizz.App.Pages.MainPage;
 
 public class MainPageTransitions(
     Image restaurantImage,

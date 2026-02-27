@@ -8,5 +8,5 @@ public partial class GeoLocPickerViewModel : ObservableObject
     [ObservableProperty]
     public partial bool Enabled { get; set; } = false;
     [ObservableProperty]
-    public partial ObservableCollection<string> GeoLocations { get; set; } = [];
+    public partial ObservableCollection<string> GeoLocations { get; set; } = new(Enumerable.Repeat(string.Empty, Locations.Cities.Count + 1));
 }

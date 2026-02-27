@@ -1,4 +1,4 @@
-﻿using RandomRestaurantQuizz.App.Pages.Transitions;
+﻿using RandomRestaurantQuizz.App.Pages.MainPage;
 
 namespace RandomRestaurantQuizz.App;
 

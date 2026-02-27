@@ -4,7 +4,7 @@
              x:Class="RandomRestaurantQuizz.App.MainPage"
              xmlns:controls="clr-namespace:RandomRestaurantQuizz.App;assembly=RandomRestaurantQuizz.App"
              xmlns:vm="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
-             xmlns:conv="clr-namespace:RandomRestaurantQuizz.App.ViewModels"
+             xmlns:conv="clr-namespace:RandomRestaurantQuizz.App.Pages.MainPage"
              xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              x:DataType="vm:MainPageViewModel"
              Loaded="ContentPage_Loaded"
