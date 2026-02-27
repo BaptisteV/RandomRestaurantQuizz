@@ -2,7 +2,7 @@
 
 namespace RandomRestaurantQuizz.App;
 
-internal class Game2(RoundManager roundManager, ISoundEffect soundEffect, VmUpdater vmUpdater) : IQuizzGame
+internal class QuizzGame(RoundManager roundManager, ISoundEffect soundEffect, VmUpdater vmUpdater) : IQuizzGame
 {
     private readonly RoundManager _roundManager = roundManager;
     private readonly ISoundEffect _soundEffects = soundEffect;

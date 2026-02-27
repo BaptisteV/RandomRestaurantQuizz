@@ -39,7 +39,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<VmUpdater>();
         builder.Services.AddSingleton<ITransitions, MainPageTransitions>();
-        builder.Services.AddSingleton<IQuizzGame, Game2>();
+        builder.Services.AddSingleton<IQuizzGame, QuizzGame>();
         builder.Services.AddSingleton<MainPageViewModel>();
         builder.Services.AddSingleton<RecapViewModel>();
         builder.Services.AddSingleton<GeoLocPickerViewModel>();
