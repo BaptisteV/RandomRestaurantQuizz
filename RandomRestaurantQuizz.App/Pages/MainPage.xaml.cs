@@ -1,4 +1,5 @@
-﻿using RandomRestaurantQuizz.Core.SoundEffects;
+﻿using RandomRestaurantQuizz.App.Pages.Transitions;
+using RandomRestaurantQuizz.Core.SoundEffects;
 
 namespace RandomRestaurantQuizz.App;
 
@@ -12,6 +13,8 @@ public partial class MainPage : ContentPage, IDisposable
     private readonly IQuizzGame _quizzGame;
     private readonly GeoLocPickerPage _geoPage;
     private readonly IGeolocationService _geoService;
+    private readonly MainPageTransitions _transitions;
+
     private readonly CancellationTokenSource _cts = new();
 
     public MainPage(IQuizzGame quizz, ILogger<MainPage> logger, ISoundEffect soundEffects, MainPageViewModel vm, GeoLocPickerPage geoPage, IGeolocationService geoService)
@@ -39,13 +42,13 @@ public partial class MainPage : ContentPage, IDisposable
         });
 
         InitializeComponent();
+        _transitions = new MainPageTransitions(RestaurantImage, RestaurantNameLabel, ReviewsContainer, AnswerBtn);
     }
 
     private async void ContentPage_Loaded(object? sender, EventArgs e)
     {
         await Navigation.PushModalAsync(new SpinnerModal(), false);
 
-        _cts.TryReset();
         await _soundEffects.Init();
         await InitWithSpinner();
 
@@ -83,7 +86,7 @@ public partial class MainPage : ContentPage, IDisposable
     private Task OnPhotoChanged(PhotoChangedEvent photoChangedEvent)
     {
         _logger.LogDebug("Photo changed");
-        AnimateRestaurantStart();
+        _transitions.AnimateRestaurantStart();
         _vm.ImageSource = photoChangedEvent.Source;
         return Task.CompletedTask;
     }
@@ -146,46 +149,9 @@ public partial class MainPage : ContentPage, IDisposable
         }
     }
 
-    private void AnimateRestaurantEnd()
-    {
-        _ = Task.Run(async () =>
-        {
-            var fadeImage = RestaurantImage.FadeToAsync(0, 250);
-            var fadeName = RestaurantNameLabel.FadeToAsync(0, 250);
-            var fades = ReviewsContainer
-                .GetVisualTreeDescendants()
-                .Where(e => e.GetType() == typeof(Label))
-                .Select(l => ((Label)l).FadeToAsync(0, 250))
-                .Concat([fadeImage, fadeName]);
-            await Task.WhenAll(fades);
-        });
-        /*
-        foreach (var r in _vm.Reviews)
-        {
-            r.AuthorName = "";
-            r.RelativePublishTimeDescription = "";
-            r.FullText = "";
-            r.Text = "";
-            r.TruncatedText = "";
-            r.IsExpanded = false;
-        }*/
-    }
-
-    private void AnimateRestaurantStart()
-    {
-        _ = Task.Run(async () =>
-        {
-            RestaurantImage.CancelAnimations();
-            RestaurantNameLabel.CancelAnimations();
-            var fadeImage = RestaurantImage.FadeToAsync(1.0, 50);
-            var fadeName = RestaurantNameLabel.FadeToAsync(1.0, 50);
-            await Task.WhenAll(fadeImage, fadeName);
-        });
-    }
-
     private async void AnswerBtn_Clicked(object? sender, EventArgs e)
     {
-        AnimateRestaurantEnd();
+        _transitions.AnimateRestaurantEnd();
         await _quizzGame.Answer(_vm.RatingInput, _cts.Token);
     }
 

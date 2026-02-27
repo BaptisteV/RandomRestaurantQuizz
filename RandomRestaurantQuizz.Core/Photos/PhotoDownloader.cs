@@ -120,7 +120,6 @@ public class PhotoDownloader : IPhotoDownloader
     {
         var sw = Stopwatch.StartNew();
         var data = await GetSinglePhoto(placeResult, 0, _fileNamer.GetFilename(placeResult, 0), cancellationToken);
-        await Task.Delay(1000);
         placeResult.Photos[0].DownloadedImage = data;
 
         var elapsed = sw.Elapsed;
