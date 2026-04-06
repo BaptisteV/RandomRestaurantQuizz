@@ -69,7 +69,7 @@ public class RoundManager(
 
     public async Task<RoundsFinishedEvent> RoundsFinished()
     {
-        await _scoreSaver.SaveScore(new Score { Value = _player.TotalScore(), Timestamp = DateTime.Now, LocationName = CurrentPlace.DisplayName.Text });
+        await _scoreSaver.SaveScore(new Score { Value = _player.TotalScore(), Timestamp = DateTime.Now, LocationName = SearchParams.Location.Name });
 
         var pbs = (await _scoreSaver.ReadScores())
             .SortBest()

@@ -2,7 +2,7 @@
 
 namespace RandomRestaurantQuizz.App;
 
-public partial class MainPage : ContentPage, IDisposable
+public partial class MainPage : ContentPage
 {
     private readonly ILogger<MainPage> _logger;
 
@@ -34,24 +34,9 @@ public partial class MainPage : ContentPage, IDisposable
 
         BindingContext = _vm;
 
-        _ = Task.Run(async () =>
-        {
-            // Show GeoLocPickerPage on start
-            await Navigation.PushAsync(_geoPage, false);
-        });
-
         InitializeComponent();
 
         _quizzGame.SetTransitions(new MainPageTransitions(RestaurantImage, RestaurantNameLabel, ReviewsContainer, AnswerBtn));
-    }
-
-    private async void ContentPage_Loaded(object? sender, EventArgs e)
-    {
-        await Navigation.PushModalAsync(new SpinnerModal(), false);
-
-        await InitWithSpinner();
-
-        await Navigation.PopModalAsync(true);
     }
 
     private async Task OnRoundsFinished(RoundsFinishedEvent roundFinishedEvent)
@@ -62,7 +47,7 @@ public partial class MainPage : ContentPage, IDisposable
         await Navigation.PushModalAsync(new RecapModal(recapVm), true);
     }
 
-    private async Task InitWithSpinner()
+    private async Task Init()
     {
         var searchLocation = new SearchLocation()
         {
@@ -106,17 +91,6 @@ public partial class MainPage : ContentPage, IDisposable
         await _quizzGame.Answer(_vm.RatingInput, _cts.Token);
     }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        _cts.Dispose();
-    }
-
     private void RatingPbInput_Tapped(object? sender, TappedEventArgs e)
     {
         var x = e.GetPosition(StarsContainer)!.Value.X;
@@ -131,5 +105,12 @@ public partial class MainPage : ContentPage, IDisposable
         {
             review.Text = review.IsExpanded ? review.FullText : review.TruncatedText;
         }
+    }
+
+    private async void ContentPage_NavigatedTo(object sender, NavigatedToEventArgs e)
+    {
+        _vm.IsLoading = true;
+        await Init();
+        _vm.IsLoading = false;
     }
 }

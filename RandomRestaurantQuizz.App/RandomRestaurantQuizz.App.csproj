@@ -95,7 +95,7 @@
     <MauiXaml Update="Pages\RecapModal.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="Pages\SpinnerModal.xaml">
+    <MauiXaml Update="Pages\SpinnerView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
   </ItemGroup>
@@ -107,6 +107,9 @@
   <ItemGroup>
     <Compile Update="Pages\GeoLocPickerPage.xaml.cs">
       <DependentUpon>GeoLocPickerPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\SpinnerView.xaml.cs">
+      <DependentUpon>SpinnerView.xaml</DependentUpon>
     </Compile>
     <Compile Update="Resources\Strings\AppText.Designer.cs">
       <DesignTime>True</DesignTime>

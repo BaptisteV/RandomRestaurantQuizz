@@ -9,6 +9,8 @@ namespace RandomRestaurantQuizz.App.ViewModels;
 public partial class MainPageViewModel : ObservableObject
 {
     [ObservableProperty]
+    public partial bool IsLoading { get; set; } = true;
+    [ObservableProperty]
     public partial VmSearchLocation SearchLocation { get; set; } = new();
     [ObservableProperty]
     public partial VmRound Round { get; set; } = new();

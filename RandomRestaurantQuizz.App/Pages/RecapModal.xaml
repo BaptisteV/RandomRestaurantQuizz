@@ -24,13 +24,13 @@
                         <VerticalStackLayout>
                             <Grid>
                                 <Label Text="{Binding LocationName}"
-                                       FontSize="18"
+                                       FontSize="14"
                                        HorizontalOptions="Start" />
                                 <Label Text="{Binding Timestamp}"
-                                       FontSize="18"
+                                       FontSize="14"
                                        HorizontalOptions="Center" />
                                 <Label Text="{Binding Value, StringFormat='{0:F2}'}"
-                                       FontSize="18"
+                                       FontSize="14"
                                        FontAttributes="Bold"
                                        HorizontalOptions="End" />
                             </Grid>

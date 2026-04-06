@@ -7,7 +7,7 @@
              xmlns:conv="clr-namespace:RandomRestaurantQuizz.App.Pages.MainPage"
              xmlns:res="clr-namespace:RandomRestaurantQuizz.App.Resources.Strings"
              x:DataType="vm:MainPageViewModel"
-             Loaded="ContentPage_Loaded"
+             NavigatedTo="ContentPage_NavigatedTo"
              Padding="16"
              Title="{Binding SearchLocation.Name}">
 
@@ -20,137 +20,139 @@
         <conv:TextToTruncatedTextConverter x:Key="TextToTruncatedTextConverter" />
         <conv:ScoreDiffToColorConverter x:Key="ScoreDiffToColorConverter" />
     </ContentPage.Resources>
+    <Grid>
+        <Grid MaximumWidthRequest="720"
+              Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="72"></RowDefinition>
+                <RowDefinition Height="72"></RowDefinition>
+            </Grid.RowDefinitions>
+            <ScrollView  Grid.Row="0">
+                <VerticalStackLayout Spacing="4">
+                    <Grid>
+                        <Label x:Name="RestaurantNameLabel"
+                               Text="{Binding Round.RestaurantName}"
+                               HorizontalOptions="Start"
+                               FontSize="Small" />
 
-    <Grid MaximumWidthRequest="720"
-          Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="72"></RowDefinition>
-            <RowDefinition Height="72"></RowDefinition>
-        </Grid.RowDefinitions>
-        <ScrollView  Grid.Row="0">
-            <VerticalStackLayout Spacing="4">
-                <Grid>
-                    <Label x:Name="RestaurantNameLabel"
-                           Text="{Binding Round.RestaurantName}"
-                           HorizontalOptions="Start"
-                           FontSize="Small" />
+                        <Label Text="{Binding Round.Progress}"
+                               HorizontalOptions="End"
+                               FontSize="Small" />
+                    </Grid>
 
-                    <Label Text="{Binding Round.Progress}"
-                           HorizontalOptions="End"
-                           FontSize="Small" />
-                </Grid>
+                    <Grid x:Name="PhotoContainer">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+                        </Grid.GestureRecognizers>
+                        <Border BackgroundColor="#40000000"
+                                Padding="4,0"
+                                Margin="4"
+                                ZIndex="2"
+                                Stroke="#40FFFFFF"
+                                Opacity="0.8"
+                                StrokeShape="RoundRectangle 4"
+                                StrokeThickness="2"
+                                HorizontalOptions="End"
+                                VerticalOptions="Start">
+                            <AbsoluteLayout HorizontalOptions="End">
+                                <FlexLayout JustifyContent="Center">
+                                    <Label Text="{Binding Score}"
+                                           FontSize="Large" />
 
-                <Grid x:Name="PhotoContainer">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
-                    </Grid.GestureRecognizers>
-                    <Border BackgroundColor="#40000000"
-                            Padding="4,0"
-                            Margin="4"
-                            ZIndex="2"
-                            Stroke="#40FFFFFF"
-                            Opacity="0.8"
-                            StrokeShape="RoundRectangle 4"
-                            StrokeThickness="2"
-                            HorizontalOptions="End"
-                            VerticalOptions="Start">
-                        <AbsoluteLayout HorizontalOptions="End">
-                            <FlexLayout JustifyContent="Center">
-                                <Label Text="{Binding Score}"
-                                       FontSize="Large" />
+                                    <Label x:Name="ScoreDiffLabel"
+                                           Text="{Binding ScoreDiff}"
+                                           TextColor="{Binding ScoreDiff, Converter={StaticResource ScoreDiffToColorConverter}}"
+                                           FontSize="Medium" />
+                                </FlexLayout>
+                            </AbsoluteLayout>
+                        </Border>
+                        <Border Stroke="#40FFFFFF"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 4">
 
-                                <Label x:Name="ScoreDiffLabel"
-                                       Text="{Binding ScoreDiff}"
-                                       TextColor="{Binding ScoreDiff, Converter={StaticResource ScoreDiffToColorConverter}}"
-                                       FontSize="Medium" />
-                            </FlexLayout>
-                        </AbsoluteLayout>
-                    </Border>
-                    <Border Stroke="#40FFFFFF"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 4">
+                            <Image x:Name="RestaurantImage"
+                                   ZIndex="1"
+                                   HeightRequest="240"
+                                   Source="{Binding ImageSource}"
+                                   Aspect="AspectFill"
+                                   SemanticProperties.Description="Restaurant photo">
+                            </Image>
+                        </Border>
+                    </Grid>
 
-                        <Image x:Name="RestaurantImage"
-                               ZIndex="1"
-                               HeightRequest="240"
-                               Source="{Binding ImageSource}"
-                               Aspect="AspectFill"
-                               SemanticProperties.Description="Restaurant photo">
-                        </Image>
-                    </Border>
-                </Grid>
+                    <CollectionView ItemsSource="{Binding Reviews}"
+                                    x:Name="ReviewsContainer"
+                                    SizeChanged="ReviewsContainer_SizeChanged"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="conv:VmReview">
+                                <FlexLayout Direction="Column">
+                                    <FlexLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=BindingContext.ToggleReviewCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </FlexLayout.GestureRecognizers>
 
-                <CollectionView ItemsSource="{Binding Reviews}"
-                                x:Name="ReviewsContainer"
-                                SizeChanged="ReviewsContainer_SizeChanged"
-                                SelectionMode="None">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="vm:VmReview">
-                            <FlexLayout Direction="Column">
-                                <FlexLayout.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=BindingContext.ToggleReviewCommand}"
-                                                          CommandParameter="{Binding .}" />
-                                </FlexLayout.GestureRecognizers>
+                                    <BoxView HeightRequest="1"
+                                             Background="{StaticResource SoftGold}" />
 
-                                <BoxView HeightRequest="1"
-                                         Background="{StaticResource SoftGold}" />
+                                    <HorizontalStackLayout Spacing="8"
+                                                           Margin="0,1,0,0">
+                                        <Label Text="{Binding AuthorName}"
+                                               FontAttributes="Bold"
+                                               FontSize="12" />
 
-                                <HorizontalStackLayout Spacing="8"
-                                                       Margin="0,1,0,0">
-                                    <Label Text="{Binding AuthorName}"
-                                           FontAttributes="Bold"
-                                           FontSize="12" />
+                                        <Label Text="{Binding RelativePublishTimeDescription}"
+                                               FontSize="12" />
+                                    </HorizontalStackLayout>
 
-                                    <Label Text="{Binding RelativePublishTimeDescription}"
-                                           FontSize="12" />
-                                </HorizontalStackLayout>
+                                    <Label Text="{Binding Text}"
+                                           Padding="0,4"
+                                           HorizontalTextAlignment="Start"
+                                           FontFamily="TypewriterMonospace"
+                                           MaxLines="{Binding IsExpanded, Converter={StaticResource BoolToMaxLinesConverter}}"
+                                           FontSize="14">
+                                    </Label>
 
-                                <Label Text="{Binding Text}"
-                                       Padding="0,4"
-                                       HorizontalTextAlignment="Start"
-                                       FontFamily="TypewriterMonospace"
-                                       MaxLines="{Binding IsExpanded, Converter={StaticResource BoolToMaxLinesConverter}}"
-                                       FontSize="14">
-                                </Label>
+                                </FlexLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
 
-                            </FlexLayout>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                    <BoxView HeightRequest="1"
+                             Background="{StaticResource SoftGold}" />
 
-                <BoxView HeightRequest="1"
-                         Background="{StaticResource SoftGold}" />
+                </VerticalStackLayout>
+            </ScrollView>
+            <Border Grid.Row="1"
+                    x:Name="StarsContainer"
+                    Stroke="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}"
+                    StrokeThickness="2"
+                    Opacity="0.8"
+                    StrokeShape="RoundRectangle 8"
+                    HorizontalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
+                </Border.GestureRecognizers>
+                <controls:StarRating ZIndex="2"
+                                     StarSize="44"
+                                     HorizontalOptions="Fill"
+                                     Rating="{Binding RatingInput}">
+                </controls:StarRating>
+            </Border>
 
-            </VerticalStackLayout>
-        </ScrollView>
-        <Border Grid.Row="1"
-                x:Name="StarsContainer"
-                Stroke="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}"
-                StrokeThickness="2"
-                Opacity="0.8"
-                StrokeShape="RoundRectangle 8"
-                HorizontalOptions="Center">
-            <Border.GestureRecognizers>
-                <TapGestureRecognizer Tapped="RatingPbInput_Tapped" />
-            </Border.GestureRecognizers>
-            <controls:StarRating ZIndex="2"
-                                 StarSize="44"
-                                 HorizontalOptions="Fill"
-                                 Rating="{Binding RatingInput}">
-            </controls:StarRating>
-        </Border>
-
-        <Button Grid.Row="2"
-                x:Name="AnswerBtn"
-                Text="{Binding RatingInputText}"
-                SemanticProperties.Hint="{x:Static res:AppText.Answer}"
-                Clicked="AnswerBtn_Clicked"
-                HorizontalOptions="Fill"
-                IsEnabled="false"
-                FontSize="Medium"
-                Background="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}">
-        </Button>
+            <Button Grid.Row="2"
+                    x:Name="AnswerBtn"
+                    Text="{Binding RatingInputText}"
+                    SemanticProperties.Hint="{x:Static res:AppText.Answer}"
+                    Clicked="AnswerBtn_Clicked"
+                    HorizontalOptions="Fill"
+                    IsEnabled="false"
+                    FontSize="Medium"
+                    Background="{Binding RatingInput, Converter={StaticResource RatingToColorConverter}}">
+            </Button>
+        </Grid>
+        <controls:SpinnerView x:Name="Spinner"
+                               IsVisible="{Binding IsLoading}" />
     </Grid>
-
 </ContentPage>
