@@ -11,6 +11,10 @@ A .NET MAUI app that consumes the [Api](#api)
 
 Can target **Windows** or **Android**
 
+Mainly uses
+- **DuckDB**: Cache results for known cities in [Api](#api)
+- **SQLite**: Store player scores locally in [App](#app)
+
 ## Console
 A simple console app to play a single round
 
