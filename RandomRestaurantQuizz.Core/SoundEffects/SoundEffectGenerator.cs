@@ -130,11 +130,7 @@ public class RawSourceWaveStream : WaveStream
 
     public override WaveFormat WaveFormat => waveFormat;
     public override long Length => audioData.Length * 4;
-    public override long Position
-    {
-        get => position;
-        set => position = value;
-    }
+    public override long Position { get; set; } = 0;
 
     public override int Read(byte[] buffer, int offset, int count)
     {

@@ -12,15 +12,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DuckDB.NET.Bindings.Full" Version="1.4.4" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="11.0.0-preview.1.26104.118" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="11.0.0-preview.1.26104.118" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="DuckDB.NET.Bindings.Full" Version="1.5.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="11.0.0-preview.2.26159.112" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="11.0.0-preview.2.26159.112" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="11.0.0-preview.2.26159.112" />
+    <PackageReference Include="NAudio" Version="2.3.0" />
     <PackageReference Include="Plugin.Maui.Audio" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0-preview.1.26104.118" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.1.26107.1" />
-    <PackageReference Include="DuckDB.NET.Data.Full" Version="1.4.4" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.20.0.135146">
+    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0-preview.2.26159.112" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.2.26152.10" />
+    <PackageReference Include="DuckDB.NET.Data.Full" Version="1.5.0" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.22.0.136894">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

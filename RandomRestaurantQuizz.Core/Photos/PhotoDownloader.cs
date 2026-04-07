@@ -109,9 +109,9 @@ public class PhotoDownloader : IPhotoDownloader
             _logger.LogError(reqException, "Failed to get image for place: {PlaceName}", place.DisplayName.Text);
             throw;
         }
-        catch (OperationCanceledException cancelledException)
+        catch (OperationCanceledException canceledException)
         {
-            _logger.LogError(cancelledException, "Getting image canceled for: {PlaceName}", place.DisplayName.Text);
+            _logger.LogError(canceledException, "Getting image canceled for: {PlaceName}", place.DisplayName.Text);
             throw;
         }
     }

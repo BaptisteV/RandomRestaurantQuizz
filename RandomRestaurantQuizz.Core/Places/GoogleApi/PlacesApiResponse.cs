@@ -1,7 +1,5 @@
 ﻿namespace RandomRestaurantQuizz.Core.Places.GoogleApi;
 
-
-
 public sealed class PlacesApiResponse
 {
     [JsonPropertyName("places")]

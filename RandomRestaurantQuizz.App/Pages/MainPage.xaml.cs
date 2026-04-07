@@ -2,7 +2,7 @@
 
 namespace RandomRestaurantQuizz.App;
 
-public partial class MainPage : ContentPage
+public partial class MainPage : ContentPage, IDisposable
 {
     private readonly ILogger<MainPage> _logger;
 
@@ -107,10 +107,20 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async void ContentPage_NavigatedTo(object sender, NavigatedToEventArgs e)
+    private async void ContentPage_NavigatedTo(object? sender, NavigatedToEventArgs e)
     {
         _vm.IsLoading = true;
         await Init();
         _vm.IsLoading = false;
+    }
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        _cts.Dispose();
     }
 }

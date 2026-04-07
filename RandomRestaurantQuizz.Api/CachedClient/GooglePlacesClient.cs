@@ -95,6 +95,6 @@ public sealed class GooglePlacesClient : IGooglePlacesClient
         }
         _logger.LogInformation("Got {RestauCount} restaurants in {RestauElapsed}", restaurants.Places.Count, sw.Elapsed);
 
-        return restaurants;
+        return restaurants.GetNearestPlaces(searchParams.Location.Geoloc);
     }
 }

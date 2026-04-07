@@ -5,11 +5,11 @@ using System.Text.Json;
 
 namespace RandomRestaurantQuizz.Console;
 
-public class GooglePlacesStaticClient(
+public class QuizzStaticClient(
 #pragma warning disable CS9113 // Parameter is unread.
     HttpClient _,
 #pragma warning restore CS9113 // Parameter is unread.
-    ILogger<GooglePlacesStaticClient> logger) : IQuizzApiClient
+    ILogger<QuizzStaticClient> logger) : IQuizzApiClient
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -30,7 +30,7 @@ public class GooglePlacesStaticClient(
 
         return new QuizzApiResult()
         {
-            ApiResponse = restaurants,
+            ApiResponse = restaurants.GetNearestPlaces(searchParams.Location.Geoloc),
             Searched = searchParams,
         };
     }

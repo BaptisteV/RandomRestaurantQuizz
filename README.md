@@ -1,4 +1,4 @@
-### RestauQuizz
+# RestauQuizz
 Guess the rating of a restaurant based on photos and reviews
 
 ## Api

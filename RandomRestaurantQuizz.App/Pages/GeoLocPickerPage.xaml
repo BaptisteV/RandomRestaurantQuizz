@@ -17,7 +17,8 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
                     <Button Text="{Binding .}"
-                            Margin="0,4"
+                            Margin="4"
+                            FontSize="Large"
                             Clicked="Btn_Clicked" />
                 </DataTemplate>
             </CollectionView.ItemTemplate>

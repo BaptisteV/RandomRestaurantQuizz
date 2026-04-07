@@ -97,7 +97,7 @@ public class QuizzApiClient : IQuizzApiClient
 
         return new QuizzApiResult()
         {
-            ApiResponse = response,
+            ApiResponse = response.GetNearestPlaces(searchParams.Location.Geoloc),
             Searched = searchParams,
         };
     }

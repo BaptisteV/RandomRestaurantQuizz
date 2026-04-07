@@ -29,7 +29,9 @@ public sealed class SqliteScoreRepository : IScoreRepository, IDisposable
         await command.ExecuteNonQueryAsync();
     }
 
+#pragma warning disable S1144 // Unused private types or members should be removed
     private async Task DropTable()
+#pragma warning restore S1144 // Unused private types or members should be removed
     {
         var command = _connection.CreateCommand();
         command.CommandText =

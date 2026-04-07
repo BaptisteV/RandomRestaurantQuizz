@@ -26,7 +26,7 @@ public partial class RecapViewModel : ObservableObject
             Value = s.Value,
             LocationName = s.LocationName,
         });
-        Scores = new(vmScores);
+        Scores = [with(vmScores)];
         ScoreText = $"{AppText.ScoreHeader}{TotalScore:F2}";
     }
 
